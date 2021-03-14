@@ -6,6 +6,10 @@
 			[
 				{
 					"build" : ".",
+					"childIndexes" : 
+					[
+						1
+					],
 					"minimumCMakeVersion" : 
 					{
 						"string" : "3.0.0"
@@ -16,6 +20,20 @@
 					[
 						0
 					]
+				},
+				{
+					"build" : "lib",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.0.0"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "lib",
+					"targetIndexes" : 
+					[
+						1
+					]
 				}
 			],
 			"name" : "Debug",
@@ -24,12 +42,14 @@
 				{
 					"directoryIndexes" : 
 					[
-						0
+						0,
+						1
 					],
 					"name" : "automatic_suspension_system",
 					"targetIndexes" : 
 					[
-						0
+						0,
+						1
 					]
 				}
 			],
@@ -38,8 +58,15 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "automatic_suspension_system::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-automatic_suspension_system-Debug-7a90b294c214ebcf8591.json",
+					"jsonFile" : "target-automatic_suspension_system-Debug-654ff2659bd1e16e4bb2.json",
 					"name" : "automatic_suspension_system",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "lib::@306ed2d68c6501e8728f",
+					"jsonFile" : "target-lib-Debug-4bcec8452807bb46dbaf.json",
+					"name" : "lib",
 					"projectIndex" : 0
 				}
 			]

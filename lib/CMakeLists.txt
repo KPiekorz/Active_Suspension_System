@@ -1,0 +1,1 @@
+add_library(lib auto_model accelerometer_manager)
