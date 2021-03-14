@@ -94,6 +94,11 @@
 				"backtrace" : 2,
 				"fragment" : "lib/liblib.a",
 				"role" : "libraries"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "-lpthread",
+				"role" : "libraries"
 			}
 		],
 		"language" : "C"

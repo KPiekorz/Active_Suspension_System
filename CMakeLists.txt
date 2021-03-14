@@ -5,7 +5,7 @@ add_subdirectory(lib)
 
 add_executable(automatic_suspension_system main.c)
 
-target_link_libraries(automatic_suspension_system PUBLIC lib)
+target_link_libraries(automatic_suspension_system PUBLIC lib pthread)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
