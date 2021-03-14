@@ -1,11 +1,16 @@
 #include "auto_model.h"
 #include <stdio.h>
-#include "accelerometer_manager.h"
 
-void AutoModel_ModelState(void)
+/**** STATIC HELPER FUNCTION ****/
+
+
+
+/**** GLOBAL FUNCTION ****/
+
+void AutoModel_Init(void)
 {
-    printf("Model state!!!\n");
-    printf("This is extra model!!!\n");
+    printf("Init car model task.");
 
-    AccelerometerManager_Init();
+
 }
+

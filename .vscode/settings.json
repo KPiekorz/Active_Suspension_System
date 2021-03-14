@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "auto_model.h": "c",
-        "accelerometer_manager.h": "c"
+        "accelerometer_manager.h": "c",
+        "stdio.h": "c"
     }
 }

@@ -13,7 +13,7 @@ static void main_PrintArgs(int argc, char *argv[]);
 int main(int argc, char *argv[])
 {
     // main_PrintArgs(argc, argv);
-    // AutoModel_ModelState();
+    AutoModel_ModelState();
 
     // create basic pthread app
 	pid_t pid;
