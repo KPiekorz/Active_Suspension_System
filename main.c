@@ -1,5 +1,4 @@
 #include <stdio.h>
-// #include <conio.h>
 #include "accelerometer_manager.h"
 #include "auto_model.h"
 #include <pthread.h>
