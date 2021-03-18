@@ -2,7 +2,7 @@
 
 ## System description 
 
-A system that allows for adaptive control of the suspension of a modern BMW or AUDI electric car. 
+A system that allows for adaptive control of the suspension of a modern BMW or AUDI electric car (mock different sensor and components of system, which allow to simulate it).
 
 ## System requirements
 

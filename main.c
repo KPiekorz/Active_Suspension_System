@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "accelerometer_manager.h"
+#include "gyro_manager.h"
 #include "auto_model.h"
 #include <pthread.h>
 #include <stdlib.h>
@@ -18,9 +19,11 @@ typedef struct
 const module_init_t system_module_init[] = 
 {
     {AutoModel_Init},
+    {AccelerometerManager_Init},
+    {GyroManager_Init},
 };
 
-#define GetModulesCount()   (sizeof(system_module_init)/sizeof(module_init_t))    
+#define GetModulesCount()   ((int)(sizeof(system_module_init)/sizeof(module_init_t)))    
 
 /* static helper function prototype */
 static void main_PrintArgs(int argc, char *argv[]);
@@ -31,25 +34,7 @@ int main(int argc, char *argv[])
     // main_PrintArgs(argc, argv);
     // AutoModel_ModelState();
 
-    /* create another process */
-	pid_t pid = fork();
-
-    if (0 == pid)
-    {
-        /* child process */
-        
-    }
-    else
-    {
-        /* parent process */
-
-    }
-
-	printf("I'm a child process talking to you from another program, pid = %d\n", getpid());
-	printf("I'm a child process talking to you from another program, my parent pid = %d\n", getppid());
-
-	printf("Type 'q' to quit both processes.\n");
-	while(getc(stdin) == 'q') {}
+    main_InitSystemModules();
 
 	return EXIT_SUCCESS;
 }
@@ -87,7 +72,7 @@ static void main_InitSystemModules(void)
 {
     //Parent code (Before all child processes start)
 
-    printf("Suspension system modules count: %d", GetModulesCount());
+    printf("Suspension system modules count: %d\n", GetModulesCount());
 
     // for (int i = 0; i < GetModulesCount(); i++)
     // {
@@ -97,7 +82,7 @@ static void main_InitSystemModules(void)
     //         /* child code */
     //         system_module_init[i].module_init_func();
 
-    //         // it is child process now and before that all threads within process should be joined and after that process can exit(0) (with code zero = mean success)
+    //it is child process now and before that all threads within process should be joined and after that process can exit(0) (with code zero = mean success)
     //         exit(EXIT_SUCCESS);
     //     }
     // }
@@ -107,5 +92,27 @@ static void main_InitSystemModules(void)
     // while ((wpid = wait(&status)) > 0); // this way, the father waits for all the child processes 
 
     //Parent code (After all child processes end)
+
+
+    // old code maby will be useful
+       /* create another process */
+	// pid_t pid = fork();
+
+    // if (0 == pid)
+    // {
+    //     /* child process */
+        
+    // }
+    // else
+    // {
+    //     /* parent process */
+
+    // }
+
+	// printf("I'm a child process talking to you from another program, pid = %d\n", getpid());
+	// printf("I'm a child process talking to you from another program, my parent pid = %d\n", getppid());
+
+	// printf("Type 'q' to quit both processes.\n");
+	// while(getc(stdin) == 'q') {}
 
 }

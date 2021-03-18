@@ -8,7 +8,9 @@
 #define AUTO_MODEL_H
 
 /**
- * Init model and associated task with model
+ * @brief  Iint car simulation model
+ * @note   
+ * @retval None
  */
 void AutoModel_Init(void);
 

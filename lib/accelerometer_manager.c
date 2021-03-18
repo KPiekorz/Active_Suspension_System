@@ -3,5 +3,8 @@
 
 void AccelerometerManager_Init(void)
 {
-    printf("Accel init!\n");
+    printf("Init accelerometer manager module...");
+
+	printf("Type 'q' to quit both processes.\n");
+	while(getc(stdin) == 'q') {}
 }

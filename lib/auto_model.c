@@ -9,7 +9,7 @@
 
 void AutoModel_Init(void)
 {
-    printf("Init car model task...");
+    printf("Init car model module...");
 
 	printf("Type 'q' to quit both processes.\n");
 	while(getc(stdin) == 'q') {}
