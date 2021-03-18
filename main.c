@@ -54,6 +54,13 @@ int main(int argc, char *argv[])
 	return EXIT_SUCCESS;
 }
 
+/**
+ * @brief  Print program arguments entered by user.
+ * @note   
+ * @param  argc: 
+ * @param  *argv[]: 
+ * @retval None
+ */
 static void main_PrintArgs(int argc, char *argv[])
 {
     int i;
@@ -72,29 +79,32 @@ static void main_PrintArgs(int argc, char *argv[])
 }
 
 /**
- * Init system modules, whcich is in declarated in modules array.
+ * @brief Init system modules, whcich is in declarated in modules array.
+ * @note   
+ * @retval None
  */
 static void main_InitSystemModules(void)
 {
     //Parent code (Before all child processes start)
 
+    printf("Suspension system modules count: %d", GetModulesCount());
 
-    for (int i = 0; i < GetModulesCount(); i++)
-    {
-        pid_t child_pid = fork();
-        if (0 == child_pid) 
-        {
-            /* child code */
-            system_module_init[i].module_init_func();
+    // for (int i = 0; i < GetModulesCount(); i++)
+    // {
+    //     pid_t child_pid = fork();
+    //     if (0 == child_pid) 
+    //     {
+    //         /* child code */
+    //         system_module_init[i].module_init_func();
 
-            // it is child process now and before that all threads within process should be joined and after that process can exit(0) (with code zero = mean success)
-            exit(EXIT_SUCCESS);
-        }
-    }
+    //         // it is child process now and before that all threads within process should be joined and after that process can exit(0) (with code zero = mean success)
+    //         exit(EXIT_SUCCESS);
+    //     }
+    // }
     
-    int status = 0;
-    pid_t wpid;
-    while ((wpid = wait(&status)) > 0); // this way, the father waits for all the child processes 
+    // int status = 0;
+    // pid_t wpid;
+    // while ((wpid = wait(&status)) > 0); // this way, the father waits for all the child processes 
 
     //Parent code (After all child processes end)
 
