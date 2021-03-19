@@ -19,8 +19,8 @@ typedef struct
 const module_init_t system_module_init[] = 
 {
     {AutoModel_Init},
-    {AccelerometerManager_Init},
-    {GyroManager_Init},
+    // {AccelerometerManager_Init},
+    // {GyroManager_Init},
 };
 
 #define GetModulesCount()   ((int)(sizeof(system_module_init)/sizeof(module_init_t)))    
@@ -70,29 +70,29 @@ static void main_PrintArgs(int argc, char *argv[])
  */
 static void main_InitSystemModules(void)
 {
-    //Parent code (Before all child processes start)
+    printf("Suspension system init...\n");
 
+    //Parent code (Before all child processes start)
     printf("Suspension system modules count: %d\n", GetModulesCount());
 
-    // for (int i = 0; i < GetModulesCount(); i++)
-    // {
-    //     pid_t child_pid = fork();
-    //     if (0 == child_pid) 
-    //     {
-    //         /* child code */
-    //         system_module_init[i].module_init_func();
+    for (int i = 0; i < GetModulesCount(); i++)
+    {
+        pid_t child_pid = fork();
+        if (0 == child_pid) 
+        {
+            /* child code */
+            system_module_init[i].module_init_func();
 
-    //it is child process now and before that all threads within process should be joined and after that process can exit(0) (with code zero = mean success)
-    //         exit(EXIT_SUCCESS);
-    //     }
-    // }
+            exit(EXIT_SUCCESS);
+        }
+    }
     
-    // int status = 0;
-    // pid_t wpid;
-    // while ((wpid = wait(&status)) > 0); // this way, the father waits for all the child processes 
+    int status = 0;
+    pid_t wpid;
+    while ((wpid = wait(&status)) > 0); // this way, the father waits for all the child processes 
 
     //Parent code (After all child processes end)
-
+    printf("System end!!!");
 
     // old code maby will be useful
        /* create another process */
