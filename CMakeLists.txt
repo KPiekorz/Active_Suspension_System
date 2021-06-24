@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.0.0)
 project(automatic_suspension_system VERSION 0.1.0)
 
-add_subdirectory(lib)
+add_subdirectory(common)
 add_subdirectory(control)
 add_subdirectory(gui)
 add_subdirectory(model_simulation)
@@ -17,6 +17,7 @@ set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 
 target_include_directories(automatic_suspension_system PUBLIC
                           "${PROJECT_BINARY_DIR}"
+                          "${PROJECT_SOURCE_DIR}/common"
                           "${PROJECT_SOURCE_DIR}/sensors"
                           "${PROJECT_SOURCE_DIR}/control"
                           "${PROJECT_SOURCE_DIR}/model_simulation"
