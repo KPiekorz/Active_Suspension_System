@@ -9,6 +9,8 @@
 #include <unistd.h>
 #include <system_utility.h>
 
+#include "sensors.h"
+
 /* modules init functions */
 typedef void (*module_init)(void);
 
@@ -35,7 +37,9 @@ int main(int argc, char *argv[])
     // main_PrintArgs(argc, argv);
     // AutoModel_ModelState();
 
-    main_InitSystemModules();
+    // main_InitSystemModules();
+
+    Sensors_PrintSensorData();
 
 	return EXIT_SUCCESS;
 }

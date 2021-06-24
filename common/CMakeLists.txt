@@ -1,1 +1,1 @@
-add_library(lib auto_model accelerometer_manager gyro_manager system_utility)
+add_library(common auto_model accelerometer_manager gyro_manager system_utility)
