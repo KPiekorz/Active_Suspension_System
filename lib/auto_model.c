@@ -14,10 +14,10 @@ void AutoModel_Init(void)
 
 	while(1)
 	{
+		Delay(2);
+
 		printf("Car simulation...\n");
 		fflush(stdout);
-
-		Delay(2);
 	}
 
 	printf("Type 'q' to quit both processes.\n");

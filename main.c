@@ -7,6 +7,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <system_utility.h>
 
 /* modules init functions */
 typedef void (*module_init)(void);
