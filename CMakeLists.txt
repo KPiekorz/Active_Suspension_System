@@ -20,4 +20,4 @@ target_include_directories(automatic_suspension_system PUBLIC
                           "${PROJECT_SOURCE_DIR}/model_simulation"
                           "${PROJECT_SOURCE_DIR}/gui")
 
-target_link_libraries(automatic_suspension_system PUBLIC  common sensors)
+target_link_libraries(automatic_suspension_system PUBLIC  common sensors gui model_simulation control)

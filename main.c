@@ -41,6 +41,8 @@ int main(int argc, char *argv[])
 
     Sensors_PrintSensorData();
 
+    printf("Delay in us: %d\n\r", SEC_TO_US(1));
+
 	return EXIT_SUCCESS;
 }
 
