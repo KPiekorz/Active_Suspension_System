@@ -6,7 +6,7 @@ A system that allows for adaptive control of the suspension of a modern BMW or A
 
 ## System requirements
 
-- 
+- installed Python 3.6.9 version (https://github.com/vim/vim/issues/2984)
 
 ## System operation assumption
 
