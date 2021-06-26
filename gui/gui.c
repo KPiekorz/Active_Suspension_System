@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// #define START_PYTHON_GUI
+#define START_PYTHON_GUI
 
 /*** STATIC FUNTION ***/
 
