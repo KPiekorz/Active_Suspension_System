@@ -10,13 +10,15 @@
 
 void Gui_RunGui(void)
 {
-    const char filename[] = "gui_plot";
-    FILE * fp;
-
     Py_Initialize();
 
-	fp = _Py_fopen(filename, "r");
-	PyRun_SimpleFile(fp, filename);
+    FILE* PScriptFile = fopen("gui_plot.py", "r");
+    
+    if(PScriptFile)
+    {
+        PyRun_SimpleFile(PScriptFile, "gui_plot.py");
+        fclose(PScriptFile);
+    } 
 
-	Py_Finalize();    
+    Py_Finalize();
 }
