@@ -10,6 +10,7 @@
 #include <system_utility.h>
 
 #include "sensors.h"
+#include "gui.h"
 
 /* modules init functions */
 typedef void (*module_init)(void);
@@ -39,9 +40,11 @@ int main(int argc, char *argv[])
 
     // main_InitSystemModules();
 
-    Sensors_PrintSensorData();
+    // Sensors_PrintSensorData();
 
-    printf("Delay in us: %d\n\r", SEC_TO_US(1));
+    // printf("Delay in us: %d\n\r", SEC_TO_US(1));
+
+    Gui_RunGui();
 
 	return EXIT_SUCCESS;
 }
