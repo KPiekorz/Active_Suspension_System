@@ -8,6 +8,8 @@ A system that allows for adaptive control of the suspension of a modern BMW or A
 
 - installed Python 3.6.9 version (https://github.com/vim/vim/issues/2984, for cmake https://stackoverflow.com/questions/11041299/python-h-no-such-file-or-directory, for python dev instalation https://github.com/stevenlovegrove/Pangolin/issues/494)
 - run python script from c (https://medium.datadriveninvestor.com/how-to-quickly-embed-python-in-your-c-application-23c19694813)
+- pip install matplotlib
+- 
 
 ## System operation assumption
 
