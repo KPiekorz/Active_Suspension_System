@@ -14,6 +14,10 @@ A system that allows for adaptive control of the suspension of a modern BMW or A
   - source gui3.7/bin/activate
   - pip install numpy scipy matplotlib pyqt5
 
+## Run project
+
+- 
+
 ## System requirements
 
 - installed Python 3.6.9 version (https://github.com/vim/vim/issues/2984, for cmake https://stackoverflow.com/questions/11041299/python-h-no-such-file-or-directory, for python dev instalation https://github.com/stevenlovegrove/Pangolin/issues/494)

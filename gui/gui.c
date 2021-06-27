@@ -20,8 +20,8 @@ void Gui_RunGui(void)
     Py_Initialize();
 
     errno = 0;
-    system("chmod +x gui_plot.py");
-    FILE* PScriptFile = fopen("gui_plot.py", "r");
+    system("chmod +x ./gui/gui_plot.py");
+    FILE* PScriptFile = fopen("./gui/gui_plot.py", "r");
 
     if (PScriptFile == NULL) 
     {
@@ -37,4 +37,9 @@ void Gui_RunGui(void)
 
 #endif /* START_PYTHON_GUI */
 
+}
+
+void Gui_SendDataToPlot(void * data, uint16_t data_len)
+{
+    
 }

@@ -1,3 +1,7 @@
+#ifndef _POSIX_C_SOURCE
+	#define _POSIX_C_SOURCE 200112L /* Or higher */
+#endif
+
 #include <stdio.h>
 #include "accelerometer_manager.h"
 #include "gyro_manager.h"
@@ -11,23 +15,7 @@
 
 #include "sensors.h"
 #include "gui.h"
-
-/* modules init functions */
-typedef void (*module_init)(void);
-
-typedef struct
-{
-    module_init module_init_func;
-} module_init_t;
-
-const module_init_t system_module_init[] = 
-{
-    {AutoModel_Init},
-    // {AccelerometerManager_Init},
-    // {GyroManager_Init},
-};
-
-#define GetModulesCount()   ((int)(sizeof(system_module_init)/sizeof(module_init_t)))    
+#include "model_simulation.h"
 
 /* static helper function prototype */
 static void main_PrintArgs(int argc, char *argv[]);
@@ -80,23 +68,7 @@ static void main_PrintArgs(int argc, char *argv[])
  */
 static void main_InitSystemModules(void)
 {
-    printf("Suspension system init...\n");
-
-    //Parent code (Before all child processes start)
-    printf("Suspension system modules count: %d\n", GetModulesCount());
-
-    for (int i = 0; i < GetModulesCount(); i++)
-    {
-        pid_t child_pid = fork();
-        if (0 == child_pid) 
-        {
-            /* child code */
-            system_module_init[i].module_init_func();
-
-            exit(EXIT_SUCCESS);
-        }
-    }
-    
+   
     int status = 0;
     pid_t wpid;
     while ((wpid = wait(&status)) > 0); // this way, the father waits for all the child processes 
