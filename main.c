@@ -3,16 +3,14 @@
 #endif
 
 #include <stdio.h>
-#include "accelerometer_manager.h"
-#include "gyro_manager.h"
-#include "auto_model.h"
 #include <pthread.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
-#include <system_utility.h>
 
+#include "system_utility.h"
+#include "system_process.h"
 #include "sensors.h"
 #include "gui.h"
 #include "model_simulation.h"
@@ -32,7 +30,10 @@ int main(int argc, char *argv[])
 
     // printf("Delay in us: %d\n\r", SEC_TO_US(1));
 
-    Gui_RunGui();
+    // Gui_RunGui();
+
+
+    /* 
 
 	return EXIT_SUCCESS;
 }

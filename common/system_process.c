@@ -30,10 +30,8 @@ const module_init_t system_module_init[] =
 
 /*** GLOBAL FUNCTION ***/
 
-void SystemInit_Init(void)
+void SystemProcess_Initialize(void)
 {
-    Gui_RunGui();
-
     printf("Suspension system init...\n");
 
     for (int i = 0; i < GetModulesCount(); i++)
@@ -53,7 +51,7 @@ void SystemInit_Init(void)
     }
 }
 
-void SystemInit_Init(void)
+void SystemProcess_Destroy(void)
 {
     
 }

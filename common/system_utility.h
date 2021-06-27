@@ -10,4 +10,4 @@
 
 #define Delay(s)    (usleep(SEC_TO_US(s)))
 
-#endif  
+#endif  /* SYSTEM_UTILITY_H */

@@ -6,7 +6,7 @@ A system that allows for adaptive control of the suspension of a modern BMW or A
 
 ## Setup python enviroment
 
-- Run following commands in terminal (in main project folder):
+- Run following commands in terminal (in main project folder) (https://www.youtube.com/watch?v=ClOlSlDpCm4):
   - sudo apt upgrade 
   - sudo apt install python3-venv python3-pip python3-tk
   - sudo apt install python3.7 python3.7-dev python3.7-venv
