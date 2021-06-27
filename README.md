@@ -48,3 +48,12 @@ A system that allows for adaptive control of the suspension of a modern BMW or A
 ## Used sensor
 
 - Prescriptive indication of the sensors used is not possible at this time. You will probably need a fusion of a dozen or so sensors that will allow you to accurately recreate the condition of the suspension and the body, steered, etc.
+
+## RTOS process and thread
+
+- Waiting for all child precesses:
+```c
+int status = 0;
+pid_t wpid;
+while ((wpid = wait(&status)) > 0); // this way, the father waits for all the child processes 
+```

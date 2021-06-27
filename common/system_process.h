@@ -15,4 +15,11 @@ void SystemProcess_Initialize(void);
  */
 void SystemProcess_Destroy(void);
 
+/**
+ * @brief  Print all process pid
+ * @note   
+ * @retval None
+ */
+void SystemProcess_PrintProcessPid(void);
+
 #endif  /* SYSTEM_PROCESS_H */

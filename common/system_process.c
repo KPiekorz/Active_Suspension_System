@@ -36,15 +36,6 @@ const process_attributes_t_t system_process_attributes[] =
 
 /*** STATIC FUNCTION ***/
 
-static systemProcess_PrintProcessPid(void)
-{
-    for (uint8_t i = 0; i < GetProcessCount(); i++)
-    {
-        printf ("Process %s, pid: %d\n", system_process_attributes[i].process_name, 
-                                         system_process_attributes[i].process_pid);
-    }
-}
-
 /*** GLOBAL FUNCTION ***/
 
 void SystemProcess_Initialize(void)
@@ -73,4 +64,13 @@ void SystemProcess_Initialize(void)
 void SystemProcess_Destroy(void)
 {
     
+}
+
+void SystemProcess_PrintProcessPid(void)
+{
+    for (uint8_t i = 0; i < GetProcessCount(); i++)
+    {
+        printf ("Process %s, pid: %d\n", system_process_attributes[i].process_name, 
+                                         system_process_attributes[i].process_pid);
+    }
 }
