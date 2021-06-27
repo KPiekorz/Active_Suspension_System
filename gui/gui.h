@@ -19,13 +19,6 @@ void Gui_Init(void);
 void Gui_Destroy(void);
 
 /**
- * @brief  Start python gui
- * @note   
- * @retval None
- */
-void Gui_RunGui(void);
-
-/**
  * @brief  Sand data to pythno gui via UDP socket
  * @note   
  * @param  data: pointer to data to send (best will be array)
