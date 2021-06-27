@@ -5,6 +5,13 @@
 #include <stdint.h>
 
 /**
+ * @brief  Init gui module
+ * @note   
+ * @retval None
+ */
+void Gui_Init(void);
+
+/**
  * @brief  Start python gui
  * @note   
  * @retval None

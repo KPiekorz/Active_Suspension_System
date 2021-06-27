@@ -16,7 +16,13 @@ A system that allows for adaptive control of the suspension of a modern BMW or A
 
 ## Run project
 
-- 
+- To build projekt insert follownig command in root projekt folder (automatic_suspension_system):
+  - mkdir build
+  - cd build
+  - cmake ..
+  - make
+- To run projekt insert follownig command in root projekt folder (automatic_suspension_system):
+  - ./build/automatic_suspension_system
 
 ## System requirements
 
@@ -37,11 +43,8 @@ A system that allows for adaptive control of the suspension of a modern BMW or A
 
 ## System structure and architecture
 
+- to do
+
 ## Used sensor
 
-- Camera
-- Heigh sensor
-- Acccel
-- Gyro
-- Stearing
-- Speed sensor
+- Prescriptive indication of the sensors used is not possible at this time. You will probably need a fusion of a dozen or so sensors that will allow you to accurately recreate the condition of the suspension and the body, steered, etc.

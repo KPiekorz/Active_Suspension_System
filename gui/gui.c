@@ -12,6 +12,11 @@
 
 /*** GLOBAL FUNCTION ***/
 
+void Gui_Init(void)
+{
+    
+}
+
 void Gui_RunGui(void)
 {
 
