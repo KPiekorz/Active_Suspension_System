@@ -18,6 +18,8 @@ void Gui_RunGui(void)
 
     Py_Initialize();
 
+
+    system("killall file-roller");
     FILE* PScriptFile = fopen("gui_plot.py", "r");
 
     if(PScriptFile)

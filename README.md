@@ -4,12 +4,20 @@
 
 A system that allows for adaptive control of the suspension of a modern BMW or AUDI electric car (mock different sensor and components of system, which allow to simulate it).
 
+## Setup python enviroment
+
+- Run following commands in terminal:
+  - sudo apt upgrade 
+  - sudo apt install python3-venv python3-pip python3-tk
+  - sudo apt install python3.7 python3.7-dev python3.7-venv
+  - python3.7 -m venv work3.7
+  - source work3.7/bin/activate
+  - pip install numpy scipy matplotlib
+
 ## System requirements
 
 - installed Python 3.6.9 version (https://github.com/vim/vim/issues/2984, for cmake https://stackoverflow.com/questions/11041299/python-h-no-such-file-or-directory, for python dev instalation https://github.com/stevenlovegrove/Pangolin/issues/494)
 - run python script from c (https://medium.datadriveninvestor.com/how-to-quickly-embed-python-in-your-c-application-23c19694813)
-- pip install matplotlib
-- 
 
 ## System operation assumption
 
