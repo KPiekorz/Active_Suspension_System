@@ -14,7 +14,13 @@
 
 void Gui_Init(void)
 {
-    
+        printf ("Init GUI process...");
+
+}
+
+void Gui_Destroy(void)
+{
+    printf ("Destroy GUI process...");
 }
 
 void Gui_RunGui(void)

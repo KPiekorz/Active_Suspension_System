@@ -4,23 +4,30 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include "system_init.h"
+#include "system_process.h"
 #include "gui.h"
 #include "control.h"
 #include "model_simulation.h"
 #include "sensors.h"
 
-/* modules init functions */
-typedef void (*module_init)(void);
+#define UNKNOWN_PID     (0)
+
+/* process init functions */
+typedef void (* process_init)(void);
+
+/* process dystroy function */
+typedef void (* process_destory)(void);
 
 typedef struct
 {
-    module_init module_init_func;
+    process_init process_init_func;
+    pid_t process_pid;
+    process_destory process_destroy_func;
 } module_init_t;
 
 const module_init_t system_module_init[] = 
 {
-    {Gui_Init},
+    {Gui_Init,      UNKNOWN_PID,    Gui_Destroy},
 };
 
 #define GetModulesCount()   ((int)(sizeof(system_module_init)/sizeof(module_init_t)))    

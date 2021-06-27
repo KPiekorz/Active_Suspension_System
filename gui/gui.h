@@ -5,11 +5,18 @@
 #include <stdint.h>
 
 /**
- * @brief  Init gui module
+ * @brief  Init gui process
  * @note   
  * @retval None
  */
 void Gui_Init(void);
+
+/**
+ * @brief  Destroy gui process
+ * @note   
+ * @retval None
+ */
+void Gui_Destroy(void);
 
 /**
  * @brief  Start python gui
