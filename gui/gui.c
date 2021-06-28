@@ -26,9 +26,9 @@ static void gui_RunGui(void)
     system("chmod +x ./gui/gui_plot.py");
     FILE* PScriptFile = fopen("./gui/gui_plot.py", "r");
 
-    if (PScriptFile == NULL) 
+    if (PScriptFile == NULL)
     {
-        printf("File to open py gui, Error: %d \n", errno);
+        DEBUG_LOG_ERROR("File to open py gui, Error: %d", errno);
     }
     else
     {
@@ -46,7 +46,7 @@ static void gui_RunGui(void)
 
 void Gui_Init(void)
 {
-    printf ("Init GUI process...\n");
+    DEBUG_LOG_DEBUG("Init GUI process...");
 
     // /* Init udp socket connection to python gui app */
     // gui_InitUdpSocketConnectionToPythonPlot();
@@ -56,19 +56,19 @@ void Gui_Init(void)
 
     while (1)
     {
-        printf ("Gui process running...\n");
+        DEBUG_LOG_VERBOSE("Gui process running...");
 		usleep(SEC_TO_US(1));
     }
 }
 
 void Gui_Destroy(void)
 {
-    printf ("Destroy GUI process...");
+    DEBUG_LOG_DEBUG("Destroy GUI process...");
 
 
 }
 
 void Gui_SendDataToPlot(void * data, uint16_t data_len)
 {
-    
+
 }
