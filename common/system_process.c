@@ -27,7 +27,7 @@ typedef struct
     const char * process_name;
 } process_attributes_t_t;
 
-const process_attributes_t_t system_process_attributes[] = 
+process_attributes_t_t system_process_attributes[] = 
 {
     {Gui_Init,          Gui_Destroy,        UNKNOWN_PID,        "Gui"},
 };
@@ -35,6 +35,16 @@ const process_attributes_t_t system_process_attributes[] =
 #define GetProcessCount()   ((int)(sizeof(system_process_attributes)/sizeof(process_attributes_t_t)))    
 
 /*** STATIC FUNCTION ***/
+
+static void systemProcess_KillAllSystemProcess(void)
+{
+    for (uint8_t i = 0; i < GetProcessCount(); i++)
+    {
+        printf("Kill process...\n");
+        kill(system_process_attributes[i].process_pid, SIGKILL);
+        system_process_attributes[i].process_pid = UNKNOWN_PID;
+    }
+}
 
 /*** GLOBAL FUNCTION ***/
 
@@ -44,29 +54,34 @@ void SystemProcess_Initialize(void)
 
     for (int i = 0; i < GetProcessCount(); i++)
     {
-      
-        // here we will create new process
+        /* here we will create new process */
         pid_t child_pid = fork();
 
         if (0 == child_pid) 
         {
             /* child code */
             system_process_attributes[i].process_init_func();
+        
+            exit(EXIT_SUCCESS);
         }
         else 
         {
             /* parent code */
+    		printf("I'm a parent process, pid = %d\n", getpid());
+    		printf("My child process, pid = %d\n", child_pid);
 
+            system_process_attributes[i].process_pid = child_pid;
         }
     }
 }
 
 void SystemProcess_Destroy(void)
 {
-    
+    /* kill all system process */
+    systemProcess_KillAllSystemProcess();   
 }
 
-void SystemProcess_PrintProcessPid(void)
+void SystemProcess_PrintAllProcessPid(void)
 {
     for (uint8_t i = 0; i < GetProcessCount(); i++)
     {

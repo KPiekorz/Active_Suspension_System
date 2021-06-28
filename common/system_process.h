@@ -22,4 +22,11 @@ void SystemProcess_Destroy(void);
  */
 void SystemProcess_PrintProcessPid(void);
 
+/**
+ * @brief  Print system process pid
+ * @note   
+ * @retval None
+ */
+void SystemProcess_PrintAllProcessPid(void);
+
 #endif  /* SYSTEM_PROCESS_H */

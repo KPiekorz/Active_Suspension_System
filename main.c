@@ -28,11 +28,17 @@ int main(int argc, char *argv[])
 
     // Sensors_PrintSensorData();
 
-    // printf("Delay in us: %d\n\r", SEC_TO_US(1));
-
     // Gui_RunGui();
 
 
+    SystemProcess_Initialize();
+
+    SystemProcess_PrintAllProcessPid();
+
+	/* Wait for q(uit) */
+  	while(getc(stdin)!='q') {}
+
+    SystemProcess_Destroy();
 
 	return EXIT_SUCCESS;
 }

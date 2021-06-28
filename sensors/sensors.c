@@ -4,5 +4,5 @@
 
 void Sensors_PrintSensorData(void)
 {
-    printf("\n\rHello I am sensor!\n\r");
+    printf("Hello I am sensor!\n");
 }

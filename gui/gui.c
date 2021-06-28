@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <errno.h>
 
+#include "system_utility.h"
+
 #define INCLUDE_PYTHON_GUI
 
 /*** STATIC FUNTION ***/
@@ -26,7 +28,7 @@ static void gui_RunGui(void)
 
     if (PScriptFile == NULL) 
     {
-        printf("File to open py gui, Error: %d \n\r", errno);
+        printf("File to open py gui, Error: %d \n", errno);
     }
     else
     {
@@ -44,13 +46,19 @@ static void gui_RunGui(void)
 
 void Gui_Init(void)
 {
-    printf ("Init GUI process...");
+    printf ("Init GUI process...\n");
 
-    /* Init udp socket connection to python gui app */
-    gui_InitUdpSocketConnectionToPythonPlot();
+    // /* Init udp socket connection to python gui app */
+    // gui_InitUdpSocketConnectionToPythonPlot();
 
-    /* Start gui python app */
-    gui_RunGui();
+    // /* Start gui python app */
+    // gui_RunGui();
+
+    while (1)
+    {
+        printf ("Gui process running...\n");
+		usleep(SEC_TO_US(1));
+    }
 }
 
 void Gui_Destroy(void)
