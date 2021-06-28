@@ -51,8 +51,8 @@ void Gui_Init(void)
     // /* Init udp socket connection to python gui app */
     // gui_InitUdpSocketConnectionToPythonPlot();
 
-    // /* Start gui python app */
-    // gui_RunGui();
+    /* Start gui python app */
+    gui_RunGui();
 
     while (1)
     {
