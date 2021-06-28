@@ -6,21 +6,21 @@
 
 /**
  * @brief  Init gui process
- * @note   
+ * @note
  * @retval None
  */
 void Gui_Init(void);
 
 /**
  * @brief  Destroy gui process
- * @note   
+ * @note
  * @retval None
  */
 void Gui_Destroy(void);
 
 /**
  * @brief  Sand data to pythno gui via UDP socket
- * @note   
+ * @note
  * @param  data: pointer to data to send (best will be array)
  * @param  data_len: data lenght in bytes
  * @retval None

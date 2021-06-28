@@ -30,7 +30,8 @@ typedef struct
 
 process_attributes_t_t system_process_attributes[] =
 {
-    {Gui_Init,          Gui_Destroy,        UNKNOWN_PID,        "Gui"},
+    {Gui_Init,          Gui_Destroy,        UNKNOWN_PID,        "Gui"           },
+    {Control_Init,      Control_Destroy,    UNKNOWN_PID,        "Control"       },
 };
 
 #define GetProcessCount()   ((int)(sizeof(system_process_attributes)/sizeof(process_attributes_t_t)))
@@ -60,7 +61,7 @@ static void systemProcess_PrintAllProcessPid(void)
 
 void SystemProcess_Initialize(void)
 {
-    DEBUG_LOG_DEBUG("Suspension system init..");
+    DEBUG_LOG_DEBUG("Suspension system init...");
 
     for (int i = 0; i < GetProcessCount(); i++)
     {
@@ -89,6 +90,13 @@ void SystemProcess_Initialize(void)
 
 void SystemProcess_Destroy(void)
 {
+    DEBUG_LOG_DEBUG("Suspension system destroy...");
+
+    for (int i = 0; i < GetProcessCount(); i++)
+    {
+        system_process_attributes[i].process_destroy_func();
+    }
+
     /* kill all system process */
     systemProcess_KillAllSystemProcess();
 }
