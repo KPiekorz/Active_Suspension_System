@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
 
     SystemProcess_Initialize();
 
-	/* Wait for q(uit) */
+    DEBUG_LOG_ALWAYS("Enter q to quit: ");
   	while(getc(stdin)!='q') {}
 
     SystemProcess_Destroy();

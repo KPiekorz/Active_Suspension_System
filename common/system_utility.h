@@ -18,10 +18,9 @@
 
 /*** DEBUG LOGS ***/
 
-#define ENABLE_VERBOSE_LOG
-#define ENABLE_DEBUG_LOG
-#define ENABLE_WARN_LOG
-#define ENABLE_ERROR_LOG
+// #define ENABLE_VERBOSE_LOG
+// #define ENABLE_DEBUG_LOG
+// #define ENABLE_WARN_LOG
 
 #ifdef ENABLE_VERBOSE_LOG
     #define DEBUG_LOG_VERBOSE(...)  { printf("VERBOSE: " __VA_ARGS__);  printf("\n"); }
@@ -41,10 +40,8 @@
     #define DEBUG_LOG_WARN(...)     // nothing
 #endif
 
-#ifdef ENABLE_ERROR_LOG
-    #define DEBUG_LOG_ERROR(...)    { printf("ERROR: " __VA_ARGS__);    printf("\n"); }
-#else
-    #define DEBUG_LOG_ERROR(...)    // nothing
-#endif
+#define DEBUG_LOG_ERROR(...)        { printf("ERROR: " __VA_ARGS__);    printf("\n"); }
+
+#define DEBUG_LOG_ALWAYS(...)       { printf("ALWAYS: " __VA_ARGS__);   printf("\n"); }
 
 #endif  /* SYSTEM_UTILITY_H */

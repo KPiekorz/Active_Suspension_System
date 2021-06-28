@@ -40,9 +40,11 @@ process_attributes_t_t system_process_attributes[] =
 
 static void systemProcess_KillAllSystemProcess(void)
 {
+    DEBUG_LOG_DEBUG("systemProcess_KillAllSystemProcess");
+
     for (uint8_t i = 0; i < GetProcessCount(); i++)
     {
-        DEBUG_LOG_DEBUG("Kill process...");
+        DEBUG_LOG_DEBUG("systemProcess_KillAllSystemProcess, process name: %s, pid: %d", system_process_attributes[i].process_name, system_process_attributes[i].process_pid);
         kill(system_process_attributes[i].process_pid, SIGKILL);
         system_process_attributes[i].process_pid = UNKNOWN_PID;
     }
@@ -61,7 +63,7 @@ static void systemProcess_PrintAllProcessPid(void)
 
 void SystemProcess_Initialize(void)
 {
-    DEBUG_LOG_DEBUG("Suspension system init...");
+    DEBUG_LOG_DEBUG("SystemProcess_Initialize");
 
     for (int i = 0; i < GetProcessCount(); i++)
     {
@@ -85,12 +87,13 @@ void SystemProcess_Initialize(void)
         }
     }
 
+    /* print all created system process */
     systemProcess_PrintAllProcessPid();
 }
 
 void SystemProcess_Destroy(void)
 {
-    DEBUG_LOG_DEBUG("Suspension system destroy...");
+    DEBUG_LOG_DEBUG("SystemProcess_Destroy");
 
     for (int i = 0; i < GetProcessCount(); i++)
     {
