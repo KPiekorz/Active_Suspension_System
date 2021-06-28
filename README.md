@@ -1,13 +1,13 @@
 # Active Suspension System
 
-## System description 
+## System description
 
 A system that allows for adaptive control of the suspension of a modern BMW or AUDI electric car (mock different sensor and components of system, which allow to simulate it).
 
 ## Setup python enviroment
 
 - Run following commands in terminal (in main project folder) (https://www.youtube.com/watch?v=ClOlSlDpCm4):
-  - sudo apt upgrade 
+  - sudo apt upgrade
   - sudo apt install python3-venv python3-pip python3-tk
   - sudo apt install python3.7 python3.7-dev python3.7-venv
   - python3.7 -m venv gui3.7
@@ -55,5 +55,5 @@ A system that allows for adaptive control of the suspension of a modern BMW or A
 ```c
 int status = 0;
 pid_t wpid;
-while ((wpid = wait(&status)) > 0); // this way, the father waits for all the child processes 
+while ((wpid = wait(&status)) > 0); // this way, the father waits for all the child processes
 ```

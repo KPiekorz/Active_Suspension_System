@@ -9,12 +9,12 @@
 /*** TIME TRANSFORMATION ***/
 
 #define SEC_TO_US(s)    (s * 1000000)
-#define SEC_TO_US(s)    (s * 1000000)
+#define MS_TO_US(s)     (s * 1000)
 
 /*** DELAY MACROS ***/
 
-#define Delay_s(s)    (usleep(SEC_TO_US(s)))
-#define Delay_ms(s)    (usleep(SEC_TO_US(s)))
+#define DELAY_S(s)     (usleep(SEC_TO_US(s)))
+#define DELAY_MS(s)    (usleep(MS_TO_US(s)))
 
 /*** DEBUG LOGS ***/
 
@@ -26,25 +26,25 @@
 #ifdef ENABLE_VERBOSE_LOG
     #define DEBUG_LOG_VERBOSE(...)  { printf("VERBOSE: " __VA_ARGS__);  printf("\n"); }
 #else
-    #define DEBUG_LOG_VERBOSE(...) // nothing
+    #define DEBUG_LOG_VERBOSE(...)  // nothing
 #endif
 
 #ifdef ENABLE_DEBUG_LOG
     #define DEBUG_LOG_DEBUG(...)    { printf("DEBUG: " __VA_ARGS__);    printf("\n"); }
 #else
-    #define DEBUG_LOG_DEBUG(...) // nothing
+    #define DEBUG_LOG_DEBUG(...)    // nothing
 #endif
 
 #ifdef ENABLE_WARN_LOG
     #define DEBUG_LOG_WARN(...)     { printf("WARN: " __VA_ARGS__);     printf("\n"); }
 #else
-    #define DEBUG_LOG_WARN(...)  // nothing
+    #define DEBUG_LOG_WARN(...)     // nothing
 #endif
 
 #ifdef ENABLE_ERROR_LOG
     #define DEBUG_LOG_ERROR(...)    { printf("ERROR: " __VA_ARGS__);    printf("\n"); }
 #else
-    #define DEBUG_LOG_ERROR(...)  // nothing
+    #define DEBUG_LOG_ERROR(...)    // nothing
 #endif
 
 #endif  /* SYSTEM_UTILITY_H */

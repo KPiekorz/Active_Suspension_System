@@ -17,19 +17,10 @@
 
 /* static helper function prototype */
 static void main_PrintArgs(int argc, char *argv[]);
-static void main_InitSystemModules(void);
 
 int main(int argc, char *argv[])
 {
-    // main_PrintArgs(argc, argv);
-    // AutoModel_ModelState();
-
-    // main_InitSystemModules();
-
-    // Sensors_PrintSensorData();
-
-    // Gui_RunGui();
-
+    main_PrintArgs(argc, argv);
 
     SystemProcess_Initialize();
 
@@ -63,37 +54,4 @@ static void main_PrintArgs(int argc, char *argv[])
     {
         DEBUG_LOG_DEBUG("Argument list is empty!");
     }
-}
-
-/**
- * @brief Init system modules, whcich is in declarated in modules array.
- * @note
- * @retval None
- */
-static void main_InitSystemModules(void)
-{
-
-    int status = 0;
-    pid_t wpid;
-    while ((wpid = wait(&status)) > 0); // this way, the father waits for all the child processes
-
-
-
-    // old code maby will be useful
-       /* create another process */
-	// pid_t pid = fork();
-
-    // if (0 == pid)
-    // {
-    //     /* child process */
-
-    // }
-    // else
-    // {
-    //     /* parent process */
-
-    // }
-
-	// while(getc(stdin) == 'q') {}
-
 }
