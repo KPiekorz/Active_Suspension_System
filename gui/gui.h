@@ -4,6 +4,13 @@
 #include <stdio.h>
 #include <stdint.h>
 
+typedef enum
+{
+    gui_message_control_signal,
+    gui_message_model_output,
+
+} gui_message_type_t;
+
 /**
  * @brief  Init gui process
  * @note
@@ -25,6 +32,6 @@ void Gui_Destroy(void);
  * @param  data_len: data lenght in bytes
  * @retval None
  */
-void Gui_SendDataToPlot(void * data, uint16_t data_len);
+void Gui_SendMessage(gui_message_type_t message_type, void * data, uint16_t data_len);
 
 #endif /* GUI_H */

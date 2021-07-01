@@ -9,7 +9,8 @@ void Control_Init(void)
     {
         DEBUG_LOG_VERBOSE("Control process running...");
 		usleep(SEC_TO_US(2));
-    }}
+    }
+}
 
 void Control_Destroy(void)
 {
