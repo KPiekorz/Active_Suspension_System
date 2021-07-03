@@ -7,9 +7,9 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "system_utility.h"
 #include "model_simulation.h"
 #include "gui.h"
-#include "system_utility.h"
 #include "control.h"
 #include "sensors.h"
 
@@ -28,8 +28,13 @@ void ModelSimulation_Init(void)
 
     while (1)
     {
-        const char * message = "Hello gui!";
-        Gui_SendMessage(gui_message_control_signal, message, strlen(message));
+        uint8_t data[10];
+        uint16_t byte_index = 0;
+
+        byte_index += SystemUtility_SetOneByte(data, byte_index, 1);
+        byte_index += SystemUtility_SetOneByte(data, byte_index, 2);
+
+        Gui_SendMessage(gui_message_control_signal, data, byte_index);
 
         DELAY_S(3);
         DEBUG_LOG_VERBOSE("[SIM] Model simulation process running...");

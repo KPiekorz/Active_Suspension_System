@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 /*** SYSTEM_FIFO_SIZE ***/
 
@@ -70,5 +71,17 @@ uint16_t SystemUtility_SetTwoBytesLE(uint8_t * buf, uint16_t byte_index, uint16_
 
 uint16_t SystemUtility_GetOneByte(uint8_t * buf, uint16_t byte_index, uint8_t value);
 uint16_t SystemUtility_GetTwoBytesLE(uint8_t * buf, uint16_t byte_index, uint16_t value);
+
+/*** SEND MESSAGE AMONGS SYSTEM PROCESS API ***/
+
+/**
+ * @brief  Send messages to other process created in system.
+ * @note
+ * @param  fifo_name: fifo queue name
+ * @param  data: data
+ * @param  data_len: data length
+ * @retval TRUE if operation was successful, otherwise FALSE.
+ */
+bool SystemUtility_SendMessage(const char * fifo_name, uint8_t message_type, uint8_t * data, uint16_t data_len);
 
 #endif  /* SYSTEM_UTILITY_H */

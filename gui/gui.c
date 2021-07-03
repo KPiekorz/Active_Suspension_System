@@ -92,7 +92,7 @@ static void *gui_ReceiveMessageThread(void *cookie)
         /* Read data from FIFO */
         if ((bytes_read = read(fd, buff, sizeof(buff))) == -1)
         {
-            DEBUG_LOG_ERROR("Something is wrong with FIFO.");
+            DEBUG_LOG_ERROR("[GUI] Something is wrong with FIFO.");
             return 0;
         }
 
@@ -140,7 +140,7 @@ static void gui_StartReceiveMessageTread(void)
     /* Create thread */
     if ((status = pthread_create(&tSimpleThread, &aSimpleThreadAttr, gui_ReceiveMessageThread, NULL)))
     {
-        DEBUG_LOG_ERROR("[GUI] Can't create a thread!");
+        DEBUG_LOG_ERROR("[GUI] gui_StartReceiveMessageTread, Can't create a thread!");
         return;
     }
 }
@@ -149,7 +149,7 @@ static void gui_StartReceiveMessageTread(void)
 
 void Gui_Init(void)
 {
-    DEBUG_LOG_DEBUG("Init GUI process...");
+    DEBUG_LOG_DEBUG("[GUI] Gui_Init, Init process...");
 
     /* Init pipe connection to gui process */
     gui_StartReceiveMessageTread();
@@ -158,48 +158,26 @@ void Gui_Init(void)
     // gui_InitUdpSocketConnectionToPythonPlot();
 
     /* Start gui python app */
-    // gui_RunGui();
+    gui_RunGui();
 
     while (1)
     {
-        DEBUG_LOG_VERBOSE("[GUI] Gui process running... (should never enter here).");
+        DEBUG_LOG_VERBOSE("[GUI] Gui_Init, process running... (should never enter here).");
         DELAY_S(5);
     }
 }
 
 void Gui_Destroy(void)
 {
-    DEBUG_LOG_DEBUG("Destroy GUI process...");
+    DEBUG_LOG_DEBUG("[GUI] Destroy process...");
 }
 
-void Gui_SendMessage(gui_message_type_t message_type, const void * data, int data_len)
+void Gui_SendMessage(gui_message_type_t message_type, uint8_t * data, uint16_t data_len)
 {
-    DEBUG_LOG_DEBUG("Gui_SendMessage, message type: %d, len: %d", message_type, data_len);
+    DEBUG_LOG_DEBUG("[GUI] Gui_SendMessage, message type: %d, len: %d", message_type, data_len);
 
-    int fd;
-    char buff[GET_MESSAGE_SIZE(data_len)];
-    buff[SYSTEM_MESSAGE_TYPE_OFFSET] = message_type;
-    buff[SYSTEM_MESSAGE_LENGTH_OFFSET] = data_len;
-    memcpy(&(buff[SYSTEM_MESSAGE_DATA_OFFSET]), (char *)data, data_len);
-
-    /* Open FIFO file */
-    if ((fd = open(gui_fifo_name, O_WRONLY)) == -1)
+    if (!SystemUtility_SendMessage(gui_fifo_name, (uint8_t)message_type, data, data_len))
     {
-        DEBUG_LOG_ERROR("[GUI] Cannot open FIFO.");
-        return;
-    }
-
-    /* Write a message to FIFO */
-    if (write(fd, buff, GET_MESSAGE_SIZE(data_len)) != strlen(buff))
-    {
-        DEBUG_LOG_ERROR("[GUI] Cannot write to FIFO.");
-        return;
-    }
-
-    /* Close FIFO */
-    if (close(fd) == -1)
-    {
-        DEBUG_LOG_ERROR("[GUI] Cannot close FIFO.");
-        return;
+        DEBUG_LOG_ERROR("[GUI] Gui_SendMessage, Can't send message to gui process!");
     }
 }
