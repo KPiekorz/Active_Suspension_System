@@ -26,7 +26,8 @@ void Gui_Init(void);
 void Gui_Destroy(void);
 
 /**
- * @brief  Sand data to pythno gui via UDP socket
+ * @brief  Sand message to gui process, form any other procerss from the system (pipe).
+ *         It will give other process to communicate with each other win convenient way.
  * @note
  * @param  data: pointer to data to send (best will be array)
  * @param  data_len: data lenght in bytes

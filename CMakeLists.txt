@@ -1,5 +1,11 @@
 cmake_minimum_required(VERSION 3.0.0)
 project(automatic_suspension_system VERSION 0.0.0)
+project(automatic_suspension_system C)
+
+set(CMAKE_C_FLAGS -pthread)
+
+set(CPACK_PROJECT_NAME ${PROJECT_NAME})
+set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 
 find_package(PythonLibs REQUIRED)
 include_directories(${PYTHON_INCLUDE_DIRS})
@@ -11,9 +17,6 @@ add_subdirectory(model_simulation)
 add_subdirectory(sensors)
 
 add_executable(automatic_suspension_system main.c)
-
-set(CPACK_PROJECT_NAME ${PROJECT_NAME})
-set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 
 target_include_directories(automatic_suspension_system PUBLIC
                           "${PROJECT_BINARY_DIR}"

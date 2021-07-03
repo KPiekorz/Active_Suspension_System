@@ -3,16 +3,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <pthread.h>
+#include <unistd.h>
+#include <stdbool.h>
 
 #include "system_utility.h"
 
-#define INCLUDE_PYTHON_GUI
+// #define INCLUDE_PYTHON_GUI
 
 /*** STATIC FUNTION ***/
 
 static void gui_InitUdpSocketConnectionToPythonPlot(void)
 {
+}
 
+static void gui_SendDataToPlot(void *data, uint16_t data_len)
+{
 }
 
 static void gui_RunGui(void)
@@ -24,7 +30,7 @@ static void gui_RunGui(void)
 
     errno = 0;
     system("chmod +x ./gui/gui_plot.py");
-    FILE* PScriptFile = fopen("./gui/gui_plot.py", "r");
+    FILE *PScriptFile = fopen("./gui/gui_plot.py", "r");
 
     if (PScriptFile == NULL)
     {
@@ -39,7 +45,45 @@ static void gui_RunGui(void)
     Py_Finalize();
 
 #endif /* INCLUDE_PYTHON_GUI */
+}
 
+static void * gui_ReceiveMessageThread(void *cookie)
+{
+
+    while (true)
+    {
+        /* receive message from other modules form system */
+
+        DEBUG_LOG_VERBOSE("[GUI] Receive message from other preocess...");
+        usleep(SEC_TO_US(5));
+    }
+}
+
+static void gui_StartMessageReader(void)
+{
+    /**
+    *  Start a FIFO reader mean to create thread for receiving a
+    * messages from other thread process among the system.
+    **/
+
+    int status;
+
+    /* Thread variable */
+    pthread_t tSimpleThread;
+
+    /* Thread attributes variable */
+    pthread_attr_t aSimpleThreadAttr;
+
+    /* Initialize thread attributes structure for FIFO scheduling */
+    pthread_attr_init(&aSimpleThreadAttr);
+    pthread_attr_setschedpolicy(&aSimpleThreadAttr, SCHED_FIFO);
+
+    /* Create thread */
+    if ((status = pthread_create(&tSimpleThread, &aSimpleThreadAttr, gui_ReceiveMessageThread, NULL)))
+    {
+        DEBUG_LOG_ERROR("[GUI] Can't create a thread!");
+        return;
+    }
 }
 
 /*** GLOBAL FUNCTION ***/
@@ -47,6 +91,9 @@ static void gui_RunGui(void)
 void Gui_Init(void)
 {
     DEBUG_LOG_DEBUG("Init GUI process...");
+
+    /* Init pipe connection to gui process */
+    gui_StartMessageReader();
 
     // /* Init udp socket connection to python gui app */
     // gui_InitUdpSocketConnectionToPythonPlot();
@@ -57,18 +104,16 @@ void Gui_Init(void)
     while (1)
     {
         DEBUG_LOG_VERBOSE("Gui process running...");
-		usleep(SEC_TO_US(1));
+        usleep(SEC_TO_US(1));
     }
 }
 
 void Gui_Destroy(void)
 {
     DEBUG_LOG_DEBUG("Destroy GUI process...");
-
-
 }
 
-void Gui_SendDataToPlot(void * data, uint16_t data_len)
+void Gui_SendMessage(gui_message_type_t message_type, void *data, uint16_t data_len)
 {
-
+    DEBUG_LOG_DEBUG("Gui_SendMessage, data len: %d", data_len);
 }
