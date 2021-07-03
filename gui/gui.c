@@ -6,10 +6,16 @@
 #include <pthread.h>
 #include <unistd.h>
 #include <stdbool.h>
+#include <sys/stat.h>
+#include <error.h>
+#include <fcntl.h>
+#include <string.h>
 
 #include "system_utility.h"
 
 #define INCLUDE_PYTHON_GUI
+
+const char *gui_fifo_name = "gui_fifo";
 
 /*** STATIC FUNTION ***/
 
@@ -47,24 +53,62 @@ static void gui_RunGui(void)
 #endif /* INCLUDE_PYTHON_GUI */
 }
 
-static void * gui_ReceiveMessageThread(void *cookie)
+static void *gui_ReceiveMessageThread(void *cookie)
 {
-	/* Scheduling policy: FIFO or RR */
-	int policy;
-	/* Structure of other thread parameters */
-	struct sched_param param;
+    /* Scheduling policy: FIFO or RR */
+    int policy;
+    /* Structure of other thread parameters */
+    struct sched_param param;
 
-	/* Read modify and set new thread priority */
-	pthread_getschedparam( pthread_self(), &policy, &param);
-	param.sched_priority = sched_get_priority_max(policy);
-	pthread_setschedparam( pthread_self(), policy, &param);
+    /* Read modify and set new thread priority */
+    pthread_getschedparam(pthread_self(), &policy, &param);
+    param.sched_priority = sched_get_priority_max(policy);
+    pthread_setschedparam(pthread_self(), policy, &param);
+
+    int fd, bytes_read;
+    char buff[DEFAULT_FIFO_SIZE];
+
+    /* Create FIFO */
+    if ((mkfifo(gui_fifo_name, 0664) == -1) && (errno != EEXIST))
+    {
+        DEBUG_LOG_ERROR("[GUI] Cannot create FIFO.");
+        return 0;
+    }
+
+    /* Open FIFO file */
+    if ((fd = open(gui_fifo_name, O_RDONLY)) == -1)
+    {
+        DEBUG_LOG_ERROR("[GUI] Cannot open FIFO.");
+        return 0;
+    }
 
     while (true)
     {
         /* receive message from other modules form system */
+        memset(buff, '\0', sizeof(buff));
+
+        /* Read data from FIFO */
+        if ((bytes_read = read(fd, buff, sizeof(buff))) == -1)
+        {
+            DEBUG_LOG_ERROR("Something is wrong with FIFO.");
+            return 0;
+        }
+
+        /* If there is no data just continue */
+        if (bytes_read == 0)
+            continue;
+
+        /* If there is message print it */
+        if (bytes_read > 0)
+        {
+            DEBUG_LOG_VERBOSE("gui_ReceiveMessageThread, buff: %s", buff);
+
+            DEBUG_LOG_DEBUG("gui_ReceiveMessageThread, type: %d, len: %d",
+                            );
+        }
 
         DEBUG_LOG_VERBOSE("[GUI] Receive message from other preocess...");
-        usleep(SEC_TO_US(1));
+        // usleep(SEC_TO_US(1));
     }
 }
 
@@ -108,7 +152,7 @@ void Gui_Init(void)
     // gui_InitUdpSocketConnectionToPythonPlot();
 
     /* Start gui python app */
-    gui_RunGui();
+    // gui_RunGui();
 
     while (1)
     {
@@ -124,5 +168,32 @@ void Gui_Destroy(void)
 
 void Gui_SendMessage(gui_message_type_t message_type, void *data, uint16_t data_len)
 {
-    DEBUG_LOG_DEBUG("Gui_SendMessage, data len: %d", data_len);
+    DEBUG_LOG_DEBUG("Gui_SendMessage, message type: %d, ata len: %d", message_type, data_len);
+
+    int fd;
+    char buff[GET_MESSAGE_SIZE(data_len)];
+    buff[SYSTEM_MESSAGE_TYPE_OFFSET] = message_type;
+    buff[SYSTEM_MESSAGE_LENGTH_OFFSET] = data_len;
+    memcpy(&(buff[SYSTEM_MESSAGE_DATA_OFFSET]), (char *)data, data_len);
+
+    /* Open FIFO file */
+    if ((fd = open(gui_fifo_name, O_WRONLY)) == -1)
+    {
+        DEBUG_LOG_ERROR("Cannot open FIFO.");
+        return;
+    }
+
+    /* Write a message to FIFO */
+    if (write(fd, buff, strlen(buff)) != strlen(buff))
+    {
+        DEBUG_LOG_ERROR("Cannot write to FIFO.");
+        return;
+    }
+
+    /* Close FIFO */
+    if (close(fd) == -1)
+    {
+        DEBUG_LOG_ERROR("Cannot close FIFO.");
+        return;
+    }
 }
