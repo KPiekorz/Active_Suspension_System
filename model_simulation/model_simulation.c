@@ -31,8 +31,8 @@ void ModelSimulation_Init(void)
         const char * message = "Hello gui!";
         Gui_SendMessage(gui_message_control_signal, message, strlen(message));
 
-        DEBUG_LOG_VERBOSE("Model simulation process running...");
-		usleep(SEC_TO_US(3));
+        DELAY_S(3);
+        DEBUG_LOG_VERBOSE("[SIM] Model simulation process running...");
     }
 
     exit(EXIT_SUCCESS);

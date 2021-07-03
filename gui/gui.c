@@ -84,6 +84,8 @@ static void *gui_ReceiveMessageThread(void *cookie)
 
     while (true)
     {
+        DEBUG_LOG_VERBOSE("[GUI] Waiting for new message.");
+
         /* receive message from other modules form system */
         memset(buff, '\0', sizeof(buff));
 
@@ -96,7 +98,10 @@ static void *gui_ReceiveMessageThread(void *cookie)
 
         /* If there is no data just continue */
         if (bytes_read == 0)
+        {
+            DELAY_MS(1000);
             continue;
+        }
 
         /* If there is message print it */
         if (bytes_read > 2)
@@ -113,7 +118,7 @@ static void *gui_ReceiveMessageThread(void *cookie)
     }
 }
 
-static void gui_StartMessageReader(void)
+static void gui_StartReceiveMessageTread(void)
 {
     /**
     *  Start a FIFO reader mean to create thread for receiving a
@@ -147,7 +152,7 @@ void Gui_Init(void)
     DEBUG_LOG_DEBUG("Init GUI process...");
 
     /* Init pipe connection to gui process */
-    gui_StartMessageReader();
+    gui_StartReceiveMessageTread();
 
     /* Init udp socket connection to python gui app */
     // gui_InitUdpSocketConnectionToPythonPlot();
@@ -158,7 +163,7 @@ void Gui_Init(void)
     while (1)
     {
         DEBUG_LOG_VERBOSE("[GUI] Gui process running... (should never enter here).");
-        usleep(SEC_TO_US(5));
+        DELAY_S(5);
     }
 }
 
@@ -169,7 +174,7 @@ void Gui_Destroy(void)
 
 void Gui_SendMessage(gui_message_type_t message_type, const void * data, int data_len)
 {
-    DEBUG_LOG_DEBUG("Gui_SendMessage, message type: %d, ata len: %d", message_type, data_len);
+    DEBUG_LOG_DEBUG("Gui_SendMessage, message type: %d, len: %d", message_type, data_len);
 
     int fd;
     char buff[GET_MESSAGE_SIZE(data_len)];
@@ -180,21 +185,21 @@ void Gui_SendMessage(gui_message_type_t message_type, const void * data, int dat
     /* Open FIFO file */
     if ((fd = open(gui_fifo_name, O_WRONLY)) == -1)
     {
-        DEBUG_LOG_ERROR("Cannot open FIFO.");
+        DEBUG_LOG_ERROR("[GUI] Cannot open FIFO.");
         return;
     }
 
     /* Write a message to FIFO */
-    if (write(fd, buff, strlen(buff)) != strlen(buff))
+    if (write(fd, buff, GET_MESSAGE_SIZE(data_len)) != strlen(buff))
     {
-        DEBUG_LOG_ERROR("Cannot write to FIFO.");
+        DEBUG_LOG_ERROR("[GUI] Cannot write to FIFO.");
         return;
     }
 
     /* Close FIFO */
     if (close(fd) == -1)
     {
-        DEBUG_LOG_ERROR("Cannot close FIFO.");
+        DEBUG_LOG_ERROR("[GUI] Cannot close FIFO.");
         return;
     }
 }
