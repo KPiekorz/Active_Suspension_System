@@ -9,7 +9,7 @@
 
 #include "system_utility.h"
 
-// #define INCLUDE_PYTHON_GUI
+#define INCLUDE_PYTHON_GUI
 
 /*** STATIC FUNTION ***/
 
@@ -49,13 +49,22 @@ static void gui_RunGui(void)
 
 static void * gui_ReceiveMessageThread(void *cookie)
 {
+	/* Scheduling policy: FIFO or RR */
+	int policy;
+	/* Structure of other thread parameters */
+	struct sched_param param;
+
+	/* Read modify and set new thread priority */
+	pthread_getschedparam( pthread_self(), &policy, &param);
+	param.sched_priority = sched_get_priority_max(policy);
+	pthread_setschedparam( pthread_self(), policy, &param);
 
     while (true)
     {
         /* receive message from other modules form system */
 
         DEBUG_LOG_VERBOSE("[GUI] Receive message from other preocess...");
-        usleep(SEC_TO_US(5));
+        usleep(SEC_TO_US(1));
     }
 }
 
@@ -95,7 +104,7 @@ void Gui_Init(void)
     /* Init pipe connection to gui process */
     gui_StartMessageReader();
 
-    // /* Init udp socket connection to python gui app */
+    /* Init udp socket connection to python gui app */
     // gui_InitUdpSocketConnectionToPythonPlot();
 
     /* Start gui python app */
@@ -104,7 +113,7 @@ void Gui_Init(void)
     while (1)
     {
         DEBUG_LOG_VERBOSE("Gui process running...");
-        usleep(SEC_TO_US(1));
+        usleep(SEC_TO_US(5));
     }
 }
 

@@ -10,8 +10,8 @@ A system that allows for adaptive control of the suspension of a modern BMW or A
   - sudo apt upgrade
   - sudo apt install python3-venv python3-pip python3-tk
   - sudo apt install python3.7 python3.7-dev python3.7-venv
-  - python3.7 -m venv gui3.7
-  - source gui3.7/bin/activate
+  - python3.7 -m venv gui-env
+  - source gui-env/bin/activate
   - pip install numpy scipy matplotlib pyqt5
 
 ## Run project
