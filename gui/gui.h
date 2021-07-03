@@ -33,6 +33,6 @@ void Gui_Destroy(void);
  * @param  data_len: data lenght in bytes
  * @retval None
  */
-void Gui_SendMessage(gui_message_type_t message_type, void * data, uint16_t data_len);
+void Gui_SendMessage(gui_message_type_t message_type, const void * data, int data_len);
 
 #endif /* GUI_H */

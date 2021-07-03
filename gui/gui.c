@@ -99,16 +99,17 @@ static void *gui_ReceiveMessageThread(void *cookie)
             continue;
 
         /* If there is message print it */
-        if (bytes_read > 0)
+        if (bytes_read > 2)
         {
-            DEBUG_LOG_VERBOSE("gui_ReceiveMessageThread, buff: %s", buff);
-
-            DEBUG_LOG_DEBUG("gui_ReceiveMessageThread, type: %d, len: %d",
-                            );
+            DEBUG_LOG_DEBUG("[GUI] gui_ReceiveMessageThread, buff: %s, type: %d, len: %d",
+                            buff,
+                            buff[SYSTEM_MESSAGE_TYPE_OFFSET],
+                            buff[SYSTEM_MESSAGE_LENGTH_OFFSET]);
         }
-
-        DEBUG_LOG_VERBOSE("[GUI] Receive message from other preocess...");
-        // usleep(SEC_TO_US(1));
+        else
+        {
+            DEBUG_LOG_WARN("[GUI] gui_ReceiveMessageThread, Message too short!!!");
+        }
     }
 }
 
@@ -156,7 +157,7 @@ void Gui_Init(void)
 
     while (1)
     {
-        DEBUG_LOG_VERBOSE("Gui process running...");
+        DEBUG_LOG_VERBOSE("[GUI] Gui process running... (should never enter here).");
         usleep(SEC_TO_US(5));
     }
 }
@@ -166,7 +167,7 @@ void Gui_Destroy(void)
     DEBUG_LOG_DEBUG("Destroy GUI process...");
 }
 
-void Gui_SendMessage(gui_message_type_t message_type, void *data, uint16_t data_len)
+void Gui_SendMessage(gui_message_type_t message_type, const void * data, int data_len)
 {
     DEBUG_LOG_DEBUG("Gui_SendMessage, message type: %d, ata len: %d", message_type, data_len);
 

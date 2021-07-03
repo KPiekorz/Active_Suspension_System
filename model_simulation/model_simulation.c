@@ -5,6 +5,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <stdint.h>
+#include <string.h>
 
 #include "model_simulation.h"
 #include "gui.h"
@@ -27,6 +28,9 @@ void ModelSimulation_Init(void)
 
     while (1)
     {
+        const char * message = "Hello gui!";
+        Gui_SendMessage(gui_message_control_signal, message, strlen(message));
+
         DEBUG_LOG_VERBOSE("Model simulation process running...");
 		usleep(SEC_TO_US(3));
     }
