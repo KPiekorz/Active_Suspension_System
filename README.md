@@ -57,3 +57,7 @@ int status = 0;
 pid_t wpid;
 while ((wpid = wait(&status)) > 0); // this way, the father waits for all the child processes
 ```
+
+## Problems
+
+- Cmake fix: https://cgold.readthedocs.io/en/latest/tutorials/libraries/symbols/link-order.html

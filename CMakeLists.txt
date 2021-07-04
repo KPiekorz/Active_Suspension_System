@@ -10,6 +10,18 @@ set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 find_package(PythonLibs REQUIRED)
 include_directories(${PYTHON_INCLUDE_DIRS})
 
+include_directories(common)
+include_directories(control)
+include_directories(gui)
+include_directories(model_simulation)
+include_directories(sensors)
+
+link_directories(common)
+link_directories(control)
+link_directories(gui)
+link_directories(model_simulation)
+link_directories(sensors)
+
 add_subdirectory(common)
 add_subdirectory(control)
 add_subdirectory(gui)
@@ -18,12 +30,4 @@ add_subdirectory(sensors)
 
 add_executable(automatic_suspension_system main.c)
 
-target_include_directories(automatic_suspension_system PUBLIC
-                          "${PROJECT_BINARY_DIR}"
-                          "${PROJECT_SOURCE_DIR}/common"
-                          "${PROJECT_SOURCE_DIR}/sensors"
-                          "${PROJECT_SOURCE_DIR}/control"
-                          "${PROJECT_SOURCE_DIR}/model_simulation"
-                          "${PROJECT_SOURCE_DIR}/gui")
-
-target_link_libraries(automatic_suspension_system common sensors gui model_simulation control ${PYTHON_LIBRARIES})
+target_link_libraries(automatic_suspension_system system_process sensors gui model_simulation control ${PYTHON_LIBRARIES})

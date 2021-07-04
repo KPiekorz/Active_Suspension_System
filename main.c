@@ -9,11 +9,11 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include "system_utility.h"
-#include "system_process.h"
 #include "sensors.h"
 #include "gui.h"
 #include "model_simulation.h"
+#include "system_utility.h"
+#include "system_process.h"
 
 /* static helper function prototype */
 static void main_PrintArgs(int argc, char *argv[]);

@@ -106,10 +106,16 @@ static void *gui_ReceiveMessageThread(void *cookie)
         /* If there is message print it */
         if (bytes_read > 2)
         {
-            DEBUG_LOG_DEBUG("[GUI] gui_ReceiveMessageThread, buff: %s, type: %d, len: %d",
-                            buff,
+            DEBUG_LOG_DEBUG("[GUI] gui_ReceiveMessageThread, type: %d, len: %d",
                             buff[SYSTEM_MESSAGE_TYPE_OFFSET],
                             buff[SYSTEM_MESSAGE_LENGTH_OFFSET]);
+
+            uint8_t * data = &(buff[SYSTEM_MESSAGE_DATA_OFFSET]);
+            uint8_t value = 0;
+            uint16_t byte_index = 0;
+            byte_index += SystemUtility_GetOneByte(data, byte_index, &value);
+
+            DEBUG_LOG_DEBUG("[GUI] Value: %d", value);
         }
         else
         {
