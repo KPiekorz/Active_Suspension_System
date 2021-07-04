@@ -8,13 +8,25 @@
 #include <fcntl.h>
 #include <string.h>
 
-bool SystemUtility_SendMessage(const char * fifo_name, uint8_t message_type, uint8_t * data, uint16_t data_len)
+/*** STATIC FUNCTION ***/
+
+static void systemUtility_CopyFloatArray(float * src, float * dest, int len)
+{
+    for (int i = 0; i < len; i++)
+    {
+        dest[i] = src[i];
+    }
+}
+
+/*** GLOBAL FUNCTION ***/
+
+bool SystemUtility_SendMessage(const char * fifo_name, int message_type, float * data, int data_len)
 {
     int fd;
-    uint8_t buff[GET_MESSAGE_SIZE(data_len)];
-    buff[SYSTEM_MESSAGE_TYPE_OFFSET] = message_type;
-    buff[SYSTEM_MESSAGE_LENGTH_OFFSET] = (uint8_t)data_len;
-    memcpy(&(buff[SYSTEM_MESSAGE_DATA_OFFSET]), data, data_len);
+    float buff[GET_MESSAGE_LEN(data_len)];
+    buff[SYSTEM_MESSAGE_TYPE_OFFSET] = (float)message_type;
+    buff[SYSTEM_MESSAGE_LENGTH_OFFSET] = (float)data_len;
+    systemUtility_CopyFloatArray(data, &(buff[SYSTEM_MESSAGE_DATA_OFFSET]), data_len);
 
     /* Open FIFO file */
     if ((fd = open(fifo_name, O_WRONLY)) == -1)
@@ -23,7 +35,7 @@ bool SystemUtility_SendMessage(const char * fifo_name, uint8_t message_type, uin
     }
 
     /* Write a message to FIFO */
-    if (write(fd, buff, GET_MESSAGE_SIZE(data_len)) != GET_MESSAGE_SIZE(data_len))
+    if (write(fd, buff, GET_MESSAGE_LEN(data_len)) != GET_MESSAGE_LEN(data_len))
     {
         return false;
     }

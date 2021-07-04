@@ -28,13 +28,9 @@ void ModelSimulation_Init(void)
 
     while (1)
     {
-        uint8_t data[10];
-        uint16_t byte_index = 0;
+        float data[3] = {3, 1, 1};
 
-        byte_index += SystemUtility_SetOneByte(data, byte_index, 1);
-        byte_index += SystemUtility_SetOneByte(data, byte_index, 2);
-
-        Gui_SendMessage(gui_message_control_signal, data, byte_index);
+        Gui_SendMessage(gui_message_control_signal, data, 3);
 
         DELAY_S(3);
         DEBUG_LOG_VERBOSE("[SIM] Model simulation process running...");

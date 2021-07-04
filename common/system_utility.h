@@ -7,6 +7,7 @@
 #include <pthread.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <string.h>
 
 /*** SYSTEM_FIFO_SIZE ***/
 
@@ -17,7 +18,7 @@
 #define SYSTEM_MESSAGE_TYPE_OFFSET          (0)
 #define SYSTEM_MESSAGE_LENGTH_OFFSET        (1)
 #define SYSTEM_MESSAGE_DATA_OFFSET          (2)
-#define GET_MESSAGE_SIZE(l)                 (l + 2)
+#define GET_MESSAGE_LEN(l)                  ((l + 2) * sizeof(float))
 
 /*** TIME TRANSFORMATION ***/
 
@@ -74,6 +75,6 @@
  * @param  data_len: data length
  * @retval TRUE if operation was successful, otherwise FALSE.
  */
-bool SystemUtility_SendMessage(const char * fifo_name, uint8_t message_type, uint8_t * data, uint16_t data_len);
+bool SystemUtility_SendMessage(const char * fifo_name, int message_type, float * data, int data_len);
 
 #endif  /* SYSTEM_UTILITY_H */

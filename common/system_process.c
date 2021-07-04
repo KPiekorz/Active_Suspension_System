@@ -43,7 +43,7 @@ static void systemProcess_KillAllSystemProcess(void)
 {
     DEBUG_LOG_DEBUG("systemProcess_KillAllSystemProcess");
 
-    for (uint8_t i = 0; i < GetProcessCount(); i++)
+    for (int i = 0; i < GetProcessCount(); i++)
     {
         DEBUG_LOG_DEBUG("systemProcess_KillAllSystemProcess, process name: %s, pid: %d", system_process_attributes[i].process_name, system_process_attributes[i].process_pid);
         kill(system_process_attributes[i].process_pid, SIGKILL);
@@ -53,7 +53,7 @@ static void systemProcess_KillAllSystemProcess(void)
 
 static void systemProcess_PrintAllProcessPid(void)
 {
-    for (uint8_t i = 0; i < GetProcessCount(); i++)
+    for (int i = 0; i < GetProcessCount(); i++)
     {
         DEBUG_LOG_DEBUG("Process %s, pid: %d", system_process_attributes[i].process_name,
                                                system_process_attributes[i].process_pid);

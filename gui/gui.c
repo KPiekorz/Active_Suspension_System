@@ -23,7 +23,7 @@ static void gui_InitUdpSocketConnectionToPythonPlot(void)
 {
 }
 
-static void gui_SendDataToPlot(void *data, uint16_t data_len)
+static void gui_SendDataToPlot(void *data, int data_len)
 {
 }
 
@@ -66,7 +66,7 @@ static void *gui_ReceiveMessageThread(void *cookie)
     pthread_setschedparam(pthread_self(), policy, &param);
 
     int fd, bytes_read;
-    char buff[DEFAULT_FIFO_SIZE];
+    float buff[DEFAULT_FIFO_SIZE];
 
     /* Create FIFO */
     if ((mkfifo(gui_fifo_name, 0664) == -1) && (errno != EEXIST))
@@ -110,12 +110,9 @@ static void *gui_ReceiveMessageThread(void *cookie)
                             buff[SYSTEM_MESSAGE_TYPE_OFFSET],
                             buff[SYSTEM_MESSAGE_LENGTH_OFFSET]);
 
-            uint8_t * data = &(buff[SYSTEM_MESSAGE_DATA_OFFSET]);
-            uint8_t value = 0;
-            uint16_t byte_index = 0;
-            byte_index += SystemUtility_GetOneByte(data, byte_index, &value);
+            float * data = &(buff[SYSTEM_MESSAGE_DATA_OFFSET]);
 
-            DEBUG_LOG_DEBUG("[GUI] Value: %d", value);
+            DEBUG_LOG_DEBUG("[GUI] Value: %d", data[0]);
         }
         else
         {
@@ -178,11 +175,11 @@ void Gui_Destroy(void)
     DEBUG_LOG_DEBUG("[GUI] Destroy process...");
 }
 
-void Gui_SendMessage(gui_message_type_t message_type, uint8_t * data, uint16_t data_len)
+void Gui_SendMessage(gui_message_type_t message_type, float * data, int data_len)
 {
     DEBUG_LOG_DEBUG("[GUI] Gui_SendMessage, message type: %d, len: %d", message_type, data_len);
 
-    if (!SystemUtility_SendMessage(gui_fifo_name, (uint8_t)message_type, data, data_len))
+    if (!SystemUtility_SendMessage(gui_fifo_name, (int)message_type, data, data_len))
     {
         DEBUG_LOG_ERROR("[GUI] Gui_SendMessage, Can't send message to gui process!");
     }
