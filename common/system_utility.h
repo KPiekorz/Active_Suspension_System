@@ -8,6 +8,11 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
+#include <stdint.h>
+
+/*** BYTE TYPE ***/
+
+#define byte                                int //char // uint8
 
 /*** SYSTEM_FIFO_SIZE ***/
 
@@ -86,5 +91,16 @@ bool SystemUtility_SendMessage(const char * fifo_name, int message_type, float *
  * @retval None
  */
 void SystemUtility_CopyFloatArray(float * src, float * dest, int len);
+
+/**
+ * @brief  Set foat array in byte array
+ * @note
+ * @param  src: float array
+ * @param  src_len: float aray length
+ * @param  dest: [out] byte array (byte is int or char or uint8_t)
+ * @param  dest_len: [out] dest array length
+ * @retval None
+ */
+void SystemUtility_SetFloatArrayInByteArray(float * src, int src_len, byte * dest, int * dest_len);
 
 #endif  /* SYSTEM_UTILITY_H */

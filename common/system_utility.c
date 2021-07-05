@@ -48,3 +48,13 @@ void SystemUtility_CopyFloatArray(float * src, float * dest, int len)
         dest[i] = src[i];
     }
 }
+
+void SystemUtility_SetFloatArrayInByteArray(float * src, int src_len, byte * dest, int * dest_len)
+{
+
+}
+
+void SystemUtility_GetFloatArrayFromByteArray()
+{
+
+}
