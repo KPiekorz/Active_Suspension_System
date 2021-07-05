@@ -65,7 +65,7 @@
 
 #define DEBUG_LOG_ERROR(...)        { fprintf(stderr, "ERROR: " __VA_ARGS__);    printf("\n"); }
 
-/*** SEND MESSAGE AMONGS SYSTEM PROCESS API ***/
+/*** SYSTEM FUNCTION ***/
 
 /**
  * @brief  Send messages to other process created in system.
@@ -76,5 +76,15 @@
  * @retval TRUE if operation was successful, otherwise FALSE.
  */
 bool SystemUtility_SendMessage(const char * fifo_name, int message_type, float * data, int data_len);
+
+/**
+ * @brief  Copy src float array , to dest float array.
+ * @note
+ * @param  src: source float array
+ * @param  dest: destination float array
+ * @param  len: length of of shorter array
+ * @retval None
+ */
+void SystemUtility_CopyFloatArray(float * src, float * dest, int len);
 
 #endif  /* SYSTEM_UTILITY_H */
