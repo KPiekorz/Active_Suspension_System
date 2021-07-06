@@ -12,7 +12,7 @@
 
 /*** BYTE TYPE ***/
 
-#define byte                                int //char // uint8
+#define byte                                unsigned int //char // uint8
 
 /*** SYSTEM_FIFO_SIZE ***/
 

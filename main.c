@@ -31,6 +31,8 @@ int main(int argc, char *argv[])
     byte b_arr[b_arr_size];
     memset(b_arr, 0, b_arr_size);
 
+    DEBUG_LOG_DEBUG("Float i: %f", f_arr[0]);
+
     int b_arr_used_size = SystemUtility_SetFloatArrayInByteArray(f_arr, f_arr_size, b_arr, b_arr_size);
     if (b_arr_used_size > 0)
     {
