@@ -97,10 +97,21 @@ void SystemUtility_CopyFloatArray(float * src, float * dest, int len);
  * @note
  * @param  src: float array
  * @param  src_len: float aray length
- * @param  dest: [out] byte array (byte is int or char or uint8_t)
- * @param  dest_len: [out] dest array length
- * @retval None
+ * @param  dest: byte array (byte is int or char or uint8_t)
+ * @param  dest_len: dest array length (dest array size)
+ * @retval Size of byte array, with set float values.
  */
-void SystemUtility_SetFloatArrayInByteArray(float * src, int src_len, byte * dest, int * dest_len);
+int SystemUtility_SetFloatArrayInByteArray(float * src, const int src_len, byte * dest, const int dest_len);
+
+/**
+ * @brief  Get float array from byte array
+ * @note
+ * @param  src: byte array
+ * @param  src_len: size of byte array
+ * @param  dest: float array
+ * @param  dest_len: float array size
+ * @retval Size od used float array size.
+ */
+int SystemUtility_GetFloatArrayFromByteArray(byte * src, const int src_len, float * dest, const int dest_len);
 
 #endif  /* SYSTEM_UTILITY_H */

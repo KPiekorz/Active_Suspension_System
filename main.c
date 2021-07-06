@@ -22,7 +22,38 @@ int main(int argc, char *argv[])
 {
     main_PrintArgs(argc, argv);
 
-    SystemProcess_Initialize();
+    int f_arr_size = 2;
+    float f_arr[f_arr_size];
+    f_arr[0] = 1.32;
+    f_arr[1] = 3.45;
+
+    const int b_arr_size = 200;
+    byte b_arr[b_arr_size];
+    memset(b_arr, 0, b_arr_size);
+
+    int b_arr_used_size = SystemUtility_SetFloatArrayInByteArray(f_arr, f_arr_size, b_arr, b_arr_size);
+    if (b_arr_used_size > 0)
+    {
+        DEBUG_LOG_DEBUG("Size: %d", b_arr_used_size);
+    }
+    else
+    {
+        DEBUG_LOG_DEBUG("Error!");
+    }
+
+    memset(f_arr, 0, sizeof(float) * f_arr_size);
+
+    int f_arr_used_size = SystemUtility_GetFloatArrayFromByteArray(b_arr, b_arr_used_size, f_arr, f_arr_size);
+    if (f_arr_used_size > 0)
+    {
+        DEBUG_LOG_DEBUG("Size: %d", f_arr_used_size);
+    }
+    else
+    {
+        DEBUG_LOG_DEBUG("Error!");
+    }
+
+    // SystemProcess_Initialize();
 
     DEBUG_LOG_ALWAYS("Enter q to quit: ");
   	while(getc(stdin)!='q') {}

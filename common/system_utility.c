@@ -49,12 +49,63 @@ void SystemUtility_CopyFloatArray(float * src, float * dest, int len)
     }
 }
 
-void SystemUtility_SetFloatArrayInByteArray(float * src, int src_len, byte * dest, int * dest_len)
+int SystemUtility_SetFloatArrayInByteArray(float * src, const int src_len, byte * dest, const int dest_len)
 {
+    int byte_array_size = (int)sizeof(float) * src_len;
 
+    if (src_len == 0 || byte_array_size > dest_len)
+    {
+        return 0;
+    }
+
+    if (sizeof(unsigned int) != sizeof(float))
+    {
+        return 0;
+    }
+
+    int byte_index = 0;
+    for (int i = 0; i < src_len; i++)
+    {
+        unsigned int asInt = *((int*)&(src[i]));
+        for (int j = 0; j < sizeof(float); j++)
+        {
+            dest[byte_index++] = (asInt >> (8 * j)) & 0xFF;
+        }
+    }
+
+    return byte_array_size;
 }
 
-void SystemUtility_GetFloatArrayFromByteArray()
+int SystemUtility_GetFloatArrayFromByteArray(byte * src, const int src_len, float * dest, const int dest_len)
 {
+    if (src_len == 0)
+    {
+        return 0;
+    }
 
+    if (sizeof(unsigned int) != sizeof(float))
+    {
+        return 0;
+    }
+
+    int float_array_size = src_len / (int)sizeof(float);
+
+    if (float_array_size < 1)
+    {
+        return 0;
+    }
+
+    int byte_index = 0;
+    for (int i = 0; i < float_array_size; i++)
+    {
+        unsigned int asInt = 0;
+        for (int j = 0; j < sizeof(float); j++)
+        {
+            asInt = (src[byte_index++] << (8 * j));
+        }
+
+        dest[i] = (float)asInt;
+    }
+
+    return float_array_size;
 }
