@@ -4,7 +4,19 @@
 #include "gui.h"
 #include "system_utility.h"
 
-void Sensors_PrintSensorData(void)
+
+void Sensor_Init(void)
 {
-    DEBUG_LOG_VERBOSE("Hello I am sensor!");
+    DEBUG_LOG_INFO("Init CONTROL process...");
+
+    while (1)
+    {
+        DEBUG_LOG_VERBOSE("Sensor process running...");
+		DELAY_S(2);
+    }
+}
+
+void Sensor_Destroy(void)
+{
+    DEBUG_LOG_INFO("Init CONTROL process...");
 }

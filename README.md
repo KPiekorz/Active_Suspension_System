@@ -61,3 +61,4 @@ while ((wpid = wait(&status)) > 0); // this way, the father waits for all the ch
 ## Problems
 
 - Cmake fix: https://cgold.readthedocs.io/en/latest/tutorials/libraries/symbols/link-order.html
+- Fork VS Code (vs code linux process after fork): https://github.com/microsoft/vscode-cpptools/issues/511, https://stackoverflow.com/questions/40896631/debug-fork-with-visual-studio-c, https://www.youtube.com/watch?v=123IV3xZmQQ

@@ -13,7 +13,7 @@
 #include "system_utility.h"
 #include "system_process.h"
 
-#define INIT_GUI
+#include "gui.h"
 
 /* static helper function prototype */
 static void main_PrintArgs(int argc, char *argv[]);

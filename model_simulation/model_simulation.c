@@ -24,19 +24,23 @@ static void modelSimluation_StartSimulation(void)
 
 void ModelSimulation_Init(void)
 {
-    DEBUG_LOG_DEBUG("Init model simulation process...");
+    #ifdef INIT_MODEL_SIMULATION
+        DEBUG_LOG_DEBUG("ModelSimulation_Init, Init model simulation process...");
 
-    while (1)
-    {
-        float data[3] = {3, 1, 1};
+        while (1)
+        {
+            float data[3] = {3, 1, 1};
 
-        Gui_SendMessage(gui_message_control_signal, data, 3);
+            Gui_SendMessage(gui_message_control_signal, data, 3);
 
-        DELAY_S(3);
-        DEBUG_LOG_VERBOSE("[SIM] Model simulation process running...");
-    }
+            DELAY_S(1);
+            DEBUG_LOG_VERBOSE("[SIM] Model simulation process running...");
+        }
 
-    exit(EXIT_SUCCESS);
+        exit(EXIT_SUCCESS);
+    #else
+        DEBUG_LOG_INFO("[SIM] ModelSimulation_Init, Won't be initialized.");
+    #endif
 }
 
 void ModelSimulation_Destroy(void)

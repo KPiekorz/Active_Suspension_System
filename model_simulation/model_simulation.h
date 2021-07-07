@@ -1,6 +1,8 @@
 #ifndef MODEL_SIMULATION_H
 #define MODEL_SIMULATION_H
 
+#define INIT_MODEL_SIMULATION
+
 typedef enum
 {
     model_simulation_message_states,

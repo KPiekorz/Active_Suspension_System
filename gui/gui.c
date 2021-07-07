@@ -154,7 +154,7 @@ static void gui_StartReceiveMessageTread(void)
 void Gui_Init(void)
 {
     #ifdef  INIT_GUI
-        DEBUG_LOG_DEBUG("[GUI] Gui_Init, Init process...");
+        DEBUG_LOG_INFO("[GUI] Gui_Init, Init process...");
 
         /* Init pipe connection to gui process */
         gui_StartReceiveMessageTread();
@@ -170,8 +170,10 @@ void Gui_Init(void)
             DEBUG_LOG_VERBOSE("[GUI] Gui_Init, process running... (should never enter here).");
             DELAY_S(5);
         }
+
+        exit(EXIT_SUCCESS);
     #else
-        DEBUG_LOG_DEBUG("[GUI] Gui_Init, Won't be initialized...");
+        DEBUG_LOG_INFO("[GUI] Gui_Init, Won't be initialized.");
     #endif
 }
 
