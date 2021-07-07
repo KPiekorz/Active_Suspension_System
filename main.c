@@ -13,6 +13,8 @@
 #include "system_utility.h"
 #include "system_process.h"
 
+#define INIT_GUI
+
 /* static helper function prototype */
 static void main_PrintArgs(int argc, char *argv[]);
 
@@ -53,7 +55,7 @@ int main(int argc, char *argv[])
         DEBUG_LOG_DEBUG("Error!");
     }
 
-    // SystemProcess_Initialize();
+    SystemProcess_Initialize();
 
     DEBUG_LOG_ALWAYS("Enter q to quit: ");
   	while(getc(stdin)!='q') {}

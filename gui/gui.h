@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdint.h>
 
+// #define INIT_GUI
+
 typedef enum
 {
     gui_message_control_signal,

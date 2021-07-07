@@ -14,8 +14,6 @@
 
 #define UNKNOWN_PID     (0)
 
-// #define INIT_GUI
-
 /* process init functions */
 typedef void (* process_init)(void);
 

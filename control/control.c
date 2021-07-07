@@ -8,7 +8,7 @@ void Control_Init(void)
     while (1)
     {
         DEBUG_LOG_VERBOSE("Control process running...");
-		usleep(SEC_TO_US(2));
+		DELAY_S(2);
     }
 }
 
