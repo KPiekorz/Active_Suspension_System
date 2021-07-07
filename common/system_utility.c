@@ -53,7 +53,7 @@ void SystemUtility_CopyFloatArray(float * src, float * dest, int len)
 
 int SystemUtility_SetFloatArrayInByteArray(float * src, const int src_len, byte * dest, const int dest_len)
 {
-    if (sizeof(byte) != sizeof(float) ||
+    if (sizeof(unsigned int) != sizeof(float) ||
         FLOAT_SIZE != sizeof(float))
     {
         return 0;
@@ -70,19 +70,21 @@ int SystemUtility_SetFloatArrayInByteArray(float * src, const int src_len, byte 
     for (int i = 0; i < src_len; i++)
     {
         DEBUG_LOG_DEBUG("Src i: %f", src[i]);
-        byte asInt = *((byte*)&(src[i]));
+        unsigned int asInt = *((unsigned int*)&(src[i]));
 
-        dest[byte_index++] = ((byte)asInt      ) & 0xFF;
-        DEBUG_LOG_DEBUG("Byte: %d", ((byte)asInt      ) & 0xFF);
+        DEBUG_LOG_DEBUG("asInt: %d", asInt);
 
-        dest[byte_index++] = ((byte)asInt >> 8 ) & 0xFF;
-        DEBUG_LOG_DEBUG("Byte: %d", ((byte)asInt >> 8 ) & 0xFF);
+        dest[byte_index++] = (asInt) & 0xFF;
+        DEBUG_LOG_DEBUG("Byte: %d", (asInt) & 0xFF);
 
-        dest[byte_index++] = ((byte)asInt >> 16) & 0xFF;
-        DEBUG_LOG_DEBUG("Byte: %d", ((byte)asInt >> 16) & 0xFF);
+        dest[byte_index++] = (asInt >> 8) & 0xFF;
+        DEBUG_LOG_DEBUG("Byte: %d", (asInt >> 8) & 0xFF);
 
-        dest[byte_index++] = ((byte)asInt >> 24) & 0xFF;
-        DEBUG_LOG_DEBUG("Byte: %d", ((byte)asInt >> 24) & 0xFF);
+        dest[byte_index++] = (asInt >> 16) & 0xFF;
+        DEBUG_LOG_DEBUG("Byte: %d", (asInt >> 16) & 0xFF);
+
+        dest[byte_index++] = (asInt >> 24) & 0xFF;
+        DEBUG_LOG_DEBUG("Byte: %d", (asInt >> 24) & 0xFF);
 
     }
 
@@ -91,7 +93,7 @@ int SystemUtility_SetFloatArrayInByteArray(float * src, const int src_len, byte 
 
 int SystemUtility_GetFloatArrayFromByteArray(byte * src, const int src_len, float * dest, const int dest_len)
 {
-    if (sizeof(byte) != sizeof(float) ||
+    if (sizeof(unsigned int) != sizeof(float) ||
         FLOAT_SIZE != sizeof(float))
     {
         return 0;
@@ -112,11 +114,11 @@ int SystemUtility_GetFloatArrayFromByteArray(byte * src, const int src_len, floa
     int byte_index = 0;
     for (int i = 0; i < float_array_size; i++)
     {
-        byte asInt =0;
-        asInt = src[byte_index++];
-        asInt |= src[byte_index++] << 8;
-        asInt |= src[byte_index++] << 16;
-        asInt |= src[byte_index++] << 24;
+        unsigned int asInt = 0;
+        asInt = (unsigned int)src[byte_index++];
+        asInt |= ((unsigned int)src[byte_index++]) << 8;
+        asInt |= ((unsigned int)src[byte_index++]) << 16;
+        asInt |= ((unsigned int)src[byte_index++]) << 24;
 
         dest[i] = *((float*)&asInt);
 
