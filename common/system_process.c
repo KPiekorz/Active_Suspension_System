@@ -30,7 +30,7 @@ typedef struct
 
 process_attributes_t_t system_process_attributes[] =
 {
-    {Gui_Init,              Gui_Destroy,                UNKNOWN_PID,        "Gui"                    },
+    // {Gui_Init,              Gui_Destroy,                UNKNOWN_PID,        "Gui"                    },
     {Control_Init,          Control_Destroy,            UNKNOWN_PID,        "Control"                },
     {ModelSimulation_Init,  ModelSimulation_Destroy,    UNKNOWN_PID,        "Model_simulation"       },
 };

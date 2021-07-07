@@ -153,24 +153,26 @@ static void gui_StartReceiveMessageTread(void)
 
 void Gui_Init(void)
 {
-    DEBUG_LOG_DEBUG("[GUI] Gui_Init, Init process...");
+    #ifdef  INIT_GUI
+        DEBUG_LOG_DEBUG("[GUI] Gui_Init, Init process...");
 
-    ModelSimulation_SendMessage(model_simulation_message_states, NULL, 0);
+        /* Init pipe connection to gui process */
+        gui_StartReceiveMessageTread();
 
-    /* Init pipe connection to gui process */
-    gui_StartReceiveMessageTread();
+        /* Init udp socket connection to python gui app */
+        // gui_InitUdpSocketConnectionToPythonPlot();
 
-    /* Init udp socket connection to python gui app */
-    // gui_InitUdpSocketConnectionToPythonPlot();
+        /* Start gui python app */
+        gui_RunGui();
 
-    /* Start gui python app */
-    gui_RunGui();
-
-    while (1)
-    {
-        DEBUG_LOG_VERBOSE("[GUI] Gui_Init, process running... (should never enter here).");
-        DELAY_S(5);
-    }
+        while (1)
+        {
+            DEBUG_LOG_VERBOSE("[GUI] Gui_Init, process running... (should never enter here).");
+            DELAY_S(5);
+        }
+    #else
+        DEBUG_LOG_DEBUG("[GUI] Gui_Init, Won't be initialized...");
+    #endif
 }
 
 void Gui_Destroy(void)
