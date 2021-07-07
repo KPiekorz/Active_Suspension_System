@@ -44,3 +44,8 @@ void ModelSimulation_Destroy(void)
     DEBUG_LOG_DEBUG("Destroy model simulation process...");
 
 }
+
+void ModelSimulation_SendMessage(model_simulation_message_type_t message_type, float * data, int data_len)
+{
+
+}

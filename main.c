@@ -9,8 +9,6 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include "sensors.h"
-#include "gui.h"
 #include "model_simulation.h"
 #include "system_utility.h"
 #include "system_process.h"

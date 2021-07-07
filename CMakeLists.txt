@@ -30,4 +30,4 @@ add_subdirectory(sensors)
 
 add_executable(automatic_suspension_system main.c)
 
-target_link_libraries(automatic_suspension_system system_process sensors gui model_simulation control ${PYTHON_LIBRARIES})
+target_link_libraries(automatic_suspension_system system_process sensors model_simulation control gui ${PYTHON_LIBRARIES})

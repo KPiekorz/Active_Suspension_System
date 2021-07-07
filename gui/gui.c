@@ -12,6 +12,7 @@
 #include <string.h>
 
 #include "system_utility.h"
+#include "model_simulation.h"
 
 #define INCLUDE_PYTHON_GUI
 
@@ -153,6 +154,8 @@ static void gui_StartReceiveMessageTread(void)
 void Gui_Init(void)
 {
     DEBUG_LOG_DEBUG("[GUI] Gui_Init, Init process...");
+
+    ModelSimulation_SendMessage(model_simulation_message_states, NULL, 0);
 
     /* Init pipe connection to gui process */
     gui_StartReceiveMessageTread();
