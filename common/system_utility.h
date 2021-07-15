@@ -23,6 +23,8 @@
 #define GET_FLOAT_DATA_SIZE(float_data_len)         (float_data_len * sizeof(float)) // only float data size in bytes
 #define GET_FULL_MESSAGE_SIZE(float_data_len)       (GET_FLOAT_DATA_SIZE(float_data_len) + 2) // float array size in bytes and message metadata size in bytes (message type and size of payload)
 
+#define GET_FLOAT_DATA_LEN(message_payload_size)    (message_payload_size * sizeof(float))
+
 /*** TIME TRANSFORMATION ***/
 
 #define SEC_TO_US(s)                                (s * 1000000)
@@ -75,25 +77,33 @@ typedef uint8_t byte; //unsigned int //char // uint8_t
 /*** SYSTEM FUNCTION ***/
 
 /**
+ * @brief  Create message fifo queue
+ * @note
+ * @param  fifo_name: fifo name
+ * @retval true if successfully queue created, otherwise false
+ */
+bool SystemUtility_CreateMessageFifo(const char * fifo_name);
+
+/**
  * @brief  Send messages to other process created in system.
  * @note
  * @param  fifo_name: fifo queue name
- * @param  data: data (length of float array)
- * @param  data_len: data length
- * @retval 
+ * @param  float_data: data (length of float array)
+ * @param  float_data_len: data length
+ * @retval true if successfully send message, otherwise false
  */
-int SystemUtility_SendMessage(const char * fifo_name, int message_type, float * float_data, const int float_data_len);
+bool SystemUtility_SendMessage(const char * fifo_name, int message_type, float * float_data, const int float_data_len);
 
 /**
  * @brief  Receive message from other process created in system
  * @note
  * @param  fifo_name: fifo queue name
- * @param  message_type: message type
- * @param  data: 
- * @param  data_len: 
- * @retval 
+ * @param  message_type: [out] message type
+ * @param  float_data: [out] float data
+ * @param  float_data_len: [out] data length of received float message (as input you have to provide max float data array length)
+ * @retval true if successfully received data, otherwise false
  */
-int SystemUtility_ReceiveMessage(const char * fifo_name, int message_type, float * data, int data_len);
+bool SystemUtility_ReceiveMessage(const char * fifo_name, int * message_type, float * float_data, int * float_data_len);
 
 /**
  * @brief  Copy src float array , to dest float array.
@@ -110,9 +120,9 @@ void SystemUtility_CopyFloatArray(float * src, float * dest, int len);
  * @note
  * @param  src: float array
  * @param  src_len: float aray length
- * @param  dest: byte array (byte is int or char or uint8_t)
- * @param  dest_len: dest array length (dest array size)
- * @retval Size of byte array, with set float values.
+ * @param  dest: byte array
+ * @param  dest_len: dest array max length
+ * @retval Size of used byte array.
  */
 int SystemUtility_SetFloatArrayInByteArray(float * src, const int src_len, byte * dest, const int dest_len);
 
@@ -122,9 +132,16 @@ int SystemUtility_SetFloatArrayInByteArray(float * src, const int src_len, byte 
  * @param  src: byte array
  * @param  src_len: size of byte array
  * @param  dest: float array
- * @param  dest_len: float array size (max float array size, where float values can be saved)
- * @retval Size od used float array size.
+ * @param  dest_len: float array max length
+ * @retval Size of used float array.
  */
 int SystemUtility_GetFloatArrayFromByteArray(byte * src, const int src_len, float * dest, const int dest_len);
+
+/**
+ * @brief  
+ * @note   
+ * @retval None
+ */
+void SystemUtility_InitThread(void);
 
 #endif  /* SYSTEM_UTILITY_H */

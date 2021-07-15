@@ -69,7 +69,17 @@ static void *gui_ReceiveMessageThread(void *cookie)
         pthread_setschedparam(pthread_self(), policy, &param);
     }
 
+    SystemUtility_InitThread();
+
     // here have to be pleaced function for receiving message from other process via fifo queue
+
+    SystemUtility_CreateMessageFifo(gui_fifo_name);
+
+    while (true)
+    {
+        // SystemUtility_ReceiveMessage();
+
+    }
 }
 
 static void gui_StartReceiveMessageTread(void)
