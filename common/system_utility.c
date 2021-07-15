@@ -16,30 +16,111 @@
 
 /*** GLOBAL FUNCTION ***/
 
-bool SystemUtility_SendMessage(const char * fifo_name, int message_type, float * data, int data_len)
+int SystemUtility_SendMessage(const char * fifo_name, int message_type, float * float_data, const int float_data_len)
 {
+    // copy float to byte array and send byte array
+
+    if (GET_FULL_MESSAGE_SIZE(float_data_len) > DEFAULT_FIFO_SIZE)
+    {
+        DEBUG_LOG_ERROR("SystemUtility_SendMessage, Message too long, float data len: %d", float_data_len);
+        return 0;
+    }
+
     int fd;
-    float buff[GET_MESSAGE_LEN(data_len)];
-    buff[SYSTEM_MESSAGE_TYPE_OFFSET] = (float)message_type;
-    buff[SYSTEM_MESSAGE_LENGTH_OFFSET] = (float)data_len;
-    SystemUtility_CopyFloatArray(data, &(buff[SYSTEM_MESSAGE_DATA_OFFSET]), data_len);
+    int buff_len = GET_FULL_MESSAGE_SIZE(float_data_len);
+    byte buff[buff_len];
+
+    /* set metadata values of message */
+    buff[SYSTEM_MESSAGE_TYPE_OFFSET] = (byte)message_type;
+    buff[SYSTEM_MESSAGE_PAYLOAD_SIZE_OFFSET] = (byte)GET_FLOAT_DATA_SIZE(float_data_len);
+
+    if (GET_FLOAT_DATA_SIZE(float_data_len) != SystemUtility_SetFloatArrayInByteArray(float_data, float_data_len, &(buff[SYSTEM_MESSAGE_PAYLOAD_OFFSET]), GET_FLOAT_DATA_SIZE(float_data_len)))
+    {
+        DEBUG_LOG_ERROR("SystemUtility_SendMessage, Can't set float array to byte array!");
+        return 0;
+    }
 
     /* Open FIFO file */
     if ((fd = open(fifo_name, O_WRONLY)) == -1)
     {
-        return false;
+        DEBUG_LOG_ERROR("SystemUtility_SendMessage, Can't open fifo!");
+        return 0;
     }
 
+    int float_data_len_send = float_data_len;
+
     /* Write a message to FIFO */
-    if (write(fd, buff, GET_MESSAGE_LEN(data_len)) != GET_MESSAGE_LEN(data_len))
+    if (write(fd, buff, GET_FULL_MESSAGE_SIZE(float_data_len)) != GET_FULL_MESSAGE_SIZE(float_data_len))
     {
-        return false;
+        DEBUG_LOG_ERROR("SystemUtility_SendMessage, Can't write to fifo!");
+        float_data_len_send = 0;
     }
 
     /* Close FIFO */
     if (close(fd) == -1)
     {
-        return false;
+        DEBUG_LOG_ERROR("SystemUtility_SendMessage, Can't close fifo!");
+        float_data_len_send = 0;
+    }
+
+    return float_data_len_send;
+}
+
+int SystemUtility_ReceiveMessage(const char * fifo_name, int message_type, float * data, int data_len)
+{
+    int fd, bytes_read;
+    byte buff[DEFAULT_FIFO_SIZE];
+
+    /* Create FIFO */
+    if ((mkfifo(fifo_name, 0664) == -1) && (errno != EEXIST))
+    {
+        DEBUG_LOG_ERROR("[GUI] Cannot create FIFO.");
+        return 0;
+    }
+
+    /* Open FIFO file */
+    if ((fd = open(fifo_name, O_RDONLY)) == -1)
+    {
+        DEBUG_LOG_ERROR("[GUI] Cannot open FIFO.");
+        return 0;
+    }
+
+    while (true)
+    {
+        DEBUG_LOG_VERBOSE("[GUI] Waiting for new message.");
+
+        /* receive message from other modules form system */
+        memset(buff, '\0', sizeof(buff));
+
+        /* Read data from FIFO */
+        if ((bytes_read = read(fd, buff, sizeof(buff))) == -1)
+        {
+            DEBUG_LOG_ERROR("[GUI] Something is wrong with FIFO.");
+            return 0;
+        }
+
+        /* If there is no data just continue */
+        if (bytes_read == 0)
+        {
+            DELAY_MS(1000);
+            continue;
+        }
+
+        /* If there is message print it */
+        if (bytes_read > 2)
+        {
+            DEBUG_LOG_DEBUG("[GUI] gui_ReceiveMessageThread, type: %d, len: %d",
+                            buff[SYSTEM_MESSAGE_TYPE_OFFSET],
+                            buff[SYSTEM_MESSAGE_PAYLOAD_SIZE_OFFSET]);
+
+            byte * data = &(buff[SYSTEM_MESSAGE_PAYLOAD_OFFSET]);
+
+            DEBUG_LOG_DEBUG("[GUI] Value: %d", data[0]);
+        }
+        else
+        {
+            DEBUG_LOG_WARN("[GUI] gui_ReceiveMessageThread, Message too short!!!");
+        }
     }
 }
 
@@ -53,42 +134,37 @@ void SystemUtility_CopyFloatArray(float * src, float * dest, int len)
 
 int SystemUtility_SetFloatArrayInByteArray(float * src, const int src_len, byte * dest, const int dest_len)
 {
-    if (sizeof(unsigned int) != sizeof(float) ||
+    if (src_len == 0 ||
+        sizeof(unsigned int) != sizeof(float) ||
         FLOAT_SIZE != sizeof(float))
     {
         return 0;
     }
 
-    int byte_array_size = (int)sizeof(float) * src_len;
-
-    if (src_len == 0 || byte_array_size > dest_len)
-    {
-        return 0;
-    }
-
     int byte_index = 0;
+
     for (int i = 0; i < src_len; i++)
     {
         DEBUG_LOG_DEBUG("Src i: %f", src[i]);
-        unsigned int asInt = *((unsigned int*)&(src[i]));
 
+        unsigned int asInt = *((unsigned int*)&(src[i]));
         DEBUG_LOG_DEBUG("asInt: %d", asInt);
 
         dest[byte_index++] = (asInt) & 0xFF;
-        DEBUG_LOG_DEBUG("Byte: %d", (asInt) & 0xFF);
+        // DEBUG_LOG_DEBUG("Byte: %d", (asInt) & 0xFF);
 
         dest[byte_index++] = (asInt >> 8) & 0xFF;
-        DEBUG_LOG_DEBUG("Byte: %d", (asInt >> 8) & 0xFF);
+        // DEBUG_LOG_DEBUG("Byte: %d", (asInt >> 8) & 0xFF);
 
         dest[byte_index++] = (asInt >> 16) & 0xFF;
-        DEBUG_LOG_DEBUG("Byte: %d", (asInt >> 16) & 0xFF);
+        // DEBUG_LOG_DEBUG("Byte: %d", (asInt >> 16) & 0xFF);
 
         dest[byte_index++] = (asInt >> 24) & 0xFF;
-        DEBUG_LOG_DEBUG("Byte: %d", (asInt >> 24) & 0xFF);
+        // DEBUG_LOG_DEBUG("Byte: %d", (asInt >> 24) & 0xFF);
 
     }
 
-    return byte_array_size;
+    return dest_len;
 }
 
 int SystemUtility_GetFloatArrayFromByteArray(byte * src, const int src_len, float * dest, const int dest_len)

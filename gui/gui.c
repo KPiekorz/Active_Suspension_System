@@ -56,70 +56,20 @@ static void gui_RunGui(void)
 
 static void *gui_ReceiveMessageThread(void *cookie)
 {
-    /* Scheduling policy: FIFO or RR */
-    int policy;
-    /* Structure of other thread parameters */
-    struct sched_param param;
-
-    /* Read modify and set new thread priority */
-    pthread_getschedparam(pthread_self(), &policy, &param);
-    param.sched_priority = sched_get_priority_max(policy);
-    pthread_setschedparam(pthread_self(), policy, &param);
-
-    int fd, bytes_read;
-    float buff[DEFAULT_FIFO_SIZE];
-
-    /* Create FIFO */
-    if ((mkfifo(gui_fifo_name, 0664) == -1) && (errno != EEXIST))
+    // it can be pleaced in other function for creating a thread
     {
-        DEBUG_LOG_ERROR("[GUI] Cannot create FIFO.");
-        return 0;
+        /* Scheduling policy: FIFO or RR */
+        int policy;
+        /* Structure of other thread parameters */
+        struct sched_param param;
+
+        /* Read modify and set new thread priority */
+        pthread_getschedparam(pthread_self(), &policy, &param);
+        param.sched_priority = sched_get_priority_max(policy);
+        pthread_setschedparam(pthread_self(), policy, &param);
     }
 
-    /* Open FIFO file */
-    if ((fd = open(gui_fifo_name, O_RDONLY)) == -1)
-    {
-        DEBUG_LOG_ERROR("[GUI] Cannot open FIFO.");
-        return 0;
-    }
-
-    while (true)
-    {
-        DEBUG_LOG_VERBOSE("[GUI] Waiting for new message.");
-
-        /* receive message from other modules form system */
-        memset(buff, '\0', sizeof(buff));
-
-        /* Read data from FIFO */
-        if ((bytes_read = read(fd, buff, sizeof(buff))) == -1)
-        {
-            DEBUG_LOG_ERROR("[GUI] Something is wrong with FIFO.");
-            return 0;
-        }
-
-        /* If there is no data just continue */
-        if (bytes_read == 0)
-        {
-            DELAY_MS(1000);
-            continue;
-        }
-
-        /* If there is message print it */
-        if (bytes_read > 2)
-        {
-            DEBUG_LOG_DEBUG("[GUI] gui_ReceiveMessageThread, type: %f, len: %f",
-                            buff[SYSTEM_MESSAGE_TYPE_OFFSET],
-                            buff[SYSTEM_MESSAGE_LENGTH_OFFSET]);
-
-            float * data = &(buff[SYSTEM_MESSAGE_DATA_OFFSET]);
-
-            DEBUG_LOG_DEBUG("[GUI] Value: %f", data[0]);
-        }
-        else
-        {
-            DEBUG_LOG_WARN("[GUI] gui_ReceiveMessageThread, Message too short!!!");
-        }
-    }
+    // here have to be pleaced function for receiving message from other process via fifo queue
 }
 
 static void gui_StartReceiveMessageTread(void)

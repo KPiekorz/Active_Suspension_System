@@ -10,30 +10,28 @@
 #include <string.h>
 #include <stdint.h>
 
-/*** BYTE TYPE ***/
-
-#define byte                                uint8_t //unsigned int //char // uint8_t
-
 /*** SYSTEM_FIFO_SIZE ***/
 
-#define DEFAULT_FIFO_SIZE                   (256)
+#define DEFAULT_FIFO_SIZE                           (256)
 
-/*** SYSTEM MESSAGE OFFSETS ***/
+/*** SYSTEM MESSAGE OFFSETS (in bytes from array beginning) ***/
 
-#define SYSTEM_MESSAGE_TYPE_OFFSET          (0)
-#define SYSTEM_MESSAGE_LENGTH_OFFSET        (1)
-#define SYSTEM_MESSAGE_DATA_OFFSET          (2)
-#define GET_MESSAGE_LEN(l)                  ((l + 2) * sizeof(float))
+#define SYSTEM_MESSAGE_TYPE_OFFSET                  (0)
+#define SYSTEM_MESSAGE_PAYLOAD_SIZE_OFFSET          (1)
+#define SYSTEM_MESSAGE_PAYLOAD_OFFSET               (2)
+
+#define GET_FLOAT_DATA_SIZE(float_data_len)         (float_data_len * sizeof(float)) // only float data size in bytes
+#define GET_FULL_MESSAGE_SIZE(float_data_len)       (GET_FLOAT_DATA_SIZE(float_data_len) + 2) // float array size in bytes and message metadata size in bytes (message type and size of payload)
 
 /*** TIME TRANSFORMATION ***/
 
-#define SEC_TO_US(s)                        (s * 1000000)
-#define MS_TO_US(s)                         (s * 1000)
+#define SEC_TO_US(s)                                (s * 1000000)
+#define MS_TO_US(s)                                 (s * 1000)
 
 /*** DELAY MACROS ***/
 
-#define DELAY_S(s)                          (usleep(SEC_TO_US(s)))
-#define DELAY_MS(s)                         (usleep(MS_TO_US(s)))
+#define DELAY_S(s)                                  (usleep(SEC_TO_US(s)))
+#define DELAY_MS(s)                                 (usleep(MS_TO_US(s)))
 
 /*** DEBUG LOGS ***/
 
@@ -70,17 +68,32 @@
 
 #define DEBUG_LOG_ERROR(...)        { fprintf(stderr, "ERROR: " __VA_ARGS__);    printf("\n"); }
 
+/*** BYTE TYPE ***/
+
+typedef uint8_t byte; //unsigned int //char // uint8_t
+
 /*** SYSTEM FUNCTION ***/
 
 /**
  * @brief  Send messages to other process created in system.
  * @note
  * @param  fifo_name: fifo queue name
- * @param  data: data
+ * @param  data: data (length of float array)
  * @param  data_len: data length
- * @retval TRUE if operation was successful, otherwise FALSE.
+ * @retval 
  */
-bool SystemUtility_SendMessage(const char * fifo_name, int message_type, float * data, int data_len);
+int SystemUtility_SendMessage(const char * fifo_name, int message_type, float * float_data, const int float_data_len);
+
+/**
+ * @brief  Receive message from other process created in system
+ * @note
+ * @param  fifo_name: fifo queue name
+ * @param  message_type: message type
+ * @param  data: 
+ * @param  data_len: 
+ * @retval 
+ */
+int SystemUtility_ReceiveMessage(const char * fifo_name, int message_type, float * data, int data_len);
 
 /**
  * @brief  Copy src float array , to dest float array.
@@ -109,7 +122,7 @@ int SystemUtility_SetFloatArrayInByteArray(float * src, const int src_len, byte 
  * @param  src: byte array
  * @param  src_len: size of byte array
  * @param  dest: float array
- * @param  dest_len: float array size
+ * @param  dest_len: float array size (max float array size, where float values can be saved)
  * @retval Size od used float array size.
  */
 int SystemUtility_GetFloatArrayFromByteArray(byte * src, const int src_len, float * dest, const int dest_len);
