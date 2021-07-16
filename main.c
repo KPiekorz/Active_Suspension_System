@@ -56,12 +56,12 @@ int main(int argc, char *argv[])
         DEBUG_LOG_DEBUG("Error!");
     }
 
-    // SystemProcess_Initialize();
+    SystemProcess_Initialize();
 
     DEBUG_LOG_ALWAYS("Enter q to quit: ");
   	while(getc(stdin)!='q') {}
 
-    // SystemProcess_Destroy();
+    SystemProcess_Destroy();
 
 	return EXIT_SUCCESS;
 }

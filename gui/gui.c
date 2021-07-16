@@ -72,14 +72,20 @@ static void *gui_ReceiveMessageThread(void *cookie)
 
     while (true)
     {
+        DEBUG_LOG_VERBOSE("[GUI] gui_ReceiveMessageThread, Wait for message!");
+
         /* delay for waiting for another message */
-        DELAY_MS(1000);
+        DELAY_MS(100);
 
         /* try receive message */
         if (true == SystemUtility_ReceiveMessage(gui_fifo_name, (int *)&message_type, float_data, &float_data_len))
         {
-            DEBUG_LOG_VERBOSE("[GUI] Gui_Init, message type: %d", message_type);
-            DEBUG_LOG_VERBOSE("[GUI] Gui_Init, float[0]: %f", float_data[0]);
+            DEBUG_LOG_VERBOSE("[GUI] gui_ReceiveMessageThread, message type: %d, float data len: %d", message_type, float_data_len);
+
+            for (int i = 0; i < float_data_len; i++)
+            {
+                DEBUG_LOG_VERBOSE("[GUI] gui_ReceiveMessageThread, float[%d]: %f", i, float_data[i]);
+            }
         }
     }
 

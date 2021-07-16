@@ -23,7 +23,7 @@
 #define GET_FLOAT_DATA_SIZE(float_data_len)         (float_data_len * sizeof(float)) // only float data size in bytes
 #define GET_FULL_MESSAGE_SIZE(float_data_len)       (GET_FLOAT_DATA_SIZE(float_data_len) + 2) // float array size in bytes and message metadata size in bytes (message type and size of payload)
 
-#define GET_FLOAT_DATA_LEN(message_payload_size)    (message_payload_size * sizeof(float))
+#define GET_FLOAT_DATA_LEN(message_payload_size)    (message_payload_size / sizeof(float))
 
 /*** TIME TRANSFORMATION ***/
 

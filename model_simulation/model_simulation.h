@@ -1,7 +1,7 @@
 #ifndef MODEL_SIMULATION_H
 #define MODEL_SIMULATION_H
 
-// #define INIT_MODEL_SIMULATION
+#define INIT_MODEL_SIMULATION
 
 typedef enum
 {

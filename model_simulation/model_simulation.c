@@ -29,11 +29,12 @@ void ModelSimulation_Init(void)
 
         while (1)
         {
-            float data[3] = {3, 1, 1};
+            float data[3] = {3.02, 1.1, 1.23};
 
             Gui_SendMessage(gui_message_control_signal, data, 3);
 
-            DELAY_S(1);
+            DELAY_S(2);
+
             DEBUG_LOG_VERBOSE("[SIM] Model simulation process running...");
         }
 
