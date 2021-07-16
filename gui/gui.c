@@ -56,57 +56,34 @@ static void gui_RunGui(void)
 
 static void *gui_ReceiveMessageThread(void *cookie)
 {
-    // it can be pleaced in other function for creating a thread
-    {
-        /* Scheduling policy: FIFO or RR */
-        int policy;
-        /* Structure of other thread parameters */
-        struct sched_param param;
+    /* init thread with good priority */
+    SystemUtility_InitThread(pthread_self());
 
-        /* Read modify and set new thread priority */
-        pthread_getschedparam(pthread_self(), &policy, &param);
-        param.sched_priority = sched_get_priority_max(policy);
-        pthread_setschedparam(pthread_self(), policy, &param);
+    /* create message fifo queue */
+    if (SystemUtility_CreateMessageFifo(gui_fifo_name) == false)
+    {
+        DEBUG_LOG_ERROR("[GUI] gui_ReceiveMessageThread, Can't create FIFO!");
+        return 0;
     }
 
-    SystemUtility_InitThread();
-
-    // here have to be pleaced function for receiving message from other process via fifo queue
-
-    SystemUtility_CreateMessageFifo(gui_fifo_name);
+    gui_message_type_t message_type = gui_message_unknown;
+    int float_data_len = 20;
+    float float_data[float_data_len];
 
     while (true)
     {
-        // SystemUtility_ReceiveMessage();
+        /* delay for waiting for another message */
+        DELAY_MS(1000);
 
+        /* try receive message */
+        if (true == SystemUtility_ReceiveMessage(gui_fifo_name, (int *)&message_type, float_data, &float_data_len))
+        {
+            DEBUG_LOG_VERBOSE("[GUI] Gui_Init, message type: %d", message_type);
+            DEBUG_LOG_VERBOSE("[GUI] Gui_Init, float[0]: %f", float_data[0]);
+        }
     }
-}
 
-static void gui_StartReceiveMessageTread(void)
-{
-    /**
-    *  Start a FIFO reader mean to create thread for receiving a
-    * messages from other thread process among the system.
-    **/
-
-    int status;
-
-    /* Thread variable */
-    pthread_t tSimpleThread;
-
-    /* Thread attributes variable */
-    pthread_attr_t aSimpleThreadAttr;
-
-    /* Initialize thread attributes structure for FIFO scheduling */
-    pthread_attr_init(&aSimpleThreadAttr);
-    pthread_attr_setschedpolicy(&aSimpleThreadAttr, SCHED_FIFO);
-
-    /* Create thread */
-    if ((status = pthread_create(&tSimpleThread, &aSimpleThreadAttr, gui_ReceiveMessageThread, NULL)))
-    {
-        DEBUG_LOG_ERROR("[GUI] gui_StartReceiveMessageTread, Can't create a thread!");
-        return;
-    }
+    return 0;
 }
 
 /*** GLOBAL FUNCTION ***/
@@ -117,13 +94,16 @@ void Gui_Init(void)
         DEBUG_LOG_INFO("[GUI] Gui_Init, Init process...");
 
         /* Init pipe connection to gui process */
-        gui_StartReceiveMessageTread();
+        if (SystemUtility_CreateThread(gui_ReceiveMessageThread))
+        {
+            DEBUG_LOG_ERROR("[GUI] Gui_Init, Can't create receive gui thread!");
+        }
 
         /* Init udp socket connection to python gui app */
         // gui_InitUdpSocketConnectionToPythonPlot();
 
         /* Start gui python app */
-        gui_RunGui();
+        // gui_RunGui();
 
         while (1)
         {

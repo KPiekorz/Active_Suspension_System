@@ -4,10 +4,11 @@
 #include <stdio.h>
 #include <stdint.h>
 
-// #define INIT_GUI
+#define INIT_GUI
 
 typedef enum
 {
+    gui_message_unknown = 0,
     gui_message_control_signal,
     gui_message_model_output,
 

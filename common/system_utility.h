@@ -138,10 +138,19 @@ int SystemUtility_SetFloatArrayInByteArray(float * src, const int src_len, byte 
 int SystemUtility_GetFloatArrayFromByteArray(byte * src, const int src_len, float * dest, const int dest_len);
 
 /**
- * @brief  
- * @note   
+ * @brief  Create thread
+ * @note
+ * @param  __start_routine: thread function
+ * @retval true if successfully created thread, otherwise false.
+ */
+bool SystemUtility_CreateThread(void *(*__start_routine) (void *));
+
+/**
+ * @brief  Init thread
+ * @note
+ * @param  thread_id: thread id
  * @retval None
  */
-void SystemUtility_InitThread(void);
+void SystemUtility_InitThread(pthread_t thread_id);
 
 #endif  /* SYSTEM_UTILITY_H */

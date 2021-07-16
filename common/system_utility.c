@@ -14,7 +14,7 @@
 
 /*** GLOBAL FUNCTION ***/
 
-bool SystemUtility_CreateMessageFifo(const char * fifo_name)
+bool SystemUtility_CreateMessageFifo(const char *fifo_name)
 {
     /* Create FIFO */
     if ((mkfifo(fifo_name, 0664) == -1) && (errno != EEXIST))
@@ -26,7 +26,7 @@ bool SystemUtility_CreateMessageFifo(const char * fifo_name)
     return true;
 }
 
-bool SystemUtility_SendMessage(const char *fifo_name, int message_type, float * float_data, const int float_data_len)
+bool SystemUtility_SendMessage(const char *fifo_name, int message_type, float *float_data, const int float_data_len)
 {
     // copy float to byte array and send byte array
 
@@ -76,7 +76,7 @@ bool SystemUtility_SendMessage(const char *fifo_name, int message_type, float * 
     return result;
 }
 
-bool SystemUtility_ReceiveMessage(const char *fifo_name, int * message_type, float * float_data, int * float_data_len)
+bool SystemUtility_ReceiveMessage(const char *fifo_name, int *message_type, float *float_data, int *float_data_len)
 {
     int fd, bytes_read;
     byte buff[DEFAULT_FIFO_SIZE];
@@ -111,8 +111,6 @@ bool SystemUtility_ReceiveMessage(const char *fifo_name, int * message_type, flo
                         buff[SYSTEM_MESSAGE_TYPE_OFFSET],
                         buff[SYSTEM_MESSAGE_PAYLOAD_SIZE_OFFSET]);
 
-
-
         if (GET_FLOAT_DATA_LEN(buff[SYSTEM_MESSAGE_PAYLOAD_SIZE_OFFSET]) > *float_data_len)
         {
             return false;
@@ -142,7 +140,7 @@ void SystemUtility_CopyFloatArray(float *src, float *dest, int len)
     }
 }
 
-int SystemUtility_SetFloatArrayInByteArray(float *src, const int src_len, byte * dest, const int dest_len)
+int SystemUtility_SetFloatArrayInByteArray(float *src, const int src_len, byte *dest, const int dest_len)
 {
     if (src_len == 0 ||
         sizeof(unsigned int) != sizeof(float) ||
@@ -218,7 +216,39 @@ int SystemUtility_GetFloatArrayFromByteArray(byte *src, const int src_len, float
     return float_array_len;
 }
 
-void SystemUtility_InitThread(void)
+bool SystemUtility_CreateThread(void *(*__start_routine) (void *))
 {
+    int status;
 
+    /* Thread variable */
+    pthread_t tSimpleThread;
+
+    /* Thread attributes variable */
+    pthread_attr_t aSimpleThreadAttr;
+
+    /* Initialize thread attributes structure for FIFO scheduling */
+    pthread_attr_init(&aSimpleThreadAttr);
+    pthread_attr_setschedpolicy(&aSimpleThreadAttr, SCHED_FIFO);
+
+    /* Create thread */
+    if ((status = pthread_create(&tSimpleThread, &aSimpleThreadAttr, __start_routine, NULL)))
+    {
+        DEBUG_LOG_ERROR("[GUI] gui_StartReceiveMessageTread, Can't create a thread!");
+        return false;
+    }
+
+    return true;
+}
+
+void SystemUtility_InitThread(pthread_t thread_id)
+{
+    /* Scheduling policy: FIFO or RR */
+    int policy;
+    /* Structure of other thread parameters */
+    struct sched_param param;
+
+    /* Read modify and set new thread priority */
+    pthread_getschedparam(thread_id, &policy, &param);
+    param.sched_priority = sched_get_priority_max(policy);
+    pthread_setschedparam(thread_id, policy, &param);
 }
