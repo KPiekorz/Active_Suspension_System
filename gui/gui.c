@@ -20,12 +20,18 @@ const char *gui_fifo_name = "gui_fifo";
 
 /*** STATIC FUNTION ***/
 
-static void gui_InitUdpSocketConnectionToPythonPlot(void)
+static bool gui_UdpClientInit(void)
 {
+    DEBUG_LOG_DEBUG("[GUI] Init udp client.");
+
+    return true;
 }
 
-static void gui_SendDataToPlot(void *data, int data_len)
+static bool gui_UdpClientSendData(byte * data, int data_len)
 {
+    DEBUG_LOG_DEBUG("[GUI] Send data in UDP.");
+
+    return true;
 }
 
 static void gui_RunGui(void)
@@ -54,7 +60,7 @@ static void gui_RunGui(void)
 #endif /* INCLUDE_PYTHON_GUI */
 }
 
-static void *gui_ReceiveMessageThread(void *cookie)
+static void * gui_ReceiveMessageThread(void *cookie)
 {
     /* init thread with good priority */
     SystemUtility_InitThread(pthread_self());
@@ -92,6 +98,34 @@ static void *gui_ReceiveMessageThread(void *cookie)
     return 0;
 }
 
+static void * gui_UdpClientThread(void *cookie)
+{
+    /* init thread with good priority */
+    SystemUtility_InitThread(pthread_self());
+
+    if (false == gui_UdpClientInit())
+    {
+        return 0;
+    }
+
+    int data_len = 3;
+    byte data[3] = {1, 2, 3};
+
+    while (true)
+    {
+        DEBUG_LOG_VERBOSE("[GUI] gui_UdpClientThread");
+
+        if (true == gui_UdpClientSendData(data, data_len))
+        {
+
+        }
+
+        DELAY_S(5);
+    }
+
+    return 0;
+}
+
 /*** GLOBAL FUNCTION ***/
 
 void Gui_Init(void)
@@ -103,6 +137,12 @@ void Gui_Init(void)
         if (SystemUtility_CreateThread(gui_ReceiveMessageThread))
         {
             DEBUG_LOG_ERROR("[GUI] Gui_Init, Can't create receive gui thread!");
+        }
+
+        /* Init udp connection to python gui */
+        if (SystemUtility_CreateThread(gui_UdpClientThread))
+        {
+            DEBUG_LOG_ERROR("[GUI] Gui_Init, Can't create udp client thread!");
         }
 
         /* Init udp socket connection to python gui app */
