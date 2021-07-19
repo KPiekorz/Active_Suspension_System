@@ -12,7 +12,7 @@ A system that allows for adaptive control of the suspension of a modern BMW or A
   - sudo apt install python3.7 python3.7-dev python3.7-venv
   - python3.7 -m venv gui-env
   - source gui-env/bin/activate
-  - pip install numpy scipy matplotlib pyqt5
+  - pip install numpy scipy matplotlib pyqt5 sockets
 
 ## Run project
 
@@ -57,6 +57,10 @@ int status = 0;
 pid_t wpid;
 while ((wpid = wait(&status)) > 0); // this way, the father waits for all the child processes
 ```
+
+## PyQt5
+
+- PyQt5 multithreading - https://realpython.com/python-pyqt-qthread/
 
 ## Problems
 

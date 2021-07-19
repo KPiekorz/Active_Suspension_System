@@ -29,9 +29,9 @@ void ModelSimulation_Init(void)
 
         while (1)
         {
-            float data[3] = {3.02, 1.1, 1.23};
+            float data[4] = {3.02, 1.1, 1.23, 5.01};
 
-            Gui_SendMessage(gui_message_control_signal, data, 3);
+            Gui_SendMessage(gui_message_control_signal, data, 4);
 
             DELAY_S(2);
 
