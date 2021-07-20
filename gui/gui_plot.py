@@ -56,21 +56,29 @@ class GUI(QtWidgets.QWidget):
         self.setWindowTitle("Adaptive suspension symulator")
         self.setGeometry(100, 100, 600, 400)
 
-        # Setup first buton
+        # Close gui
+        button_close_gui = QtWidgets.QPushButton("Close")
+        button_close_gui.clicked.connect(self.close)
+
+        # Setup init udp server buton
         button_start_udp_server = QtWidgets.QPushButton("Start UDP server")
         button_start_udp_server.clicked.connect(self.signal_start_udp_server)
 
-        # Setup second button
+        # Setup serial reader button
         button_start_serial_reader = QtWidgets.QPushButton("Start serial reader")
         button_start_serial_reader.clicked.connect(self.signal_start_serial_reader)
 
         # Setup box layout
         box_layout = QtWidgets.QVBoxLayout(self)
+        box_layout.addWidget(button_close_gui)
         box_layout.addWidget(button_start_udp_server)
         box_layout.addWidget(button_start_serial_reader)
 
         # Show gui
         self.show()
+
+    def process_udp_server_data():
+        print("Process udp server data...")
 
 if __name__ == '__main__':
 
