@@ -7,65 +7,91 @@ import matplotlib
 import os
 import socket
 import sys
+import time
 
 matplotlib.use('Qt5Agg')
 
-class UDPWorker(QtCore.QObject):
-    dataChanged = QtCore.pyqtSignal(str)
+class UDPServer(QtCore.QObject):
 
     def __init__(self, parent=None):
-        super(UDPWorker, self).__init__(parent)
-        self.server_start = False
+        super(UDPServer, self).__init__(parent)
 
     @QtCore.pyqtSlot()
-    def start(self):
-        print('Hello World!')
+    def init_server(self):
+        print("Start")
         # self.server_start = True
-        # ip = "192.168.1.4"
-        # port = 515
+        # ip = ''
+        # port = 1100
         # self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         # self.sock.bind((ip,port))
-        # self.process()
+        # self.receive_server_data()
 
-    def process(self):
-        pass
+    def receive_server_data(self):
+        while(1):
+            time.sleep(1)
+            print("process...")
         # while self.server_start:
         #     data, addr = self.sock.recvfrom(1024)
         #     self.dataChanged.emit(str(data))
 
-class UDPWidget(QtWidgets.QWidget):
-    started = QtCore.pyqtSignal()
+class SerialReader(QtCore.QObject):
 
     def __init__(self, parent=None):
-        super(UDPWidget, self).__init__(parent)
-        btn = QtWidgets.QPushButton("Start Udp server")
-        btn.clicked.connect(self.started)
+        super(SerialReader, self).__init__(parent)
 
-        # self.lst = QtWidgets.QListWidget()
+    @QtCore.pyqtSlot()
+    def read_serial(self):
+        while(1):
+            text = input("Enter :> ");
+            print(text)
 
-        layout = QtWidgets.QVBoxLayout(self)
-        # layout.addWidget(QtWidgets.QLabel("Adaptive suspension symulator"))
-        layout.addWidget(btn)
-        # lay.addWidget(self.lst)
+class GUI(QtWidgets.QWidget):
+    signal_start_udp_server = QtCore.pyqtSignal()
+    signal_start_serial_reader = QtCore.pyqtSignal()
 
+    def __init__(self, parent=None):
+        super(GUI, self).__init__(parent)
+
+        # Set box parameters
         self.setWindowTitle("Adaptive suspension symulator")
+        self.setGeometry(100, 100, 600, 400)
 
-    @QtCore.pyqtSlot(str)
-    def addItem(self, text):
-        self.lst.insertItem(0, text)
+        # Setup first buton
+        button_start_udp_server = QtWidgets.QPushButton("Start UDP server")
+        button_start_udp_server.clicked.connect(self.signal_start_udp_server)
+
+        # Setup second button
+        button_start_serial_reader = QtWidgets.QPushButton("Start serial reader")
+        button_start_serial_reader.clicked.connect(self.signal_start_serial_reader)
+
+        # Setup box layout
+        box_layout = QtWidgets.QVBoxLayout(self)
+        box_layout.addWidget(button_start_udp_server)
+        box_layout.addWidget(button_start_serial_reader)
+
+        # Show gui
+        self.show()
 
 if __name__ == '__main__':
-    import sys
+
     app = QtWidgets.QApplication(sys.argv)
-    w = UDPWidget()
-    worker = UDPWorker()
-    thread = QtCore.QThread()
-    thread.start()
-    worker.moveToThread(thread)
-    w.started.connect(worker.start)
-    worker.dataChanged.connect(w.addItem)
-    w.show()
+    gui = GUI()
+
+    upd_server = UDPServer()
+    thread_upd_server = QtCore.QThread()
+    thread_upd_server.start()
+    upd_server.moveToThread(thread_upd_server)
+
+    serial_reader = SerialReader()
+    thread_serial_reader = QtCore.QThread()
+    thread_serial_reader.start()
+    serial_reader.moveToThread(thread_serial_reader)
+
+    gui.signal_start_udp_server.connect(upd_server.init_server)
+    gui.signal_start_serial_reader.connect(serial_reader.read_serial)
+
     sys.exit(app.exec_())
+
 
 # class MplCanvas(FigureCanvasQTAgg):
 
