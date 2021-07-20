@@ -10,26 +10,69 @@
 #include <error.h>
 #include <fcntl.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 #include "system_utility.h"
 #include "model_simulation.h"
 
 #define INCLUDE_PYTHON_GUI
 
+#define PYTHON_GUI_ADDRESS      (INADDR_ANY)
+#define INVALID_SOCKET          (-1)
+
 const char *gui_fifo_name = "gui_fifo";
 
 /*** STATIC FUNTION ***/
 
-static bool gui_UdpClientInit(void)
+static bool gui_UdpClientCreate(int * my_socket)
 {
     DEBUG_LOG_DEBUG("[GUI] Init udp client.");
+
+	int s = socket(PF_INET, SOCK_DGRAM, 0);
+
+	if (s == -1)
+    {
+        DEBUG_LOG_ERROR("[GUI] Cannot create socket.");
+		return false;
+	}
+
+    *my_socket = s;
 
     return true;
 }
 
-static bool gui_UdpClientSendData(byte * data, int data_len)
+static void gui_UdpClientDestroy(int my_socket)
+{
+    DEBUG_LOG_DEBUG("[GUI] Init udp client.");
+
+	/* Clean up */
+    close(my_socket);
+}
+
+static bool gui_UdpClientSendData(int my_socket, byte * data, int data_len)
 {
     DEBUG_LOG_DEBUG("[GUI] Send data in UDP.");
+
+	/* Socket address structure */
+	struct sockaddr_in socket_addr;
+
+	/* Initialize socket address to 0*/
+	memset(&socket_addr, 0, sizeof(socket_addr));
+	/* Set socket address parameters */
+	socket_addr.sin_family = AF_INET;
+	socket_addr.sin_port = htons(1100);
+	socket_addr.sin_addr.s_addr = PYTHON_GUI_ADDRESS;
+
+	/* Send a message to server */
+    sendto(my_socket,
+          "Some text",
+          10,
+          MSG_CONFIRM,
+          (const struct sockaddr *) &socket_addr,
+          sizeof(socket_addr));
 
     return true;
 }
@@ -103,7 +146,8 @@ static void * gui_UdpClientThread(void *cookie)
     /* init thread with good priority */
     SystemUtility_InitThread(pthread_self());
 
-    if (false == gui_UdpClientInit())
+    int my_socket = INVALID_SOCKET;
+    if (false == gui_UdpClientCreate(&my_socket))
     {
         return 0;
     }
@@ -115,13 +159,15 @@ static void * gui_UdpClientThread(void *cookie)
     {
         DEBUG_LOG_VERBOSE("[GUI] gui_UdpClientThread");
 
-        if (true == gui_UdpClientSendData(data, data_len))
+        if (true == gui_UdpClientSendData(my_socket, data, data_len))
         {
 
         }
 
         DELAY_S(5);
     }
+
+    gui_UdpClientDestroy(my_socket);
 
     return 0;
 }
