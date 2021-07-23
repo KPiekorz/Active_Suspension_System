@@ -84,24 +84,24 @@ class UDPServer(QtCore.QObject):
 
     def __init__(self, parent=None):
         super(UDPServer, self).__init__(parent)
+        self.server_start = False
 
     @QtCore.pyqtSlot()
     def init_server(self):
-        print("Start")
-        # self.server_start = True
-        # ip = ''
-        # port = 1100
-        # self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        # self.sock.bind((ip,port))
-        # self.receive_server_data()
+        print("Udp server starting...")
+        self.server_start = True
+        ip = ''
+        port = 1100
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.sock.bind((ip,port))
+        self.receive_server_data()
 
     def receive_server_data(self):
-        while(1):
-            time.sleep(1)
-            print("process...")
-        # while self.server_start:
-        #     data, addr = self.sock.recvfrom(1024)
-        #     self.dataChanged.emit(str(data))
+        print("Upd server has started...")
+        while self.server_start:
+            data, addr = self.sock.recvfrom(1024)
+            print("Udp server received data:", end='')
+            print(data)
 
 class SerialReader(QtCore.QObject):
 
@@ -123,7 +123,7 @@ class GUI(QtWidgets.QMainWindow):
 
         # Set box parameters
         self.setWindowTitle("Adaptive suspension symulator")
-        self.setGeometry(100, 100, 600, 400)
+        self.setGeometry(100, 100, 600, 800)
 
         # Close gui
         button_close_gui = QtWidgets.QPushButton("Close")
@@ -146,9 +146,7 @@ class GUI(QtWidgets.QMainWindow):
 
         # Create toolbar, passing canvas as first parament, parent (self, the MainWindow) as second.
         toolbar_control = NavigationToolbar(plot_control, self)
-
         toolbar_model = NavigationToolbar(plot_model, self)
-
 
         # Setup box layout
         box_layout = QtWidgets.QVBoxLayout()
@@ -167,9 +165,6 @@ class GUI(QtWidgets.QMainWindow):
 
         # Show gui
         self.show()
-
-    def process_udp_server_data():
-        print("Process udp server data...")
 
 if __name__ == '__main__':
 

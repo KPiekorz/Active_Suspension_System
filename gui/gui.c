@@ -54,7 +54,7 @@ static void gui_UdpClientDestroy(int my_socket)
 
 static bool gui_UdpClientSendData(int my_socket, byte * data, int data_len)
 {
-    DEBUG_LOG_DEBUG("[GUI] Send data in UDP.");
+    DEBUG_LOG_DEBUG("[GUI] gui_UdpClientSendData, socket num: %d, data len: %d", my_socket, data_len);
 
 	/* Socket address structure */
 	struct sockaddr_in socket_addr;
@@ -68,8 +68,8 @@ static bool gui_UdpClientSendData(int my_socket, byte * data, int data_len)
 
 	/* Send a message to server */
     sendto(my_socket,
-          "Some text",
-          10,
+          data,
+          data_len,
           MSG_CONFIRM,
           (const struct sockaddr *) &socket_addr,
           sizeof(socket_addr));
@@ -164,7 +164,7 @@ static void * gui_UdpClientThread(void *cookie)
 
         }
 
-        DELAY_S(5);
+        DELAY_S(2);
     }
 
     gui_UdpClientDestroy(my_socket);
