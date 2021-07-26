@@ -1,7 +1,7 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
-typedef struct Mat
+typedef struct _Mat
 {
 	double * entries;
 	int row;
@@ -63,9 +63,5 @@ Mat* triinverse(Mat* A);
 Mat* rowechelon(Mat* A);
 
 Mat* hconcat(Mat* A,Mat* B);
-
-double norm(Mat* A);
-
-Mat* null(Mat *A);
 
 #endif /* MATRIX_H */

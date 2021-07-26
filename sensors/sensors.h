@@ -1,7 +1,7 @@
 #ifndef SENSORS_H
 #define SENSORS_H
 
-#define INIT_SENSOR
+// #define INIT_SENSOR
 
 /**
  * @brief  Init sensor process

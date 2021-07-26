@@ -1,7 +1,6 @@
 #include "stdlib.h"
 #include "matrix_lib.h"
 #include "system_utility.h"
-#include <math.h>
 
 void showmat(Mat* A){
 	if(A->row>0&&A->col>0){
@@ -26,7 +25,6 @@ void showmat(Mat* A){
 		printf("[]");
 	}
 }
-
 
 Mat* newmat(int r,int c,double d){
 	Mat* M=(Mat*)malloc(sizeof(Mat));
@@ -269,7 +267,7 @@ Mat* adjoint(Mat* A){
 		removerow2(A,A1,i);
 		for(int j=1;j<=A->col;j++){
 			removecol2(A1,A2,j);
-			double si=pow(-1,(double)(i+j));
+			double si= 1/((double)(i+j));
 			B->entries[(i-1)*B->col+j-1]=det(A2)*si;
 		}
 	}
@@ -410,72 +408,6 @@ Mat* vconcat(Mat* A,Mat* B){
 	return C;
 }
 
-double norm(Mat* A){
-	double d=0;
-	int k=0;
-	for(int i=1;i<=A->row;i++){
-		for(int j=1;j<=A->col;j++){
-			d+=A->entries[k]*A->entries[k];
-			k++;
-		}
-	}
-	d=sqrt(d);
-	return d;
-}
-
-Mat* null(Mat *A){
-	Mat* RM=rowechelon(A);
-	int k=RM->row;
-	for(int i=RM->row;i>=1;i--){
-		bool flag=false;
-		for(int j=1;j<=RM->col;j++){
-			if(RM->entries[(i-1)*RM->col+j-1]!=0){
-				flag=true;
-				break;
-			}
-		}
-		if(flag){
-			k=i;
-			break;
-		}
-	}
-	Mat* RRM=submat(RM,1,k,1,RM->col);
-	freemat(RM);
-	int nn=RRM->col-RRM->row;
-	if(nn==0){
-		Mat* N=newmat(0,0,0);
-		return N;
-	}
-	Mat* R1=submat(RRM,1,RRM->row,1,RRM->row);
-	Mat* R2=submat(RRM,1,RRM->row,1+RRM->row,RRM->col);
-	freemat(RRM);
-	Mat* I=eye(nn);
-	Mat* T1=multiply(R2,I);
-	freemat(R2);
-	Mat* R3=scalermultiply(T1,-1);
-	freemat(T1);
-	Mat* T2=triinverse(R1);
-	freemat(R1);
-	Mat* X=multiply(T2,R3);
-	freemat(T2);
-	freemat(R3);
-	Mat* N=vconcat(X,I);
-	freemat(I);
-	freemat(X);
-	for(int j=1;j<=N->col;j++){
-		double de=0;
-		for(int i=1;i<=N->row;i++){
-			de+=N->entries[(i-1)*N->col+j-1]*N->entries[(i-1)*N->col+j-1];
-		}
-		de=sqrt(de);
-		for(int i=1;i<=N->row;i++){
-			N->entries[(i-1)*N->col+j-1]/=de;
-		}
-
-	}
-	return N;
-}
-
 double innermultiply(Mat* a,Mat* b){
 	double d=0;
 	int n=a->row;
@@ -487,4 +419,3 @@ double innermultiply(Mat* a,Mat* b){
 	}
 	return d;
 }
-

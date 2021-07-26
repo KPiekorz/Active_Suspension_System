@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#define INIT_GUI
+// #define INIT_GUI
 
 typedef enum
 {

@@ -14,9 +14,33 @@
 #include "sensors.h"
 #include "matrix_lib.h"
 
-/*** CONSTANTS ***/
+/*** VARIABLES ***/
 
+const double m1 = 2500;
+const double m2 = 320;
+const double k1 = 80000;
+const double k2 = 500000;
+const double b1 = 350;
+const double b2 = 15020;
 
+/*** STATE SPACE MODEL - A ***/
+
+#define A_ROW_SIZE  4
+#define A_COLUMN_SIZE   4
+
+static double A_matrix[A_ROW_SIZE][A_COLUMN_SIZE] = {
+    {},
+    {},
+    {},
+    {},
+};
+
+static Mat A = {(double *)A_matrix, 4, 4};
+#define GetA() (&A)
+
+/*** STATE SPACE MODEL - B ***/
+
+/*** STATE SPACE MODEL - C ***/
 
 /*** STATIC FUNCTION ***/
 
@@ -29,6 +53,8 @@ static void * modelSimluation_SimulationStepThread(void *cookie)
 {
     /* init thread with good priority */
     SystemUtility_InitThread(pthread_self());
+
+    showmat(GetA());
 
     while (true)
     {
@@ -48,7 +74,7 @@ void ModelSimulation_Init(void)
         DEBUG_LOG_DEBUG("ModelSimulation_Init, Init model simulation process...");
 
         /* Init simulation of suspension */
-        if (SystemUtility_CreateThread(modelSimluation_SimulationStepThread))
+        if (!SystemUtility_CreateThread(modelSimluation_SimulationStepThread))
         {
             DEBUG_LOG_ERROR("[GUI] ModelSimulation_Init, Can't create simulaton step thread!");
         }
