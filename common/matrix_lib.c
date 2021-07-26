@@ -1,6 +1,7 @@
 #include "stdlib.h"
 #include "matrix_lib.h"
 #include "system_utility.h"
+#include <math.h>
 
 void showmat(Mat* A){
 	if(A->row>0&&A->col>0){
@@ -25,6 +26,7 @@ void showmat(Mat* A){
 		printf("[]");
 	}
 }
+
 
 Mat* newmat(int r,int c,double d){
 	Mat* M=(Mat*)malloc(sizeof(Mat));
@@ -259,24 +261,24 @@ double trace(Mat* A){
 	return d;
 }
 
-// Mat* adjoint(Mat* A){
-// 	Mat* B=newmat(A->row,A->col,0);
-// 	Mat* A1=newmat(A->row-1,A->col,0);
-// 	Mat* A2=newmat(A->row-1,A->col-1,0);
-// 	for(int i=1;i<=A->row;i++){
-// 		removerow2(A,A1,i);
-// 		for(int j=1;j<=A->col;j++){
-// 			removecol2(A1,A2,j);
-// 			double si=pow(-1,(double)(i+j));
-// 			B->entries[(i-1)*B->col+j-1]=det(A2)*si;
-// 		}
-// 	}
-// 	Mat* C=transpose(B);
-// 	freemat(A1);
-// 	freemat(A2);
-// 	freemat(B);
-// 	return C;
-// }
+Mat* adjoint(Mat* A){
+	Mat* B=newmat(A->row,A->col,0);
+	Mat* A1=newmat(A->row-1,A->col,0);
+	Mat* A2=newmat(A->row-1,A->col-1,0);
+	for(int i=1;i<=A->row;i++){
+		removerow2(A,A1,i);
+		for(int j=1;j<=A->col;j++){
+			removecol2(A1,A2,j);
+			double si=pow(-1,(double)(i+j));
+			B->entries[(i-1)*B->col+j-1]=det(A2)*si;
+		}
+	}
+	Mat* C=transpose(B);
+	freemat(A1);
+	freemat(A2);
+	freemat(B);
+	return C;
+}
 
 Mat* inverse(Mat* A){
 	Mat* B=adjoint(A);
@@ -297,7 +299,6 @@ Mat* copyvalue(Mat* A){
 	}
 	return B;
 }
-
 Mat* triinverse(Mat* A){
 	Mat* B=newmat(A->row,A->col,0);
 	for(int i=1;i<=B->row;i++){
@@ -311,7 +312,6 @@ Mat* triinverse(Mat* A){
 	}
 	return B;
 }
-
 Mat* rowechelon(Mat* A){
 	if(A->row==1){
 		for(int j=1;j<=A->col;j++){
@@ -377,7 +377,6 @@ Mat* rowechelon(Mat* A){
 	freemat(Be);
 	return B;
 }
-
 Mat* hconcat(Mat* A,Mat* B){
 	Mat* C=newmat(A->row,A->col+B->col,0);
 	int k=0;
@@ -393,7 +392,6 @@ Mat* hconcat(Mat* A,Mat* B){
 	}
 	return C;
 }
-
 Mat* vconcat(Mat* A,Mat* B){
 	Mat* C=newmat(A->row+B->row,A->col,0);
 	int k=0;
@@ -412,126 +410,70 @@ Mat* vconcat(Mat* A,Mat* B){
 	return C;
 }
 
-// double norm(Mat* A){
-// 	double d=0;
-// 	int k=0;
-// 	for(int i=1;i<=A->row;i++){
-// 		for(int j=1;j<=A->col;j++){
-// 			d+=A->entries[k]*A->entries[k];
-// 			k++;
-// 		}
-// 	}
-// 	d=sqrt(d);
-// 	return d;
-// }
-
-// Mat* null(Mat *A){
-// 	Mat* RM=rowechelon(A);
-// 	int k=RM->row;
-// 	for(int i=RM->row;i>=1;i--){
-// 		bool flag=false;
-// 		for(int j=1;j<=RM->col;j++){
-// 			if(RM->entries[(i-1)*RM->col+j-1]!=0){
-// 				flag=true;
-// 				break;
-// 			}
-// 		}
-// 		if(flag){
-// 			k=i;
-// 			break;
-// 		}
-// 	}
-// 	Mat* RRM=submat(RM,1,k,1,RM->col);
-// 	freemat(RM);
-// 	int nn=RRM->col-RRM->row;
-// 	if(nn==0){
-// 		Mat* N=newmat(0,0,0);
-// 		return N;
-// 	}
-// 	Mat* R1=submat(RRM,1,RRM->row,1,RRM->row);
-// 	Mat* R2=submat(RRM,1,RRM->row,1+RRM->row,RRM->col);
-// 	freemat(RRM);
-// 	Mat* I=eye(nn);
-// 	Mat* T1=multiply(R2,I);
-// 	freemat(R2);
-// 	Mat* R3=scalermultiply(T1,-1);
-// 	freemat(T1);
-// 	Mat* T2=triinverse(R1);
-// 	freemat(R1);
-// 	Mat* X=multiply(T2,R3);
-// 	freemat(T2);
-// 	freemat(R3);
-// 	Mat* N=vconcat(X,I);
-// 	freemat(I);
-// 	freemat(X);
-// 	for(int j=1;j<=N->col;j++){
-// 		double de=0;
-// 		for(int i=1;i<=N->row;i++){
-// 			de+=N->entries[(i-1)*N->col+j-1]*N->entries[(i-1)*N->col+j-1];
-// 		}
-// 		de=sqrt(de);
-// 		for(int i=1;i<=N->row;i++){
-// 			N->entries[(i-1)*N->col+j-1]/=de;
-// 		}
-
-// 	}
-// 	return N;
-// }
-
-MatList* lu(Mat* A){
-	if(A->row==1){
-		MatList* ml=(MatList*)malloc(sizeof(MatList));
-		ml->mat=newmat(1,1,A->entries[0]);
-		ml->next=(MatList*)malloc(sizeof(MatList));
-		ml->next->mat=newmat(1,1,1);
-		return ml;
-	}
-	double a=A->entries[0];
-	double c=0;
-	if(a!=0){
-		c=1/a;
-	}
-	Mat* w=submat(A,1,1,2,A->col);
-	Mat* v=submat(A,2,A->row,1,1);
-	Mat* Ab=submat(A,2,A->row,2,A->col);
-	Mat* T1=multiply(v,w);
-	Mat* T2=scalermultiply(T1,-c);
-	Mat* T3=sum(Ab,T2);
-	MatList* mlb=lu(T3);
-	freemat(T1);
-	freemat(T2);
-	freemat(T3);
-	freemat(Ab);
-	Mat* L=newmat(A->row,A->col,0);
-	Mat* U=newmat(A->row,A->col,0);
+double norm(Mat* A){
+	double d=0;
 	int k=0;
 	for(int i=1;i<=A->row;i++){
 		for(int j=1;j<=A->col;j++){
-			if(i==1&&j==1){
-				L->entries[k]=1;
-				U->entries[k]=a;
-				k++;
-			}else if(i==1&&j>1){
-				U->entries[k]=w->entries[j-2];
-				k++;
-			}else if(i>1&&j==1){
-				L->entries[k]=c*v->entries[i-2];
-				k++;
-			}else{
-				L->entries[k]=mlb->mat->entries[(i-2)*mlb->mat->col+j-2];
-				U->entries[k]=mlb->next->mat->entries[(i-2)*mlb->next->mat->col+j-2];
-				k++;
-			}
+			d+=A->entries[k]*A->entries[k];
+			k++;
 		}
 	}
-	MatList* ml=(MatList*)malloc(sizeof(MatList));
-	ml->mat=L;
-	ml->next=(MatList*)malloc(sizeof(MatList));;
-	ml->next->mat=U;
-	freemat(w);
-	freemat(v);
-	free(mlb);
-	return ml;
+	d=sqrt(d);
+	return d;
+}
+
+Mat* null(Mat *A){
+	Mat* RM=rowechelon(A);
+	int k=RM->row;
+	for(int i=RM->row;i>=1;i--){
+		bool flag=false;
+		for(int j=1;j<=RM->col;j++){
+			if(RM->entries[(i-1)*RM->col+j-1]!=0){
+				flag=true;
+				break;
+			}
+		}
+		if(flag){
+			k=i;
+			break;
+		}
+	}
+	Mat* RRM=submat(RM,1,k,1,RM->col);
+	freemat(RM);
+	int nn=RRM->col-RRM->row;
+	if(nn==0){
+		Mat* N=newmat(0,0,0);
+		return N;
+	}
+	Mat* R1=submat(RRM,1,RRM->row,1,RRM->row);
+	Mat* R2=submat(RRM,1,RRM->row,1+RRM->row,RRM->col);
+	freemat(RRM);
+	Mat* I=eye(nn);
+	Mat* T1=multiply(R2,I);
+	freemat(R2);
+	Mat* R3=scalermultiply(T1,-1);
+	freemat(T1);
+	Mat* T2=triinverse(R1);
+	freemat(R1);
+	Mat* X=multiply(T2,R3);
+	freemat(T2);
+	freemat(R3);
+	Mat* N=vconcat(X,I);
+	freemat(I);
+	freemat(X);
+	for(int j=1;j<=N->col;j++){
+		double de=0;
+		for(int i=1;i<=N->row;i++){
+			de+=N->entries[(i-1)*N->col+j-1]*N->entries[(i-1)*N->col+j-1];
+		}
+		de=sqrt(de);
+		for(int i=1;i<=N->row;i++){
+			N->entries[(i-1)*N->col+j-1]/=de;
+		}
+
+	}
+	return N;
 }
 
 double innermultiply(Mat* a,Mat* b){
@@ -544,45 +486,5 @@ double innermultiply(Mat* a,Mat* b){
 		d+=a->entries[i-1]*b->entries[i-1];
 	}
 	return d;
-}
-
-MatList* qr(Mat* A){
-	int r=A->row;
-	int c=A->col;
-	Mat* Q=newmat(r,r,0);
-	Mat* R=newmat(r,c,0);
-	Mat* ek=newmat(r,1,0);
-	Mat* uj=newmat(r,1,0);
-	Mat* aj=newmat(r,1,0);
-	for(int j=1;j<=r;j++){
-		submat2(A,aj,1,r,j,j);
-		for(int k=1;k<=r;k++){
-			uj->entries[k-1]=aj->entries[k-1];
-		}
-		for(int k=1;k<=j-1;k++){
-			submat2(Q,ek,1,r,k,k);
-			double proj=innermultiply(aj,ek);
-			for(int l=1;l<=ek->row;l++){
-				ek->entries[l-1]*=proj;
-
-			}
-			uj=minus(uj,ek);
-		}
-		double nuj=norm(uj);
-		for(int i=1;i<=r;i++){
-			Q->entries[(i-1)*r+j-1]=uj->entries[i-1]/nuj;
-		}
-		for(int j1=j;j1<=c;j1++){
-			R->entries[(j-1)*c+j1-1]=innermultiply(uj,submat(A,1,r,j1,j1))/nuj;
-		}
-	}
-	MatList* ml=(MatList*)malloc(sizeof(MatList));
-	ml->mat=Q;
-	ml->next=(MatList*)malloc(sizeof(MatList));;
-	ml->next->mat=R;
-	freemat(ek);
-	freemat(uj);
-	freemat(aj);
-	return ml;
 }
 

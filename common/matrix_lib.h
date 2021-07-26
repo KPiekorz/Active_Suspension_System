@@ -1,18 +1,12 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
-struct Mat
+typedef struct Mat
 {
-	double* entries;
+	double * entries;
 	int row;
 	int col;
-};
-
-struct MatList
-{
-	Mat* mat;
-	MatList* next;
-};
+} Mat;
 
 void showmat(Mat* A);
 
@@ -73,9 +67,5 @@ Mat* hconcat(Mat* A,Mat* B);
 double norm(Mat* A);
 
 Mat* null(Mat *A);
-
-MatList* lu(Mat* A);
-
-double innermultiply(Mat* a,Mat* b);
 
 #endif /* MATRIX_H */
