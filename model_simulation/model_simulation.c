@@ -12,6 +12,7 @@
 #include "gui.h"
 #include "control.h"
 #include "sensors.h"
+#include "matrix_lib.h"
 
 /*** STATIC FUNCTION ***/
 

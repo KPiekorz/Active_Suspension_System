@@ -7,7 +7,6 @@ import matplotlib
 import os
 import socket
 import sys
-import time
 
 matplotlib.use('Qt5Agg')
 
