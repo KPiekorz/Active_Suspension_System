@@ -14,11 +14,30 @@
 #include "sensors.h"
 #include "matrix_lib.h"
 
+/*** CONSTANTS ***/
+
+
+
 /*** STATIC FUNCTION ***/
 
 static void modelSimluation_StartSimulation(void)
 {
     // here will be copied model simulation from simulink
+}
+
+static void * modelSimluation_SimulationStepThread(void *cookie)
+{
+    /* init thread with good priority */
+    SystemUtility_InitThread(pthread_self());
+
+    while (true)
+    {
+        DEBUG_LOG_VERBOSE("[GUI] modelSimluation_SimulationStepThread");
+
+        DELAY_S(2);
+    }
+
+    return 0;
 }
 
 /*** GLOBAL FUNCTION ***/
@@ -27,6 +46,12 @@ void ModelSimulation_Init(void)
 {
     #ifdef INIT_MODEL_SIMULATION
         DEBUG_LOG_DEBUG("ModelSimulation_Init, Init model simulation process...");
+
+        /* Init simulation of suspension */
+        if (SystemUtility_CreateThread(modelSimluation_SimulationStepThread))
+        {
+            DEBUG_LOG_ERROR("[GUI] ModelSimulation_Init, Can't create simulaton step thread!");
+        }
 
         while (1)
         {

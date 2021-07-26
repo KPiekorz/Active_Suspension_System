@@ -32,7 +32,7 @@ process_attributes_t_t system_process_attributes[] =
 {
     {Gui_Init,              Gui_Destroy,                UNKNOWN_PID,        "Gui"                    },
     {ModelSimulation_Init,  ModelSimulation_Destroy,    UNKNOWN_PID,        "Model_simulation"       },
-    // {Control_Init,          Control_Destroy,            UNKNOWN_PID,        "Control"                },
+    {Control_Init,          Control_Destroy,            UNKNOWN_PID,        "Control"                },
 };
 
 #define GetProcessCount()   ((int)(sizeof(system_process_attributes)/sizeof(process_attributes_t_t)))

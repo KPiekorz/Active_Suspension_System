@@ -1,6 +1,8 @@
 #ifndef CONTROL_H
 #define CONTROL_H
 
+// #define INIT_CONTROL
+
 /**
  * @brief  Init control process
  * @note
