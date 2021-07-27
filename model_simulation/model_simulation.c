@@ -25,36 +25,78 @@ const double b2 = 15020;
 
 /*** STATE SPACE MODEL - A ***/
 
-#define A_ROW_SIZE  4
+#define A_ROW_SIZE      4
 #define A_COLUMN_SIZE   4
 
-static double A_matrix[A_ROW_SIZE][A_COLUMN_SIZE] = {
-    {},
-    {},
-    {},
-    {},
-};
+static double A_matrix[A_ROW_SIZE][A_COLUMN_SIZE];
 
-static Mat A = {(double *)A_matrix, 4, 4};
+static Mat A = {(double *)A_matrix, A_ROW_SIZE, A_ROW_SIZE};
+
 #define GetA() (&A)
 
+static void modelSimluation_InitMatrixA(void)
+{
+    A_matrix[0][0] = 0;
+    A_matrix[0][1] = 1;
+    A_matrix[0][2] = 0;
+    A_matrix[0][3] = 0;
+
+    A_matrix[1][0] = -(b1*b2)/(m1*m2);
+    A_matrix[1][1] = 0;
+    A_matrix[1][2] = ((b1/m1)*((b1/m1)+(b1/m2)+(b2/m2)))-(k1/m1);
+    A_matrix[1][3] = -(b1/m1);
+
+    A_matrix[2][0] = b2/m2;
+    A_matrix[2][1] = 0;
+    A_matrix[2][2] = -((b1/m1)+(b1/m2)+(b2/m2));
+    A_matrix[2][3] = 1;
+
+    A_matrix[3][0] = k2/m2;
+    A_matrix[3][1] = 0;
+    A_matrix[3][2] = -((k1/m1)+(k1/m2)+(k2/m2));
+    A_matrix[3][3] = 0;
+}
+
 /*** STATE SPACE MODEL - B ***/
+
+#define B_ROW_SIZE      4
+#define B_COLUMN_SIZE   2
+
+static double B_matrix[B_ROW_SIZE][B_COLUMN_SIZE];
+
+static Mat B = {(double *)B_matrix, B_ROW_SIZE, B_COLUMN_SIZE};
+
+#define GetB() (&B)
+
+static void modelSimluation_InitMatrixB(void)
+{
+    B_matrix[0][0] = 0;
+    B_matrix[0][1] = 0;
+
+    B_matrix[1][0] = 1/m1;
+    B_matrix[1][1] = (b1*b2)/(m1*m2);
+
+    B_matrix[2][0] = 0;
+    B_matrix[2][1] = -(b2/m2);
+
+    B_matrix[3][0] = (1/m1)+(1/m2);
+    B_matrix[3][1] = -(k2/m2);
+}
 
 /*** STATE SPACE MODEL - C ***/
 
 /*** STATIC FUNCTION ***/
-
-static void modelSimluation_StartSimulation(void)
-{
-    // here will be copied model simulation from simulink
-}
 
 static void * modelSimluation_SimulationStepThread(void *cookie)
 {
     /* init thread with good priority */
     SystemUtility_InitThread(pthread_self());
 
+    modelSimluation_InitMatrixA();
+    modelSimluation_InitMatrixB();
+
     showmat(GetA());
+    showmat(GetB());
 
     while (true)
     {
