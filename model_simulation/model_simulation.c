@@ -85,6 +85,23 @@ static void modelSimluation_InitMatrixB(void)
 
 /*** STATE SPACE MODEL - C ***/
 
+#define C_ROW_SIZE      1
+#define C_COLUMN_SIZE   4
+
+static double C_matrix[C_ROW_SIZE][C_COLUMN_SIZE];
+
+static Mat C = {(double *)C_matrix, C_ROW_SIZE, C_COLUMN_SIZE};
+
+#define GetC() (&C)
+
+static void modelSimluation_InitMatrixC(void)
+{
+    C_matrix[0][0] = 0;
+    C_matrix[0][1] = 0;
+    C_matrix[0][2] = 1;
+    C_matrix[0][3] = 0;
+}
+
 /*** STATIC FUNCTION ***/
 
 static void * modelSimluation_SimulationStepThread(void *cookie)
@@ -94,9 +111,11 @@ static void * modelSimluation_SimulationStepThread(void *cookie)
 
     modelSimluation_InitMatrixA();
     modelSimluation_InitMatrixB();
+    modelSimluation_InitMatrixC();
 
     showmat(GetA());
     showmat(GetB());
+    showmat(GetC());
 
     while (true)
     {
