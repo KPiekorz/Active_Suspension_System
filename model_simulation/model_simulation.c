@@ -14,6 +14,32 @@
 #include "sensors.h"
 #include "matrix_lib.h"
 
+#define DEFAULT_VALUE   0
+
+/*** SIMULATION PARAMETERS ***/
+
+#define SIM_T   300
+
+const double simulation_time = SIM_T;
+const double sampling_period = 0.5;
+
+static double road[SIM_T]; // for now it will be only step signa, in 10 step in will be 10 [cm] (0.1 [m])
+
+static void modelSimluation_GenerateRoad(void)
+{
+    // before step
+    for (int i = 0; i < 10; i++)
+    {
+
+    }
+
+    // after step
+    for (int i = 10; i < simulation_time; i++)
+    {
+        
+    }
+}
+
 /*** VARIABLES ***/
 
 const double m1 = 2500;
@@ -102,6 +128,25 @@ static void modelSimluation_InitMatrixC(void)
     C_matrix[0][3] = 0;
 }
 
+/*** STATE SPACE MODEL - STATES ***/
+
+#define INITIAL_STATES_ROW_SIZE      4
+#define INITIAL_STATES_COLUMN_SIZE   1
+
+static double INITIAL_STATES_matrix[INITIAL_STATES_ROW_SIZE][INITIAL_STATES_COLUMN_SIZE];
+
+static Mat INITIAL_STATES = {(double *)INITIAL_STATES_matrix, INITIAL_STATES_ROW_SIZE, INITIAL_STATES_COLUMN_SIZE};
+
+#define GetINITIAL_STATES() (&INITIAL_STATES)
+
+static void modelSimluation_InitMatrixINITIAL_STATES(void)
+{
+    INITIAL_STATES_matrix[0][0] = 0;
+    INITIAL_STATES_matrix[0][1] = 0;
+    INITIAL_STATES_matrix[0][2] = 0;
+    INITIAL_STATES_matrix[0][3] = 0;
+}
+
 /*** STATIC FUNCTION ***/
 
 static void * modelSimluation_SimulationStepThread(void *cookie)
@@ -113,16 +158,31 @@ static void * modelSimluation_SimulationStepThread(void *cookie)
     modelSimluation_InitMatrixB();
     modelSimluation_InitMatrixC();
 
-    showmat(GetA());
-    showmat(GetB());
-    showmat(GetC());
+    // showmat(GetA());
+    // showmat(GetB());
+    // showmat(GetC());
 
-    while (true)
+    Mat * I = eye(A_ROW_SIZE);
+    Mat * Xd = newmat(INITIAL_STATES_ROW_SIZE, INITIAL_STATES_COLUMN_SIZE, DEFAULT_VALUE);
+
+    showmat(I);
+    showmat(Xd);
+
+    // actual simulation
+    for (int i = 0; i < simulation_time; i++)
     {
-        // DEBUG_LOG_VERBOSE("[GUI] modelSimluation_SimulationStepThread");
+        if (i == 0)
+        {
+            
+        }
+        else
+        {
 
-        DELAY_S(2);
+        }
     }
+
+    freemat(I);
+    freemat(Xd);
 
     return 0;
 }
