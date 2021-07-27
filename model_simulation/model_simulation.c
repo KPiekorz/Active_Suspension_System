@@ -119,7 +119,7 @@ static void * modelSimluation_SimulationStepThread(void *cookie)
 
     while (true)
     {
-        DEBUG_LOG_VERBOSE("[GUI] modelSimluation_SimulationStepThread");
+        // DEBUG_LOG_VERBOSE("[GUI] modelSimluation_SimulationStepThread");
 
         DELAY_S(2);
     }
@@ -148,7 +148,7 @@ void ModelSimulation_Init(void)
 
             DELAY_S(2);
 
-            DEBUG_LOG_VERBOSE("[SIM] Model simulation process running...");
+            // DEBUG_LOG_VERBOSE("[SIM] Model simulation process running...");
         }
 
         exit(EXIT_SUCCESS);
