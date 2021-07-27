@@ -3,14 +3,14 @@
 
 typedef struct _Mat
 {
-	double * entries;
+	float * entries;
 	int row;
 	int col;
 } Mat;
 
 void showmat(Mat* A);
 
-Mat* newmat(int r,int c,double d);
+Mat* newmat(int r,int c,float d);
 
 void freemat(Mat* A);
 
@@ -20,13 +20,13 @@ Mat* zeros(int r,int c);
 
 Mat* ones(int r,int c);
 
-Mat* randm(int r,int c,double l,double u);
+Mat* randm(int r,int c,float l,float u);
 
-double get(Mat* M,int r,int c);
+float get(Mat* M,int r,int c);
 
-void set(Mat* M,int r,int c,double d);
+void set(Mat* M,int r,int c,float d);
 
-Mat* scalermultiply(Mat* M,double c);
+Mat* scalermultiply(Mat* M,float c);
 
 Mat* sum(Mat* A,Mat* B);
 
@@ -48,9 +48,9 @@ void removecol2(Mat* A,Mat* B,int c);
 
 Mat* transpose(Mat* A);
 
-double det(Mat* M);
+float det(Mat* M);
 
-double trace(Mat* A);
+float trace(Mat* A);
 
 Mat* adjoint(Mat* A);
 

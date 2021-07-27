@@ -26,10 +26,10 @@ void showmat(Mat* A){
 	}
 }
 
-Mat* newmat(int r,int c,double d){
+Mat* newmat(int r,int c,float d){
 	Mat* M=(Mat*)malloc(sizeof(Mat));
 	M->row=r;M->col=c;
-	M->entries=(double*)malloc(sizeof(double)*r*c);
+	M->entries=(float*)malloc(sizeof(float)*r*c);
 	int k=0;
 	for(int i=1;i<=M->row;i++){
 		for(int j=1;j<=M->col;j++){
@@ -62,28 +62,28 @@ Mat* ones(int r,int c){
 	return O;
 }
 
-Mat* randm(int r,int c,double l,double u){
+Mat* randm(int r,int c,float l,float u){
 	Mat* R=newmat(r,c,1);
 	int k=0;
 	for(int i=1;i<=r;i++){
 		for(int j=1;j<=c;j++){
-			double r=((double)rand())/((double)RAND_MAX);
+			float r=((float)rand())/((float)RAND_MAX);
 			R->entries[k++]=l+(u-l)*r;
 		}
 	}
 	return R;
 }
 
-double get(Mat* M,int r,int c){
-	double d=M->entries[(r-1)*M->col+c-1];
+float get(Mat* M,int r,int c){
+	float d=M->entries[(r-1)*M->col+c-1];
 	return d;
 }
 
-void set(Mat* M,int r,int c,double d){
+void set(Mat* M,int r,int c,float d){
 	M->entries[(r-1)*M->col+c-1]=d;
 }
 
-Mat* scalermultiply(Mat* M,double c){
+Mat* scalermultiply(Mat* M,float c){
 	Mat* B=newmat(M->row,M->col,0);
 	int k=0;
 	for(int i=0;i<M->row;i++){
@@ -158,7 +158,7 @@ Mat* multiply(Mat* A,Mat* B){
 	Mat* C=newmat(r1,c2,0);
 	for(int i=1;i<=r1;i++){
 		for(int j=1;j<=c2;j++){
-			double de=0;
+			float de=0;
 			for(int k=1;k<=r2;k++){
 				de+=A->entries[(i-1)*A->col+k-1]*B->entries[(k-1)*B->col+j-1];
 			}
@@ -230,18 +230,18 @@ Mat* transpose(Mat* A){
 	return B;
 }
 
-double det(Mat* M){
+float det(Mat* M){
 	int r=M->row;
 	int c=M->col;
 	if(r==1&&c==1){
-		double d=M->entries[0];
+		float d=M->entries[0];
 		return d;
 	}
 	Mat* M1=removerow(M,1);
 	Mat* M2=newmat(M->row-1,M->col-1,0);
-	double d=0, si=+1;
+	float d=0, si=+1;
 	for(int j=1;j<=M->col;j++){
-		double c=M->entries[j-1];
+		float c=M->entries[j-1];
 		removecol2(M1,M2,j);
 		d+=si*det(M2)*c;
 		si*=-1;
@@ -251,8 +251,8 @@ double det(Mat* M){
 	return d;
 }
 
-double trace(Mat* A){
-	double d=0;
+float trace(Mat* A){
+	float d=0;
 	for(int i=1;i<=A->row;i++){
 		d+=A->entries[(i-1)*A->row+i-1];
 	}
@@ -267,7 +267,7 @@ Mat* adjoint(Mat* A){
 		removerow2(A,A1,i);
 		for(int j=1;j<=A->col;j++){
 			removecol2(A1,A2,j);
-			double si= 1/((double)(i+j));
+			float si= 1/((float)(i+j));
 			B->entries[(i-1)*B->col+j-1]=det(A2)*si;
 		}
 	}
@@ -280,7 +280,7 @@ Mat* adjoint(Mat* A){
 
 Mat* inverse(Mat* A){
 	Mat* B=adjoint(A);
-	double de=det(A);
+	float de=det(A);
 	Mat* C=scalermultiply(B,1/de);
 	freemat(B);
 	return C;
@@ -335,13 +335,13 @@ Mat* rowechelon(Mat* A){
 	}
 	if(ind2>1){
 		for(int j=1;j<=B->col;j++){
-			double temp=B->entries[j-1];
+			float temp=B->entries[j-1];
 			B->entries[j-1]=B->entries[(ind2-1)*B->col+j-1];
 			B->entries[(ind2-1)*B->col+j-1]=temp;
 		}
 	}
 	if(B->entries[0]!=0){
-		double coeff=B->entries[0];
+		float coeff=B->entries[0];
 		for(int j=1;j<=B->col;j++){
 			B->entries[j-1]/=coeff;
 		}
@@ -352,7 +352,7 @@ Mat* rowechelon(Mat* A){
 			}
 		}
 	}else{
-		double coeff=0;
+		float coeff=0;
 		for(int j=1;j<=B->col;j++){
 			if(B->entries[j-1]!=0&&coeff==0){
 				coeff=B->entries[j-1];
@@ -408,8 +408,8 @@ Mat* vconcat(Mat* A,Mat* B){
 	return C;
 }
 
-double innermultiply(Mat* a,Mat* b){
-	double d=0;
+float innermultiply(Mat* a,Mat* b){
+	float d=0;
 	int n=a->row;
 	if(a->col>n){
 		n=a->col;

@@ -14,49 +14,55 @@
 #include "sensors.h"
 #include "matrix_lib.h"
 
-#define DEFAULT_VALUE   0
+    #define DEFAULT_VALUE   0
 
 /*** SIMULATION PARAMETERS ***/
 
 #define SIM_T   300
 
-const double simulation_time = SIM_T;
-const double sampling_period = 0.5;
+const float simulation_time = SIM_T;
+const float sampling_period = 0.5;
 
-static double road[SIM_T]; // for now it will be only step signa, in 10 step in will be 10 [cm] (0.1 [m])
+/**
+ * @note Road and force will be set in input matrix in every interation
+ */
+
+static float road[SIM_T]; // for now it will be only step signa, in 10 step in will be 10 [cm] (0.1 [m])
 
 static void modelSimluation_GenerateRoad(void)
 {
     // before step
     for (int i = 0; i < 10; i++)
     {
-
+        road[i] = 0;
     }
 
     // after step
     for (int i = 10; i < simulation_time; i++)
     {
-        
+        road[i] = 0.1;
     }
 }
 
+static float force; // this varialbe will be update from control process
+
 /*** VARIABLES ***/
 
-const double m1 = 2500;
-const double m2 = 320;
-const double k1 = 80000;
-const double k2 = 500000;
-const double b1 = 350;
-const double b2 = 15020;
+const float m1 = 2500;
+const float m2 = 320;
+const float k1 = 80000;
+const float k2 = 500000;
+const float b1 = 350;
+const float b2 = 15020;
 
 /*** STATE SPACE MODEL - A ***/
 
 #define A_ROW_SIZE      4
 #define A_COLUMN_SIZE   4
 
-static double A_matrix[A_ROW_SIZE][A_COLUMN_SIZE];
+static float A_matrix[A_ROW_SIZE][A_COLUMN_SIZE];
 
-static Mat A = {(double *)A_matrix, A_ROW_SIZE, A_ROW_SIZE};
+static Mat A = {(float *)A_matrix, A_ROW_SIZE, A_ROW_SIZE};
 
 #define GetA() (&A)
 
@@ -88,9 +94,9 @@ static void modelSimluation_InitMatrixA(void)
 #define B_ROW_SIZE      4
 #define B_COLUMN_SIZE   2
 
-static double B_matrix[B_ROW_SIZE][B_COLUMN_SIZE];
+static float B_matrix[B_ROW_SIZE][B_COLUMN_SIZE];
 
-static Mat B = {(double *)B_matrix, B_ROW_SIZE, B_COLUMN_SIZE};
+static Mat B = {(float *)B_matrix, B_ROW_SIZE, B_COLUMN_SIZE};
 
 #define GetB() (&B)
 
@@ -114,9 +120,9 @@ static void modelSimluation_InitMatrixB(void)
 #define C_ROW_SIZE      1
 #define C_COLUMN_SIZE   4
 
-static double C_matrix[C_ROW_SIZE][C_COLUMN_SIZE];
+static float C_matrix[C_ROW_SIZE][C_COLUMN_SIZE];
 
-static Mat C = {(double *)C_matrix, C_ROW_SIZE, C_COLUMN_SIZE};
+static Mat C = {(float *)C_matrix, C_ROW_SIZE, C_COLUMN_SIZE};
 
 #define GetC() (&C)
 
@@ -133,9 +139,9 @@ static void modelSimluation_InitMatrixC(void)
 #define INITIAL_STATES_ROW_SIZE      4
 #define INITIAL_STATES_COLUMN_SIZE   1
 
-static double INITIAL_STATES_matrix[INITIAL_STATES_ROW_SIZE][INITIAL_STATES_COLUMN_SIZE];
+static float INITIAL_STATES_matrix[INITIAL_STATES_ROW_SIZE][INITIAL_STATES_COLUMN_SIZE];
 
-static Mat INITIAL_STATES = {(double *)INITIAL_STATES_matrix, INITIAL_STATES_ROW_SIZE, INITIAL_STATES_COLUMN_SIZE};
+static Mat INITIAL_STATES = {(float *)INITIAL_STATES_matrix, INITIAL_STATES_ROW_SIZE, INITIAL_STATES_COLUMN_SIZE};
 
 #define GetINITIAL_STATES() (&INITIAL_STATES)
 
@@ -162,27 +168,42 @@ static void * modelSimluation_SimulationStepThread(void *cookie)
     // showmat(GetB());
     // showmat(GetC());
 
+    // calcualte Ad matrix - discrete matric of A
+    Mat * s_a = scalermultiply(GetA(), sampling_period);
     Mat * I = eye(A_ROW_SIZE);
-    Mat * Xd = newmat(INITIAL_STATES_ROW_SIZE, INITIAL_STATES_COLUMN_SIZE, DEFAULT_VALUE);
+    Mat * before_inv = minus(I, s_a);
+    freemat(s_a);
+    freemat(I);
+    Mat * Ad = inverse(before_inv);
+    freemat(before_inv);
 
-    showmat(I);
-    showmat(Xd);
+    // calcualte Bd matrix - discrete matric of B
+    Mat * ad_s = scalermultiply(Ad, sampling_period);
+    Mat * Bd = multiply(ad_s, GetB());
+    freemat(ad_s);
 
     // actual simulation
     for (int i = 0; i < simulation_time; i++)
     {
+        DELAY_MS(10);
+
+        // send road to gui plot
+        Gui_SendMessage(gui_message_control_road, (float *)&road[i], 1);
+
         if (i == 0)
         {
-            
+            // set input matrix
+
         }
         else
         {
+            // set input matrix
 
         }
     }
 
-    freemat(I);
-    freemat(Xd);
+    freemat(Ad);
+    freemat(Bd);
 
     return 0;
 }
@@ -194,6 +215,9 @@ void ModelSimulation_Init(void)
     #ifdef INIT_MODEL_SIMULATION
         DEBUG_LOG_DEBUG("ModelSimulation_Init, Init model simulation process...");
 
+        /* Init road input */
+        modelSimluation_GenerateRoad();
+
         /* Init simulation of suspension */
         if (!SystemUtility_CreateThread(modelSimluation_SimulationStepThread))
         {
@@ -202,13 +226,10 @@ void ModelSimulation_Init(void)
 
         while (1)
         {
-            float data[4] = {3.02, 1.1, 1.23, 5.01};
-
+            // float data[4] = {3.02, 1.1, 1.23, 5.01};
             // Gui_SendMessage(gui_message_control_signal, data, 4);
 
-            DELAY_S(2);
-
-            // DEBUG_LOG_VERBOSE("[SIM] Model simulation process running...");
+            DELAY_S(10);
         }
 
         exit(EXIT_SUCCESS);
@@ -225,5 +246,6 @@ void ModelSimulation_Destroy(void)
 
 void ModelSimulation_SendMessage(model_simulation_message_type_t message_type, float * data, int data_len)
 {
+    DEBUG_LOG_DEBUG("[SIM] ModelSimulation_SendMessage, message type: %d", message_type);
 
 }

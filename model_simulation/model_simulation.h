@@ -6,6 +6,7 @@
 typedef enum
 {
     model_simulation_message_states,
+    model_simulation_message_control_force,
 } model_simulation_message_type_t;
 
 /**

@@ -124,7 +124,7 @@ static void * gui_ReceiveMessageThread(void *cookie)
         DEBUG_LOG_VERBOSE("[GUI] gui_ReceiveMessageThread, Wait for message!");
 
         /* delay for waiting for another message */
-        DELAY_MS(100);
+        DELAY_MS(10);
 
         /* try receive message */
         if (true == SystemUtility_ReceiveMessage(gui_fifo_name, (int *)&message_type, float_data, &float_data_len))
@@ -218,6 +218,7 @@ void Gui_SendMessage(gui_message_type_t message_type, float * data, int data_len
 {
     DEBUG_LOG_DEBUG("[GUI] Gui_SendMessage, message type: %d, len: %d", message_type, data_len);
 
+    // this message will be received in gui_ReceiveMessageThread
     if (!SystemUtility_SendMessage(gui_fifo_name, (int)message_type, data, data_len))
     {
         DEBUG_LOG_ERROR("[GUI] Gui_SendMessage, Can't send message to gui process!");
