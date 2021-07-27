@@ -131,6 +131,15 @@ static void * gui_ReceiveMessageThread(void *cookie)
         {
             DEBUG_LOG_VERBOSE("[GUI] gui_ReceiveMessageThread, message type: %d, float data len: %d", message_type, float_data_len);
 
+            switch (message_type)
+            {
+                case gui_message_road:
+
+                break;
+                default:
+                break;
+            }
+
             for (int i = 0; i < float_data_len; i++)
             {
                 DEBUG_LOG_VERBOSE("[GUI] gui_ReceiveMessageThread, float[%d]: %f", i, float_data[i]);

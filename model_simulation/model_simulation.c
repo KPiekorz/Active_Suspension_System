@@ -153,6 +153,11 @@ static void modelSimluation_InitMatrixINITIAL_STATES(void)
     INITIAL_STATES_matrix[0][3] = 0;
 }
 
+/*** INPUT MATRIX ***/
+
+#define INPUT_ROW_SIZE      2
+#define INPUT_COLUMN_SIZE   1
+
 /*** STATIC FUNCTION ***/
 
 static void * modelSimluation_SimulationStepThread(void *cookie)
@@ -182,28 +187,48 @@ static void * modelSimluation_SimulationStepThread(void *cookie)
     Mat * Bd = multiply(ad_s, GetB());
     freemat(ad_s);
 
+    showmat(Ad);
+    showmat(Bd);
+
+    Mat * xk_1 = newmat(INITIAL_STATES_ROW_SIZE, INITIAL_STATES_ROW_SIZE, DEFAULT_VALUE);
+
     // actual simulation
-    for (int i = 0; i < simulation_time; i++)
+    for (int i = 0; i < 1; i++) // simulation_time
     {
         DELAY_MS(10);
 
         // send road to gui plot
-        Gui_SendMessage(gui_message_control_road, (float *)&road[i], 1);
+        Gui_SendMessage(gui_message_road, &road[i], 1);
 
         if (i == 0)
         {
             // set input matrix
+            Mat * INPUT = newmat(INPUT_ROW_SIZE, INPUT_COLUMN_SIZE, DEFAULT_VALUE);
+            set(INPUT, 1, 1, road[i]);
+            set(INPUT, 1, 1, force); // this will be update by mesage from control process
 
+            // calculate Xd and Yd
+
+            // calculate x
+            // Mat xk = add something
+            // set xk_1 with xk values
+
+            freemat(INPUT);
         }
         else
         {
             // set input matrix
+
+            // calculate Xd and Yd
+
+            // calculate x
 
         }
     }
 
     freemat(Ad);
     freemat(Bd);
+    freemat(xk_1);
 
     return 0;
 }
