@@ -267,9 +267,59 @@ static void * modelSimluation_SimulationStepThread(void *cookie)
         }
     }
 
+    // send states to control and gui process (Xd and Yd)
+    modelSimluation_SendModelStates(xk_1, road[SIM_T-1]);
+
     freemat(Ad);
     freemat(Bd);
     freemat(xk_1);
+
+    return 0;
+}
+
+static void * modelSimluation_ReceiveMessageThread(void *cookie)
+{
+/* init thread with good priority */
+    SystemUtility_InitThread(pthread_self());
+
+    // /* create message fifo queue */
+    // if (SystemUtility_CreateMessageFifo(gui_fifo_name) == false)
+    // {
+    //     DEBUG_LOG_ERROR("[GUI] gui_ReceiveMessageThread, Can't create FIFO!");
+    //     return 0;
+    // }
+
+    // gui_message_type_t message_type = gui_message_unknown;
+    // int float_data_len = 20;
+    // float float_data[float_data_len];
+
+    // while (true)
+    // {
+    //     DEBUG_LOG_VERBOSE("[GUI] gui_ReceiveMessageThread, Wait for message!");
+
+    //     /* delay for waiting for another message */
+    //     // DELAY_MS(1);
+
+    //     /* try receive message */
+    //     if (true == SystemUtility_ReceiveMessage(gui_fifo_name, (int *)&message_type, float_data, &float_data_len))
+    //     {
+    //         DEBUG_LOG_VERBOSE("[GUI] gui_ReceiveMessageThread, message type: %d, float data len: %d", message_type, float_data_len);
+
+    //         switch (message_type)
+    //         {
+    //             case gui_message_model_simulation_data:
+
+    //             break;
+    //             default:
+    //             break;
+    //         }
+
+    //         for (int i = 0; i < float_data_len; i++)
+    //         {
+    //             DEBUG_LOG_VERBOSE("[GUI] gui_ReceiveMessageThread, float[%d]: %f", i, float_data[i]);
+    //         }
+    //     }
+    // }
 
     return 0;
 }
@@ -288,6 +338,12 @@ void ModelSimulation_Init(void)
         if (!SystemUtility_CreateThread(modelSimluation_SimulationStepThread))
         {
             DEBUG_LOG_ERROR("[GUI] ModelSimulation_Init, Can't create simulaton step thread!");
+        }
+
+        /* Init simulation of suspension */
+        if (!SystemUtility_CreateThread(modelSimluation_ReceiveMessageThread))
+        {
+            DEBUG_LOG_ERROR("[GUI] ModelSimulation_Init, Can't create receive thread!");
         }
 
         while (1)
