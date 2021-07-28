@@ -124,7 +124,7 @@ static void * gui_ReceiveMessageThread(void *cookie)
         DEBUG_LOG_VERBOSE("[GUI] gui_ReceiveMessageThread, Wait for message!");
 
         /* delay for waiting for another message */
-        DELAY_MS(10);
+        // DELAY_MS(1);
 
         /* try receive message */
         if (true == SystemUtility_ReceiveMessage(gui_fifo_name, (int *)&message_type, float_data, &float_data_len))
@@ -133,7 +133,7 @@ static void * gui_ReceiveMessageThread(void *cookie)
 
             switch (message_type)
             {
-                case gui_message_road:
+                case gui_message_model_simulation_data:
 
                 break;
                 default:

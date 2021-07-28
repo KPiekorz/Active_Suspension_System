@@ -9,9 +9,8 @@
 typedef enum
 {
     gui_message_unknown = 0,
-    gui_message_road,
     gui_message_control_signal,
-    gui_message_model_output,
+    gui_message_model_simulation_data,
 
 } gui_message_type_t;
 

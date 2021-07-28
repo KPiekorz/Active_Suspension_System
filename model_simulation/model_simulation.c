@@ -18,7 +18,9 @@
 
 /*** SIMULATION PARAMETERS ***/
 
-#define SIM_T   300
+#define MODEL_SIMULATION_DATA_SIZE      6
+
+#define SIM_T                           300
 
 const float simulation_time = SIM_T;
 const float sampling_period = 0.5;
@@ -27,7 +29,7 @@ const float sampling_period = 0.5;
  * @note Road and force will be set in input matrix in every interation
  */
 
-static float road[SIM_T]; // for now it will be only step signa, in 10 step in will be 10 [cm] (0.1 [m])
+static float road[SIM_T]; // for now it will be only step signal, in 10 step in will be 10 [cm] (0.1 [m])
 
 static void modelSimluation_GenerateRoad(void)
 {
@@ -44,7 +46,7 @@ static void modelSimluation_GenerateRoad(void)
     }
 }
 
-static float force; // this varialbe will be update from control process
+static float force = 5; // this varialbe will be update from control process
 
 /*** VARIABLES ***/
 
@@ -160,6 +162,28 @@ static void modelSimluation_InitMatrixINITIAL_STATES(void)
 
 /*** STATIC FUNCTION ***/
 
+static void modelSimluation_SendModelStates(Mat * x, float road)
+{
+    DEBUG_LOG_DEBUG("modelSimluation_SendModelStates, row: %d, column: %d", x->row, x->col);
+
+    if (x->row == 4 && x->col == 1)
+    {
+        float model_simulation_data[MODEL_SIMULATION_DATA_SIZE];
+        model_simulation_data[0] = get(x, 1, 1);
+        model_simulation_data[1] = get(x, 2, 1);
+        model_simulation_data[2] = get(x, 3, 1);
+        model_simulation_data[3] = get(x, 4, 1);
+        model_simulation_data[4] = road;
+        model_simulation_data[5] = force;
+
+        Gui_SendMessage(gui_message_model_simulation_data, model_simulation_data, MODEL_SIMULATION_DATA_SIZE);
+    }
+    else
+    {
+        DEBUG_LOG_ERROR("modelSimluation_SendModelStates, wrong matrix!!!");
+    }
+}
+
 static void * modelSimluation_SimulationStepThread(void *cookie)
 {
     /* init thread with good priority */
@@ -168,10 +192,6 @@ static void * modelSimluation_SimulationStepThread(void *cookie)
     modelSimluation_InitMatrixA();
     modelSimluation_InitMatrixB();
     modelSimluation_InitMatrixC();
-
-    // showmat(GetA());
-    // showmat(GetB());
-    // showmat(GetC());
 
     // calcualte Ad matrix - discrete matric of A
     Mat * s_a = scalermultiply(GetA(), sampling_period);
@@ -187,18 +207,13 @@ static void * modelSimluation_SimulationStepThread(void *cookie)
     Mat * Bd = multiply(ad_s, GetB());
     freemat(ad_s);
 
-    showmat(Ad);
-    showmat(Bd);
-
-    Mat * xk_1 = newmat(INITIAL_STATES_ROW_SIZE, INITIAL_STATES_ROW_SIZE, DEFAULT_VALUE);
+    // x(k-1)
+    Mat * xk_1 = newmat(INITIAL_STATES_ROW_SIZE, INITIAL_STATES_COLUMN_SIZE, DEFAULT_VALUE);
 
     // actual simulation
-    for (int i = 0; i < 1; i++) // simulation_time
+    for (int i = 0; i < 1; i++) // simulation_time insted od 1 !!!
     {
         DELAY_MS(10);
-
-        // send road to gui plot
-        Gui_SendMessage(gui_message_road, &road[i], 1);
 
         if (i == 0)
         {
@@ -207,22 +222,48 @@ static void * modelSimluation_SimulationStepThread(void *cookie)
             set(INPUT, 1, 1, road[i]);
             set(INPUT, 1, 1, force); // this will be update by mesage from control process
 
-            // calculate Xd and Yd
+            // send states to control and gui process (Xd and Yd)
+            modelSimluation_SendModelStates(GetINITIAL_STATES(), road[i]);
 
             // calculate x
-            // Mat xk = add something
-            // set xk_1 with xk values
+            Mat * a_x = multiply(Ad, GetINITIAL_STATES());
+            Mat * b_i = multiply(Bd, INPUT);
+
+            Mat * xk = sum(a_x, b_i);
+            set(xk_1, 1, 1, get(xk, 1, 1));
+            set(xk_1, 2, 1, get(xk, 2, 1));
+            set(xk_1, 3, 1, get(xk, 3, 1));
+            set(xk_1, 4, 1, get(xk, 4, 1));
 
             freemat(INPUT);
+            freemat(a_x);
+            freemat(b_i);
+            freemat(xk);
         }
         else
         {
             // set input matrix
+            Mat * INPUT = newmat(INPUT_ROW_SIZE, INPUT_COLUMN_SIZE, DEFAULT_VALUE);
+            set(INPUT, 1, 1, road[i]);
+            set(INPUT, 1, 1, force); // this will be update by mesage from control process
 
-            // calculate Xd and Yd
+            // send states to control and gui process (Xd and Yd)
+            modelSimluation_SendModelStates(xk_1, road[i]);
 
             // calculate x
+            Mat * a_x = multiply(Ad, xk_1);
+            Mat * b_i = multiply(Bd, INPUT);
 
+            Mat * xk = sum(a_x, b_i);
+            set(xk_1, 1, 1, get(xk, 1, 1));
+            set(xk_1, 2, 1, get(xk, 2, 1));
+            set(xk_1, 3, 1, get(xk, 3, 1));
+            set(xk_1, 4, 1, get(xk, 4, 1));
+
+            freemat(INPUT);
+            freemat(a_x);
+            freemat(b_i);
+            freemat(xk);
         }
     }
 
