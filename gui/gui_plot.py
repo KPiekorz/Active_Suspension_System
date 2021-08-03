@@ -1,3 +1,4 @@
+import types
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg, NavigationToolbar2QT as NavigationToolbar
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -11,13 +12,15 @@ import random
 
 matplotlib.use('Qt5Agg')
 
+y_model_plot = [1, 2, 3]
+y_control_plot = [1, 2, 3]
 
 class MplCanvas(FigureCanvasQTAgg):
 
     def __init__(self, parent=None, width=5, height=4, dpi=100):
-        fig = Figure(figsize=(width, height), dpi=dpi)
-        self.axes = fig.add_subplot(111)
-        super(MplCanvas, self).__init__(fig)
+        self.fig = Figure(figsize=(width, height), dpi=dpi)
+        self.axes = self.fig.add_subplot(111)
+        super(MplCanvas, self).__init__(self.fig)
 
 class UDPServer(QtCore.QObject):
 
@@ -50,8 +53,9 @@ class SerialReader(QtCore.QObject):
     @QtCore.pyqtSlot()
     def read_serial(self):
         while(1):
-            text = input("Enter :> ");
-            print(text)
+            text = input("Enter value:> ");
+            global y_model_plot
+            y_model_plot = y_model_plot + [int(text)]
 
 class GUI(QtWidgets.QMainWindow):
     signal_start_udp_server = QtCore.pyqtSignal()
@@ -78,7 +82,9 @@ class GUI(QtWidgets.QMainWindow):
 
         # Set plot paramaters
         self.plot_control = MplCanvas(self, width=5, height=4, dpi=100)
+        self.plot_control.fig.suptitle("Control signal", fontsize=10)
         self.plot_model = MplCanvas(self, width=5, height=4, dpi=100)
+        self.plot_model.fig.suptitle("Model state - Y", fontsize=10)
         self.update_plot()
 
         # Create toolbar, passing canvas as first parament, parent (self, the MainWindow) as second.
@@ -110,17 +116,21 @@ class GUI(QtWidgets.QMainWindow):
         self.timer.start()
 
     def update_plot(self):
+        global y_model_plot
         # clear plot
         self.plot_control.axes.cla()
         # set new plot axes values
-        self.plot_control.axes.plot([0, 1, 2, 3, 4], [10, 1, random.randint(0, 10), 3, 40])
+        x_control_plot = list(range(0, len(y_control_plot)))
+        self.plot_control.axes.plot(x_control_plot, y_control_plot)
         # Trigger the canvas to update and redraw.
         self.plot_control.draw()
 
+        global x_model_plot
         # clear plot
         self.plot_model.axes.cla()
         # set new plot axes values
-        self.plot_model.axes.plot([0, 1, 2, 3, 4], [10, 1, random.randint(0, 10), 3, random.randint(0, 10)])
+        x_model_plot = list(range(0, len(y_model_plot)))
+        self.plot_model.axes.plot(x_model_plot, y_model_plot)
         # Trigger the canvas to update and redraw.
         self.plot_model.draw()
 
