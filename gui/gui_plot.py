@@ -1,14 +1,14 @@
-import types
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg, NavigationToolbar2QT as NavigationToolbar
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtWidgets
+from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWidgets import QLabel
 
 import sys
 import matplotlib
-import os
 import socket
 import sys
-import random
+from random import randrange
 
 matplotlib.use('Qt5Agg')
 
@@ -91,11 +91,20 @@ class GUI(QtWidgets.QMainWindow):
         toolbar_control = NavigationToolbar(self.plot_control, self)
         toolbar_model = NavigationToolbar(self.plot_model, self)
 
+        # create kpi push button
+        kpi_button = QtWidgets.QPushButton("Calculate KPI from Y state");
+        kpi_button.clicked.connect(self.calculate_kpi)
+
+        # kpi label - value
+        self.kpi_label = QLabel()
+
         # Setup box layout
         box_layout = QtWidgets.QVBoxLayout()
         box_layout.addWidget(button_close_gui)
         box_layout.addWidget(button_start_udp_server)
         box_layout.addWidget(button_start_serial_reader)
+        box_layout.addWidget(kpi_button)
+        box_layout.addWidget(self.kpi_label)
         box_layout.addWidget(toolbar_control)
         box_layout.addWidget(self.plot_control)
         box_layout.addWidget(toolbar_model)
@@ -133,6 +142,11 @@ class GUI(QtWidgets.QMainWindow):
         self.plot_model.axes.plot(x_model_plot, y_model_plot)
         # Trigger the canvas to update and redraw.
         self.plot_model.draw()
+
+    def calculate_kpi(self):
+        new_kpi = "New kpi value for Y state: "  + str(randrange(10))
+        self.kpi_label.setText(new_kpi)
+        QApplication.processEvents()
 
 if __name__ == '__main__':
 
