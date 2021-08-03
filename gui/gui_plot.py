@@ -97,6 +97,7 @@ class GUI(QtWidgets.QMainWindow):
 
         # kpi label - value
         self.kpi_label = QLabel()
+        self.calculate_kpi()
 
         # Setup box layout
         box_layout = QtWidgets.QVBoxLayout()
@@ -144,7 +145,7 @@ class GUI(QtWidgets.QMainWindow):
         self.plot_model.draw()
 
     def calculate_kpi(self):
-        new_kpi = "New kpi value for Y state: "  + str(randrange(10))
+        new_kpi = "New kpi value model state Y: "  + str(randrange(10))
         self.kpi_label.setText(new_kpi)
         QApplication.processEvents()
 
