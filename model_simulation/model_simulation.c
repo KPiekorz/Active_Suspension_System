@@ -46,7 +46,7 @@ static void modelSimluation_GenerateRoad(void)
     }
 }
 
-static float force = 5; // this varialbe will be update from control process
+static float force = 5; // this varialbe will be update from control process (access to force variable have to be done through mutex semaphore)
 
 /*** VARIABLES ***/
 

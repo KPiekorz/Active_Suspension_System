@@ -12,8 +12,9 @@ from random import randrange
 
 matplotlib.use('Qt5Agg')
 
-y_model_plot = [1, 2, 3]
-y_control_plot = [1, 2, 3]
+road = [1, 3, 5]
+control_force = [1, 2, 3]
+model_states = [1, 2, 3]
 
 class MplCanvas(FigureCanvasQTAgg):
 
@@ -81,15 +82,18 @@ class GUI(QtWidgets.QMainWindow):
         button_start_serial_reader.clicked.connect(self.signal_start_serial_reader)
 
         # Set plot paramaters
-        self.plot_control = MplCanvas(self, width=5, height=4, dpi=100)
-        self.plot_control.fig.suptitle("Control signal", fontsize=10)
-        self.plot_model = MplCanvas(self, width=5, height=4, dpi=100)
-        self.plot_model.fig.suptitle("Model state - Y", fontsize=10)
+        self.plot_road = MplCanvas(self, width=5, height=4, dpi=100)
+        self.plot_road.fig.suptitle("Road", fontsize=10)
+        self.plot_control_force = MplCanvas(self, width=5, height=4, dpi=100)
+        self.plot_control_force.fig.suptitle("Control signal force", fontsize=10)
+        self.plot_model_state = MplCanvas(self, width=5, height=4, dpi=100)
+        self.plot_model_state.fig.suptitle("Model state - Y", fontsize=10)
         self.update_plot()
 
         # Create toolbar, passing canvas as first parament, parent (self, the MainWindow) as second.
-        toolbar_control = NavigationToolbar(self.plot_control, self)
-        toolbar_model = NavigationToolbar(self.plot_model, self)
+        toolbar_road = NavigationToolbar(self.plot_road, self)
+        toolbar_control = NavigationToolbar(self.plot_control_force, self)
+        toolbar_model = NavigationToolbar(self.plot_model_state, self)
 
         # create kpi push button
         kpi_button = QtWidgets.QPushButton("Calculate KPI from Y state");
@@ -106,10 +110,12 @@ class GUI(QtWidgets.QMainWindow):
         box_layout.addWidget(button_start_serial_reader)
         box_layout.addWidget(kpi_button)
         box_layout.addWidget(self.kpi_label)
+        box_layout.addWidget(toolbar_road)
+        box_layout.addWidget(self.plot_road)
         box_layout.addWidget(toolbar_control)
-        box_layout.addWidget(self.plot_control)
+        box_layout.addWidget(self.plot_control_force)
         box_layout.addWidget(toolbar_model)
-        box_layout.addWidget(self.plot_model)
+        box_layout.addWidget(self.plot_model_state)
 
         # Create a placeholder widget to hold our toolbar and canvas.
         widget = QtWidgets.QWidget()
@@ -126,23 +132,35 @@ class GUI(QtWidgets.QMainWindow):
         self.timer.start()
 
     def update_plot(self):
-        global y_model_plot
+        # plot road
+        global road
         # clear plot
-        self.plot_control.axes.cla()
+        self.plot_road.axes.cla()
         # set new plot axes values
-        x_control_plot = list(range(0, len(y_control_plot)))
-        self.plot_control.axes.plot(x_control_plot, y_control_plot)
+        road_x = list(range(0, len(road)))
+        self.plot_road.axes.plot(road_x, road)
         # Trigger the canvas to update and redraw.
-        self.plot_control.draw()
+        self.plot_road.draw()
 
-        global x_model_plot
+        # plot control force
+        global control_force
         # clear plot
-        self.plot_model.axes.cla()
+        self.plot_control_force.axes.cla()
         # set new plot axes values
-        x_model_plot = list(range(0, len(y_model_plot)))
-        self.plot_model.axes.plot(x_model_plot, y_model_plot)
+        control_force_x = list(range(0, len(control_force)))
+        self.plot_control_force.axes.plot(control_force_x, control_force)
         # Trigger the canvas to update and redraw.
-        self.plot_model.draw()
+        self.plot_control_force.draw()
+
+        # plot model states
+        global model_states
+        # clear plot
+        self.plot_model_state.axes.cla()
+        # set new plot axes values
+        model_states_x = list(range(0, len(model_states)))
+        self.plot_model_state.axes.plot(model_states_x, model_states)
+        # Trigger the canvas to update and redraw.
+        self.plot_model_state.draw()
 
     def calculate_kpi(self):
         new_kpi = "New kpi value model state Y: "  + str(randrange(10))
