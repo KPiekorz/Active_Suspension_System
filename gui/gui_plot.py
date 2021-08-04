@@ -44,27 +44,26 @@ class UDPServer(QtCore.QObject):
         print("Upd server has started...")
         while self.server_start:
             data, addr = self.sock.recvfrom(1024)
-            print("Udp server received data:", end='')
-            float_binary = data[0:4]
-            print(float_binary)
-            float_number = struct.unpack('f', float_binary)
-            print(float_number)
+            print("Udp server received data: ", end='')
+            b_x1 = data[0:4]
+            f_x1 = struct.unpack('f', b_x1)
+            b_x2 = data[4:8]
+            f_x2 = struct.unpack('f', b_x2)
+            b_x3 = data[8:12]
+            f_x3 = struct.unpack('f', b_x3)
+            b_x4 = data[12:16]
+            f_x4 = struct.unpack('f', b_x4)
+            b_road = data[16:20]
+            f_road = struct.unpack('f', b_road)
+            b_force = data[20:24]
+            f_force = struct.unpack('f', b_force)
 
-class SerialReader(QtCore.QObject):
-
-    def __init__(self, parent=None):
-        super(SerialReader, self).__init__(parent)
-
-    @QtCore.pyqtSlot()
-    def read_serial(self):
-        while(1):
-            text = input("Enter value:> ");
-            global y_model_plot
-            y_model_plot = y_model_plot + [int(text)]
+            print(float(f_road[0]), end='')
+            print("   ", end='')
+            print(float(f_force[0]))
 
 class GUI(QtWidgets.QMainWindow):
     signal_start_udp_server = QtCore.pyqtSignal()
-    signal_start_serial_reader = QtCore.pyqtSignal()
 
     def __init__(self, parent=None):
         super(GUI, self).__init__(parent)
@@ -76,14 +75,6 @@ class GUI(QtWidgets.QMainWindow):
         # Close gui
         button_close_gui = QtWidgets.QPushButton("Close")
         button_close_gui.clicked.connect(self.close)
-
-        # Setup init udp server buton
-        button_start_udp_server = QtWidgets.QPushButton("Start UDP server")
-        button_start_udp_server.clicked.connect(self.signal_start_udp_server)
-
-        # Setup serial reader button
-        button_start_serial_reader = QtWidgets.QPushButton("Start serial reader")
-        button_start_serial_reader.clicked.connect(self.signal_start_serial_reader)
 
         # Set plot paramaters
         self.plot_road = MplCanvas(self, width=5, height=4, dpi=100)
@@ -110,8 +101,6 @@ class GUI(QtWidgets.QMainWindow):
         # Setup box layout
         box_layout = QtWidgets.QVBoxLayout()
         box_layout.addWidget(button_close_gui)
-        box_layout.addWidget(button_start_udp_server)
-        box_layout.addWidget(button_start_serial_reader)
         box_layout.addWidget(kpi_button)
         box_layout.addWidget(self.kpi_label)
         box_layout.addWidget(toolbar_road)
@@ -134,6 +123,12 @@ class GUI(QtWidgets.QMainWindow):
         self.timer.setInterval(500)
         self.timer.timeout.connect(self.update_plot)
         self.timer.start()
+
+        # Setup timers to start udp server
+        self.timer_udp_server = QtCore.QTimer()
+        self.timer_udp_server.setInterval(500)
+        self.timer_udp_server.timeout.connect(self.start_udp_server)
+        self.timer_udp_server.start()
 
     def update_plot(self):
         # plot road
@@ -171,6 +166,11 @@ class GUI(QtWidgets.QMainWindow):
         self.kpi_label.setText(new_kpi)
         QApplication.processEvents()
 
+    def start_udp_server(self):
+        # start udp server
+        self.signal_start_udp_server.emit()
+        self.timer_udp_server.stop()
+
 if __name__ == '__main__':
 
     app = QtWidgets.QApplication(sys.argv)
@@ -181,12 +181,6 @@ if __name__ == '__main__':
     thread_upd_server.start()
     upd_server.moveToThread(thread_upd_server)
 
-    serial_reader = SerialReader()
-    thread_serial_reader = QtCore.QThread()
-    thread_serial_reader.start()
-    serial_reader.moveToThread(thread_serial_reader)
-
     gui.signal_start_udp_server.connect(upd_server.init_server)
-    gui.signal_start_serial_reader.connect(serial_reader.read_serial)
 
     sys.exit(app.exec_())
