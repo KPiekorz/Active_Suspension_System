@@ -23,7 +23,7 @@ typedef enum
 
 /*** SIMULATION PARAMETERS ***/
 
-#define SIM_T                           (10)
+#define SIM_T                           (2)
 
 #define STEP_TIME                       (5)
 
@@ -45,12 +45,22 @@ static void modelSimluation_GenerateRoad(road_type_t type)
             // before step
             for (int i = 0; i < STEP_TIME; i++)
             {
-                road[i] = 0;
+                if (i >= SIM_T)
+                {
+                    return;
+                }
+
+                road[i] = 5;
             }
 
             // after step
             for (int i = STEP_TIME; i < simulation_time; i++)
             {
+                if (i >= SIM_T)
+                {
+                    return;
+                }
+
                 road[i] = 0.1;
             }
         }
@@ -224,10 +234,12 @@ static void * modelSimluation_SimulationStepThread(void *cookie)
     // x(k-1)
     Mat * xk_1 = newmat(INITIAL_STATES_ROW_SIZE, INITIAL_STATES_COLUMN_SIZE, DEFAULT_VALUE);
 
+    DELAY_S(10);
+
     // actual simulation
     for (int i = 0; i < simulation_time; i++)
     {
-        DELAY_MS(10);
+        DELAY_MS(1000);
 
         if (i == 0)
         {
@@ -282,7 +294,7 @@ static void * modelSimluation_SimulationStepThread(void *cookie)
     }
 
     // send states to control and gui process (Xd and Yd)
-    modelSimluation_SendModelStates(xk_1, road[SIM_T-1], (int)SIM_T-1);
+    // modelSimluation_SendModelStates(xk_1, road[SIM_T-1], (int)SIM_T-1);
 
     freemat(Ad);
     freemat(Bd);

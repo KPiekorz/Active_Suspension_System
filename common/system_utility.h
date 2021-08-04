@@ -122,7 +122,7 @@ void SystemUtility_CopyFloatArray(float * src, float * dest, int len);
  * @param  src_len: float aray length
  * @param  dest: byte array
  * @param  dest_len: dest array max length
- * @retval Size of used byte array.
+ * @retval Size of used byte array (in bytes).
  */
 int SystemUtility_SetFloatArrayInByteArray(float * src, const int src_len, byte * dest, const int dest_len);
 

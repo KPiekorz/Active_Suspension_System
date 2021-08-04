@@ -9,6 +9,7 @@ import matplotlib
 import socket
 import sys
 from random import randrange
+import struct
 
 matplotlib.use('Qt5Agg')
 
@@ -44,7 +45,10 @@ class UDPServer(QtCore.QObject):
         while self.server_start:
             data, addr = self.sock.recvfrom(1024)
             print("Udp server received data:", end='')
-            print(data)
+            float_binary = data[0:4]
+            print(float_binary)
+            float_number = struct.unpack('f', float_binary)
+            print(float_number)
 
 class SerialReader(QtCore.QObject):
 

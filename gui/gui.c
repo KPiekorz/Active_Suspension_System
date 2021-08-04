@@ -20,6 +20,14 @@
 
 #define INCLUDE_PYTHON_GUI
 
+#define GUI_MAX_FLOAT_DATA_LENGHT                       (40)
+
+pthread_mutex_t mutex_udp_byte_data = PTHREAD_MUTEX_INITIALIZER;
+#define GetUpdByteDataMutex()                           (&mutex_udp_byte_data)
+#define UDP_DATA_BYTE_MAX_SIZE                          (100)
+byte upd_byte_data[UDP_DATA_BYTE_MAX_SIZE];
+int udp_byte_data_size;
+
 #define PYTHON_GUI_ADDRESS      (INADDR_ANY)
 #define INVALID_SOCKET          (-1)
 
@@ -64,10 +72,9 @@ static bool gui_UdpClientSendData(int my_socket, byte * data, int data_len)
 	socket_addr.sin_port = htons(1100);
 	socket_addr.sin_addr.s_addr = PYTHON_GUI_ADDRESS;
 
-	/* Send a message to server */
+	/* Send message to server */
     if (sendto(my_socket, data, data_len, MSG_CONFIRM, (const struct sockaddr *) &socket_addr, sizeof(socket_addr)) <= 0)
     {
-        DEBUG_LOG_ERROR("[GUI] gui_UdpClientSendData, can't send udp data, data len: %d, socket id: %d", data_len, my_socket);
         return false;
     }
 
@@ -118,20 +125,22 @@ static void * gui_ReceiveMessageThread(void *cookie)
 
     while (true)
     {
-        DEBUG_LOG_VERBOSE("[GUI] gui_ReceiveMessageThread, Wait for message!");
-
         /* delay for waiting for another message */
-        // DELAY_MS(1);
+        DELAY_MS(1);
 
         /* try receive message */
+        float_data_len = GUI_MAX_FLOAT_DATA_LENGHT;
         if (true == SystemUtility_ReceiveMessage(gui_fifo_name, (int *)&message_type, float_data, &float_data_len))
         {
-            DEBUG_LOG_VERBOSE("[GUI] gui_ReceiveMessageThread, message type: %d, float data len: %d", message_type, float_data_len);
-
             switch (message_type)
             {
                 case gui_message_model_simulation_data:
-                    DEBUG_LOG_VERBOSE("[GUI] gui_ReceiveMessageThread, road[%f]: %f", float_data[6], float_data[4]);
+                    pthread_mutex_lock(GetUpdByteDataMutex());
+
+                    /* set float data in byte array */
+                    udp_byte_data_size = SystemUtility_SetFloatArrayInByteArray(float_data, float_data_len, upd_byte_data, UDP_DATA_BYTE_MAX_SIZE);
+
+                    pthread_mutex_unlock(GetUpdByteDataMutex());
                 break;
                 default:
                     DEBUG_LOG_WARN("[GUI] gui_ReceiveMessageThread, unknown message type!");
@@ -164,12 +173,23 @@ static void * gui_UdpClientThread(void *cookie)
 
     while (true)
     {
-        if (true == gui_UdpClientSendData(my_socket, data, data_len))
-        {
+        pthread_mutex_lock(GetUpdByteDataMutex());
 
+        if (udp_byte_data_size > 0)
+        {
+            if (false == gui_UdpClientSendData(my_socket, upd_byte_data, udp_byte_data_size))
+            {
+                DEBUG_LOG_ERROR("[GUI] gui_UdpClientThread, can't send udp data, data len: %d, socket id: %d", data_len, my_socket);
+            }
         }
 
-        DELAY_S(2);
+        /* clean send udp data */
+        udp_byte_data_size = 0;
+        memset(upd_byte_data, 0, UDP_DATA_BYTE_MAX_SIZE);
+
+        pthread_mutex_unlock(GetUpdByteDataMutex());
+
+        DELAY_MS(10);
     }
 
     gui_UdpClientDestroy(my_socket);
@@ -196,11 +216,8 @@ void Gui_Init(void)
             DEBUG_LOG_ERROR("[GUI] Gui_Init, Can't create udp client thread!");
         }
 
-        /* Init udp socket connection to python gui app */
-        // gui_InitUdpSocketConnectionToPythonPlot();
-
         /* Start gui python app */
-        // gui_RunGui();
+        gui_RunGui();
 
         while (1)
         {
