@@ -14,13 +14,18 @@
 #include "sensors.h"
 #include "matrix_lib.h"
 
-    #define DEFAULT_VALUE   0
+typedef enum
+{
+    road_type_step,
+} road_type_t;
+
+#define DEFAULT_VALUE                   (0)
 
 /*** SIMULATION PARAMETERS ***/
 
-#define MODEL_SIMULATION_DATA_SIZE      6
+#define SIM_T                           (10)
 
-#define SIM_T                           300
+#define STEP_TIME                       (5)
 
 const float simulation_time = SIM_T;
 const float sampling_period = 0.5;
@@ -31,18 +36,28 @@ const float sampling_period = 0.5;
 
 static float road[SIM_T]; // for now it will be only step signal, in 10 step in will be 10 [cm] (0.1 [m])
 
-static void modelSimluation_GenerateRoad(void)
+static void modelSimluation_GenerateRoad(road_type_t type)
 {
-    // before step
-    for (int i = 0; i < 10; i++)
+    switch (type)
     {
-        road[i] = 0;
-    }
+        case road_type_step:
+        {
+            // before step
+            for (int i = 0; i < STEP_TIME; i++)
+            {
+                road[i] = 0;
+            }
 
-    // after step
-    for (int i = 10; i < simulation_time; i++)
-    {
-        road[i] = 0.1;
+            // after step
+            for (int i = STEP_TIME; i < simulation_time; i++)
+            {
+                road[i] = 0.1;
+            }
+        }
+        break;
+        default:
+            DEBUG_LOG_WARN("[SIM] modelSimluation_GenerateRoad, unknown road!");
+        break;
     }
 }
 
@@ -162,25 +177,24 @@ static void modelSimluation_InitMatrixINITIAL_STATES(void)
 
 /*** STATIC FUNCTION ***/
 
-static void modelSimluation_SendModelStates(Mat * x, float road)
+static void modelSimluation_SendModelStates(Mat * x, float road, int iteration)
 {
-    DEBUG_LOG_DEBUG("modelSimluation_SendModelStates, row: %d, column: %d", x->row, x->col);
-
     if (x->row == 4 && x->col == 1)
     {
-        float model_simulation_data[MODEL_SIMULATION_DATA_SIZE];
+        float model_simulation_data[GUI_MODEL_SIMULATION_DATA_SIZE];
         model_simulation_data[0] = get(x, 1, 1);
         model_simulation_data[1] = get(x, 2, 1);
         model_simulation_data[2] = get(x, 3, 1);
         model_simulation_data[3] = get(x, 4, 1);
         model_simulation_data[4] = road;
         model_simulation_data[5] = force;
+        model_simulation_data[6] = (float)iteration;
 
-        Gui_SendMessage(gui_message_model_simulation_data, model_simulation_data, MODEL_SIMULATION_DATA_SIZE);
+        Gui_SendMessage(gui_message_model_simulation_data, model_simulation_data, GUI_MODEL_SIMULATION_DATA_SIZE);
     }
     else
     {
-        DEBUG_LOG_ERROR("modelSimluation_SendModelStates, wrong matrix!!!");
+        DEBUG_LOG_ERROR("[SIM] modelSimluation_SendModelStates, wrong matrix!!!");
     }
 }
 
@@ -211,7 +225,7 @@ static void * modelSimluation_SimulationStepThread(void *cookie)
     Mat * xk_1 = newmat(INITIAL_STATES_ROW_SIZE, INITIAL_STATES_COLUMN_SIZE, DEFAULT_VALUE);
 
     // actual simulation
-    for (int i = 0; i < 1; i++) // simulation_time insted od 1 !!!
+    for (int i = 0; i < simulation_time; i++)
     {
         DELAY_MS(10);
 
@@ -223,7 +237,7 @@ static void * modelSimluation_SimulationStepThread(void *cookie)
             set(INPUT, 1, 1, force); // this will be update by mesage from control process
 
             // send states to control and gui process (Xd and Yd)
-            modelSimluation_SendModelStates(GetINITIAL_STATES(), road[i]);
+            modelSimluation_SendModelStates(GetINITIAL_STATES(), road[i], i);
 
             // calculate x
             Mat * a_x = multiply(Ad, GetINITIAL_STATES());
@@ -248,7 +262,7 @@ static void * modelSimluation_SimulationStepThread(void *cookie)
             set(INPUT, 1, 1, force); // this will be update by mesage from control process
 
             // send states to control and gui process (Xd and Yd)
-            modelSimluation_SendModelStates(xk_1, road[i]);
+            modelSimluation_SendModelStates(xk_1, road[i], i);
 
             // calculate x
             Mat * a_x = multiply(Ad, xk_1);
@@ -268,7 +282,7 @@ static void * modelSimluation_SimulationStepThread(void *cookie)
     }
 
     // send states to control and gui process (Xd and Yd)
-    modelSimluation_SendModelStates(xk_1, road[SIM_T-1]);
+    modelSimluation_SendModelStates(xk_1, road[SIM_T-1], (int)SIM_T-1);
 
     freemat(Ad);
     freemat(Bd);
@@ -281,6 +295,9 @@ static void * modelSimluation_ReceiveMessageThread(void *cookie)
 {
 /* init thread with good priority */
     SystemUtility_InitThread(pthread_self());
+
+
+    // THIS IS CODE FOR RECEIVING MESSAGE COPIED FROM GUI THREAD - HAVE TO BE UPDATED - mainly for receiving control force from control process
 
     // /* create message fifo queue */
     // if (SystemUtility_CreateMessageFifo(gui_fifo_name) == false)
@@ -332,18 +349,18 @@ void ModelSimulation_Init(void)
         DEBUG_LOG_DEBUG("ModelSimulation_Init, Init model simulation process...");
 
         /* Init road input */
-        modelSimluation_GenerateRoad();
+        modelSimluation_GenerateRoad(road_type_step);
 
         /* Init simulation of suspension */
         if (!SystemUtility_CreateThread(modelSimluation_SimulationStepThread))
         {
-            DEBUG_LOG_ERROR("[GUI] ModelSimulation_Init, Can't create simulaton step thread!");
+            DEBUG_LOG_ERROR("[SIM] ModelSimulation_Init, Can't create simulaton step thread!");
         }
 
         /* Init simulation of suspension */
         if (!SystemUtility_CreateThread(modelSimluation_ReceiveMessageThread))
         {
-            DEBUG_LOG_ERROR("[GUI] ModelSimulation_Init, Can't create receive thread!");
+            DEBUG_LOG_ERROR("[SIM] ModelSimulation_Init, Can't create receive thread!");
         }
 
         while (1)

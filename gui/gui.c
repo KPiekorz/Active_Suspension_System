@@ -54,8 +54,6 @@ static void gui_UdpClientDestroy(int my_socket)
 
 static bool gui_UdpClientSendData(int my_socket, byte * data, int data_len)
 {
-    DEBUG_LOG_DEBUG("[GUI] gui_UdpClientSendData, socket num: %d, data len: %d", my_socket, data_len);
-
 	/* Socket address structure */
 	struct sockaddr_in socket_addr;
 
@@ -67,12 +65,11 @@ static bool gui_UdpClientSendData(int my_socket, byte * data, int data_len)
 	socket_addr.sin_addr.s_addr = PYTHON_GUI_ADDRESS;
 
 	/* Send a message to server */
-    sendto(my_socket,
-          data,
-          data_len,
-          MSG_CONFIRM,
-          (const struct sockaddr *) &socket_addr,
-          sizeof(socket_addr));
+    if (sendto(my_socket, data, data_len, MSG_CONFIRM, (const struct sockaddr *) &socket_addr, sizeof(socket_addr)) <= 0)
+    {
+        DEBUG_LOG_ERROR("[GUI] gui_UdpClientSendData, can't send udp data, data len: %d, socket id: %d", data_len, my_socket);
+        return false;
+    }
 
     return true;
 }
@@ -134,16 +131,17 @@ static void * gui_ReceiveMessageThread(void *cookie)
             switch (message_type)
             {
                 case gui_message_model_simulation_data:
-
+                    DEBUG_LOG_VERBOSE("[GUI] gui_ReceiveMessageThread, road[%f]: %f", float_data[6], float_data[4]);
                 break;
                 default:
+                    DEBUG_LOG_WARN("[GUI] gui_ReceiveMessageThread, unknown message type!");
                 break;
             }
 
-            for (int i = 0; i < float_data_len; i++)
-            {
-                DEBUG_LOG_VERBOSE("[GUI] gui_ReceiveMessageThread, float[%d]: %f", i, float_data[i]);
-            }
+            // for (int i = 0; i < float_data_len; i++)
+            // {
+            //     DEBUG_LOG_VERBOSE("[GUI] gui_ReceiveMessageThread, float[%d]: %f", i, float_data[i]);
+            // }
         }
     }
 
@@ -166,8 +164,6 @@ static void * gui_UdpClientThread(void *cookie)
 
     while (true)
     {
-        DEBUG_LOG_VERBOSE("[GUI] gui_UdpClientThread");
-
         if (true == gui_UdpClientSendData(my_socket, data, data_len))
         {
 

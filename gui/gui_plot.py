@@ -12,8 +12,8 @@ from random import randrange
 
 matplotlib.use('Qt5Agg')
 
-road = [1, 3, 5]
-control_force = [1, 2, 3]
+road = []
+control_force = []
 model_states = [1, 2, 3]
 
 class MplCanvas(FigureCanvasQTAgg):

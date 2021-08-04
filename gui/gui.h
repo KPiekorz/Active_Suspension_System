@@ -6,6 +6,8 @@
 
 #define INIT_GUI
 
+#define GUI_MODEL_SIMULATION_DATA_SIZE      (7)
+
 typedef enum
 {
     gui_message_unknown = 0,
