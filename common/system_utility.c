@@ -107,10 +107,10 @@ bool SystemUtility_ReceiveMessage(const char *fifo_name, int *message_type, floa
     /* If there is message print it */
     if (bytes_read > 2)
     {
-        DEBUG_LOG_DEBUG("[SYSTEM] SystemUtility_ReceiveMessage, type: %d, len: %d, float data len: %d",
-                        buff[SYSTEM_MESSAGE_TYPE_OFFSET],
-                        buff[SYSTEM_MESSAGE_PAYLOAD_SIZE_OFFSET],
-                        *float_data_len);
+        // DEBUG_LOG_DEBUG("[SYSTEM] SystemUtility_ReceiveMessage, type: %d, len: %d, float data len: %d",
+        //                 buff[SYSTEM_MESSAGE_TYPE_OFFSET],
+        //                 buff[SYSTEM_MESSAGE_PAYLOAD_SIZE_OFFSET],
+        //                 *float_data_len);
 
         if (GET_FLOAT_DATA_LEN(buff[SYSTEM_MESSAGE_PAYLOAD_SIZE_OFFSET]) > *float_data_len)
         {
@@ -237,7 +237,6 @@ bool SystemUtility_CreateThread(void *(*__start_routine) (void *))
     /* Create thread */
     if ((status = pthread_create(&tSimpleThread, &aSimpleThreadAttr, __start_routine, NULL)))
     {
-        DEBUG_LOG_ERROR("[SYSTEM] SystemUtility_CreateThread, Can't create a thread!");
         return false;
     }
 

@@ -205,13 +205,13 @@ void Gui_Init(void)
         DEBUG_LOG_INFO("[GUI] Gui_Init, Init process...");
 
         /* Init pipe connection to gui process */
-        if (SystemUtility_CreateThread(gui_ReceiveMessageThread))
+        if (!SystemUtility_CreateThread(gui_ReceiveMessageThread))
         {
             DEBUG_LOG_ERROR("[GUI] Gui_Init, Can't create receive gui thread!");
         }
 
         /* Init udp connection to python gui */
-        if (SystemUtility_CreateThread(gui_UdpClientThread))
+        if (!SystemUtility_CreateThread(gui_UdpClientThread))
         {
             DEBUG_LOG_ERROR("[GUI] Gui_Init, Can't create udp client thread!");
         }
@@ -238,8 +238,6 @@ void Gui_Destroy(void)
 
 void Gui_SendMessage(gui_message_type_t message_type, float * data, int data_len)
 {
-    DEBUG_LOG_DEBUG("[GUI] Gui_SendMessage, message type: %d, len: %d", message_type, data_len);
-
     // this message will be received in gui_ReceiveMessageThread
     if (!SystemUtility_SendMessage(gui_fifo_name, (int)message_type, data, data_len))
     {

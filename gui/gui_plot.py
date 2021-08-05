@@ -15,7 +15,7 @@ matplotlib.use('Qt5Agg')
 
 road = []
 control_force = []
-model_states = [1, 2, 3]
+model_Y_state = []
 
 class MplCanvas(FigureCanvasQTAgg):
 
@@ -44,7 +44,7 @@ class UDPServer(QtCore.QObject):
         print("Upd server has started...")
         while self.server_start:
             data, addr = self.sock.recvfrom(1024)
-            print("Udp server received data: ", end='')
+            # set float data from byte data in little endian
             b_x1 = data[0:4]
             f_x1 = struct.unpack('f', b_x1)
             b_x2 = data[4:8]
@@ -57,10 +57,14 @@ class UDPServer(QtCore.QObject):
             f_road = struct.unpack('f', b_road)
             b_force = data[20:24]
             f_force = struct.unpack('f', b_force)
+            # add values to array for plot
+            global road
+            global control_force
+            global model_Y_state
+            road.append(f_road[0])
+            control_force.append(f_force[0])
+            model_Y_state.append(f_x4[0])
 
-            print(float(f_road[0]), end='')
-            print("   ", end='')
-            print(float(f_force[0]))
 
 class GUI(QtWidgets.QMainWindow):
     signal_start_udp_server = QtCore.pyqtSignal()
@@ -152,12 +156,12 @@ class GUI(QtWidgets.QMainWindow):
         self.plot_control_force.draw()
 
         # plot model states
-        global model_states
+        global model_Y_state
         # clear plot
         self.plot_model_state.axes.cla()
         # set new plot axes values
-        model_states_x = list(range(0, len(model_states)))
-        self.plot_model_state.axes.plot(model_states_x, model_states)
+        model_states_x = list(range(0, len(model_Y_state)))
+        self.plot_model_state.axes.plot(model_states_x, model_Y_state)
         # Trigger the canvas to update and redraw.
         self.plot_model_state.draw()
 
