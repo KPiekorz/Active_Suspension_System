@@ -18,6 +18,7 @@ typedef enum
 {
     road_type_step,
     road_type_random,
+    road_type_impuls,
 
 } road_type_t;
 
@@ -25,11 +26,17 @@ typedef enum
 
 /*** SIMULATION PARAMETERS ***/
 
-#define SIM_TIME (10)
+#define SIM_TIME (20)
 const float simulation_time = SIM_TIME; // how many iteration will be performed
 const float sampling_period = 0.5;
 
-const float step_time = 2;
+#define STEP_VALUE  10
+#define ST_TIME     2
+const float step_time = ST_TIME;
+
+#define IMPULSE_VALUE   10
+#define IM_TIME         2
+const float impulse_time = IM_TIME;
 
 /**
  * @note Road and force will be set in input matrix in every interation
@@ -56,15 +63,38 @@ static void modelSimluation_GenerateStep(void)
     // after step
     for (int i = step_time; i < simulation_time; i++)
     {
-        road[i] = 10;
+        road[i] = STEP_VALUE;
     }
 }
 
 static void modelSimluation_GenerateRandom(void)
 {
-        for (int i = 0; i < simulation_time; i++)
+    for (int i = 0; i < simulation_time; i++)
     {
         // road[i] = ;
+    }
+}
+
+static void modelSimluation_GenerateImpuls(void)
+{
+    if (impulse_time >= (simulation_time/2))
+    {
+        DEBUG_LOG_ERROR("[SIM] modelSimluation_GenerateStep, invalid step time!");
+        return;
+    }
+
+    // before step
+    for (int i = 0; i < impulse_time; i++)
+    {
+        road[i] = 0;
+    }
+
+    road[IM_TIME] = IMPULSE_VALUE;
+
+    // after step
+    for (int i = (impulse_time+1); i < simulation_time; i++)
+    {
+        road[i] = 0;
     }
 }
 
@@ -77,6 +107,9 @@ static void modelSimluation_GenerateRoad(road_type_t type)
     break;
     case road_type_random:
         modelSimluation_GenerateRandom();
+    break;
+    case road_type_impuls:
+        modelSimluation_GenerateImpuls();
     break;
     default:
         DEBUG_LOG_WARN("[SIM] modelSimluation_GenerateRoad, unknown road!");
@@ -257,7 +290,7 @@ static void *modelSimluation_SimulationStepThread(void *cookie)
             // set input matrix
             Mat *INPUT = newmat(INPUT_ROW_SIZE, INPUT_COLUMN_SIZE, DEFAULT_VALUE);
             set(INPUT, 1, 1, road[i]);
-            set(INPUT, 1, 1, force); // this will be update by mesage from control process
+            set(INPUT, 2, 1, force); // this will be update by mesage from control process
 
             // send states to control and gui process (Xd and Yd)
             modelSimluation_SendModelStates(GetINITIAL_STATES(), road[i], i);
@@ -374,7 +407,7 @@ void ModelSimulation_Init(void)
     DEBUG_LOG_DEBUG("ModelSimulation_Init, Init model simulation process...");
 
     /* Init road input */
-    modelSimluation_GenerateRoad(road_type_step);
+    modelSimluation_GenerateRoad(road_type_impuls);
 
     /* Init simulation of suspension */
     if (!SystemUtility_CreateThread(modelSimluation_SimulationStepThread))
