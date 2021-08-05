@@ -19,6 +19,7 @@ typedef enum
     road_type_step,
     road_type_random,
     road_type_impuls,
+    road_type_ramp,
 
 } road_type_t;
 
@@ -26,7 +27,7 @@ typedef enum
 
 /*** SIMULATION PARAMETERS ***/
 
-#define SIM_TIME (20)
+#define SIM_TIME (100)
 const float simulation_time = SIM_TIME; // how many iteration will be performed
 const float sampling_period = 0.5;
 
@@ -34,15 +35,15 @@ const float sampling_period = 0.5;
 #define ST_TIME     2
 const float step_time = ST_TIME;
 
-#define IMPULSE_VALUE   10
-#define IM_TIME         2
+#define IMPULSE_VALUE   1000
+#define IM_TIME         40
 const float impulse_time = IM_TIME;
 
 /**
  * @note Road and force will be set in input matrix in every interation
  */
 
-static float force = 0; // this varialbe will be update from control process (access to force variable have to be done through mutex semaphore)
+static float force = -5; // this varialbe will be update from control process (access to force variable have to be done through mutex semaphore)
 
 static float road[SIM_TIME]; // for now it will be only step signal, in 10 step in will be 10 [cm] (0.1 [m])
 
@@ -98,6 +99,11 @@ static void modelSimluation_GenerateImpuls(void)
     }
 }
 
+static void  modelSimluation_GenerateRamp(void)
+{
+
+}
+
 static void modelSimluation_GenerateRoad(road_type_t type)
 {
     switch (type)
@@ -110,6 +116,9 @@ static void modelSimluation_GenerateRoad(road_type_t type)
     break;
     case road_type_impuls:
         modelSimluation_GenerateImpuls();
+    break;
+    case road_type_ramp:
+        modelSimluation_GenerateRamp();
     break;
     default:
         DEBUG_LOG_WARN("[SIM] modelSimluation_GenerateRoad, unknown road!");
@@ -283,7 +292,7 @@ static void *modelSimluation_SimulationStepThread(void *cookie)
     // actual simulation
     for (int i = 0; i < simulation_time; i++)
     {
-        DELAY_MS(500);
+        DELAY_MS(50);
 
         if (i == 0)
         {
@@ -317,8 +326,6 @@ static void *modelSimluation_SimulationStepThread(void *cookie)
 
             set(INPUT, 1, 1, road[i]);
             set(INPUT, 2, 1, force); // this will be update by mesage from control process
-
-            showmat(INPUT);
 
             // send states to control and gui process (Xd and Yd)
             modelSimluation_SendModelStates(xk_1, road[i], i);
