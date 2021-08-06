@@ -1,7 +1,7 @@
 #ifndef CONTROL_H
 #define CONTROL_H
 
-// #define INIT_CONTROL
+#define INIT_CONTROL
 
 typedef enum
 {

@@ -332,11 +332,14 @@ static void *modelSimluation_SimulationStepThread(void *cookie)
         }
         else
         {
+            pthread_mutex_lock(GetForceMutex());
+
             // set input matrix
             Mat *INPUT = newmat(INPUT_ROW_SIZE, INPUT_COLUMN_SIZE, DEFAULT_VALUE);
-
             set(INPUT, 1, 1, road[i]);
             set(INPUT, 2, 1, force); // this will be update by mesage from control process
+
+            pthread_mutex_unlock(GetForceMutex());
 
             // send states to control and gui process (Xd and Yd)
             modelSimluation_SendModelStates(xk_1, road[i], i);
@@ -435,7 +438,7 @@ void ModelSimulation_Init(void)
         DEBUG_LOG_ERROR("[SIM] ModelSimulation_Init, Can't create simulaton step thread!");
     }
 
-    /* Init simulation of suspension */
+    /* Init receive message */
     if (!SystemUtility_CreateThread(modelSimluation_ReceiveMessageThread))
     {
         DEBUG_LOG_ERROR("[SIM] ModelSimulation_Init, Can't create receive thread!");
