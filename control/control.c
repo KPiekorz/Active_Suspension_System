@@ -1,12 +1,19 @@
 #include "control.h"
 #include "system_utility.h"
 #include "model_simulation.h"
+#include "matrix_lib.h"
 
 const char *control_fifo_name = "simulation_fifo";
 
 #define MAX_CONTROL_FLOAT_DATA_LEN      20
 
 /* STATIC HELPER FUNCTION */
+
+static void control_CalculateAndSendControlForce(float * float_data, int float_data_len)
+{
+    /* here for now will be simple controller, in the future can be implemented more advanced controlers */
+
+}
 
 static void *control_ReceiveMessageThread(void *cookie)
 {
@@ -36,7 +43,7 @@ static void *control_ReceiveMessageThread(void *cookie)
             switch (message_type)
             {
                 case control_message_model_states:
-
+                    control_CalculateAndSendControlForce(float_data, float_data_len);
                 break;
                 default:
                 break;
