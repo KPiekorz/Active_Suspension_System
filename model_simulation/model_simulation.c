@@ -23,6 +23,13 @@ typedef enum
 
 } road_type_t;
 
+#define MAX_SIMULATION_FLOAT_DATA_LEN   5
+
+const char *simulation_fifo_name = "simulation_fifo";
+
+pthread_mutex_t mutex_force = PTHREAD_MUTEX_INITIALIZER;
+#define GetForceMutex()   (&mutex_force)
+
 #define DEFAULT_VALUE (0)
 
 /*** SIMULATION PARAMETERS ***/
@@ -296,10 +303,14 @@ static void *modelSimluation_SimulationStepThread(void *cookie)
 
         if (i == 0)
         {
+            pthread_mutex_lock(GetForceMutex());
+
             // set input matrix
             Mat *INPUT = newmat(INPUT_ROW_SIZE, INPUT_COLUMN_SIZE, DEFAULT_VALUE);
             set(INPUT, 1, 1, road[i]);
             set(INPUT, 2, 1, force); // this will be update by mesage from control process
+
+            pthread_mutex_unlock(GetForceMutex());
 
             // send states to control and gui process (Xd and Yd)
             modelSimluation_SendModelStates(GetINITIAL_STATES(), road[i], i);
@@ -362,46 +373,48 @@ static void *modelSimluation_ReceiveMessageThread(void *cookie)
     /* init thread with good priority */
     SystemUtility_InitThread(pthread_self());
 
-    // THIS IS CODE FOR RECEIVING MESSAGE COPIED FROM GUI THREAD - HAVE TO BE UPDATED - mainly for receiving control force from control process
+    /* create message fifo queue */
+    if (!SystemUtility_CreateMessageFifo(simulation_fifo_name) == false)
+    {
+        DEBUG_LOG_ERROR("[SIM] modelSimluation_ReceiveMessageThread, Can't create FIFO!");
+        return 0;
+    }
 
-    // /* create message fifo queue */
-    // if (SystemUtility_CreateMessageFifo(gui_fifo_name) == false)
-    // {
-    //     DEBUG_LOG_ERROR("[GUI] gui_ReceiveMessageThread, Can't create FIFO!");
-    //     return 0;
-    // }
+    gui_message_type_t message_type = simulation_message_unknown;
+    int float_data_len = MAX_SIMULATION_FLOAT_DATA_LEN;
+    float float_data[MAX_SIMULATION_FLOAT_DATA_LEN];
 
-    // gui_message_type_t message_type = gui_message_unknown;
-    // int float_data_len = 20;
-    // float float_data[float_data_len];
+    while (true)
+    {
+        /* delay for waiting for another message */
+        DELAY_MS(1);
 
-    // while (true)
-    // {
-    //     DEBUG_LOG_VERBOSE("[GUI] gui_ReceiveMessageThread, Wait for message!");
+        /* try receive  */
+        float_data_len = MAX_SIMULATION_FLOAT_DATA_LEN;
+        if (true == SystemUtility_ReceiveMessage(simulation_fifo_name, (int *)&message_type, float_data, &float_data_len))
+        {
+            switch (message_type)
+            {
+                case simulation_message_control_force:
+                    pthread_mutex_lock(GetForceMutex());
 
-    //     /* delay for waiting for another message */
-    //     // DELAY_MS(1);
+                    if (float_data_len = 1)
+                    {
+                        force =+ float_data[0]; // last control force value add to last force value
+                    }
 
-    //     /* try receive message */
-    //     if (true == SystemUtility_ReceiveMessage(gui_fifo_name, (int *)&message_type, float_data, &float_data_len))
-    //     {
-    //         DEBUG_LOG_VERBOSE("[GUI] gui_ReceiveMessageThread, message type: %d, float data len: %d", message_type, float_data_len);
+                    pthread_mutex_unlock(GetForceMutex());
+                break;
+                default:
+                break;
+            }
 
-    //         switch (message_type)
-    //         {
-    //             case gui_message_model_simulation_data:
-
-    //             break;
-    //             default:
-    //             break;
-    //         }
-
-    //         for (int i = 0; i < float_data_len; i++)
-    //         {
-    //             DEBUG_LOG_VERBOSE("[GUI] gui_ReceiveMessageThread, float[%d]: %f", i, float_data[i]);
-    //         }
-    //     }
-    // }
+            for (int i = 0; i < float_data_len; i++)
+            {
+                DEBUG_LOG_VERBOSE("[SIM] modelSimluation_ReceiveMessageThread, float[%d]: %f", i, float_data[i]);
+            }
+        }
+    }
 
     return 0;
 }
@@ -411,7 +424,7 @@ static void *modelSimluation_ReceiveMessageThread(void *cookie)
 void ModelSimulation_Init(void)
 {
 #ifdef INIT_MODEL_SIMULATION
-    DEBUG_LOG_DEBUG("ModelSimulation_Init, Init model simulation process...");
+    DEBUG_LOG_DEBUG("[SIM] ModelSimulation_Init, Init model simulation process...");
 
     /* Init road input */
     modelSimluation_GenerateRoad(road_type_impuls);
@@ -430,10 +443,7 @@ void ModelSimulation_Init(void)
 
     while (1)
     {
-        // float data[4] = {3.02, 1.1, 1.23, 5.01};
-        // Gui_SendMessage(gui_message_control_signal, data, 4);
-
-        DELAY_S(10);
+        DELAY_S(5);
     }
 
     exit(EXIT_SUCCESS);
@@ -444,10 +454,13 @@ void ModelSimulation_Init(void)
 
 void ModelSimulation_Destroy(void)
 {
-    DEBUG_LOG_DEBUG("Destroy model simulation process...");
+    DEBUG_LOG_DEBUG("[SIM] Destroy model simulation process...");
 }
 
 void ModelSimulation_SendMessage(model_simulation_message_type_t message_type, float *data, int data_len)
 {
-    DEBUG_LOG_DEBUG("[SIM] ModelSimulation_SendMessage, message type: %d", message_type);
+        if (!SystemUtility_SendMessage(simulation_fifo_name, (int)message_type, data, data_len))
+    {
+        DEBUG_LOG_ERROR("[SIM] ModelSimulation_SendMessage, Can't send message to gui process!");
+    }
 }
