@@ -53,9 +53,11 @@ class UDPServer(QtCore.QObject):
             f_x3 = struct.unpack('f', b_x3)
             b_x4 = data[12:16]
             f_x4 = struct.unpack('f', b_x4)
-            b_road = data[16:20]
+            b_x5 = data[16:20]
+            f_x5 = struct.unpack('f', b_x5)
+            b_road = data[20:24]
             f_road = struct.unpack('f', b_road)
-            b_force = data[20:24]
+            b_force = data[24:28]
             f_force = struct.unpack('f', b_force)
             # add values to array for plot
             global road
@@ -63,7 +65,7 @@ class UDPServer(QtCore.QObject):
             global model_Y_state
             road.append(f_road[0])
             control_force.append(f_force[0])
-            model_Y_state.append(f_x4[0])
+            model_Y_state.append(f_x5[0])
 
 
 class GUI(QtWidgets.QMainWindow):

@@ -29,7 +29,7 @@ static void control_InitMatrixK(void)
 
 /* MATRIX FOR SYSTEM STATES */
 
-#define X_ROW_SIZE 4
+#define X_ROW_SIZE 5
 #define X_COLUMN_SIZE 1
 
 static float X_matrix[X_ROW_SIZE][X_COLUMN_SIZE];
@@ -42,12 +42,13 @@ static Mat X = {(float *)X_matrix, X_ROW_SIZE, X_COLUMN_SIZE};
 
 static void control_GetModelStates(float * float_data, int float_data_len, Mat * X)
 {
-    if (float_data_len >= 4)
+    if (float_data_len >= X_ROW_SIZE)
     {
-        set(X, 1, 1, float_data[0]);
-        set(X, 2, 1, float_data[1]);
-        set(X, 3, 1, float_data[2]);
-        set(X, 4, 1, float_data[3]);
+        set(X, 1, 1, float_data[MODEL_SIMULATION_STATE_X1]);
+        set(X, 2, 1, float_data[MODEL_SIMULATION_STATE_X1_DOT]);
+        set(X, 3, 1, float_data[MODEL_SIMULATION_STATE_Y1]);
+        set(X, 4, 1, float_data[MODEL_SIMULATION_STATE_Y1_DOT]);
+        set(X, 5, 1, float_data[MODEL_SIMULATION_STATE_Y2]);
     }
 }
 

@@ -283,20 +283,20 @@ static void modelSimluation_SendModelStates(Mat *x, float road, int iteration)
     {
         pthread_mutex_lock(GetForceMutex());
 
-        float model_simulation_data[GUI_MODEL_SIMULATION_DATA_SIZE];
-        model_simulation_data[0] = get(x, 1, 1);
-        model_simulation_data[1] = get(x, 2, 1);
-        model_simulation_data[2] = get(x, 3, 1);
-        model_simulation_data[3] = get(x, 4, 1);
-        model_simulation_data[4] = get(x, 5, 1);
-        model_simulation_data[5] = road;
-        model_simulation_data[6] = force;
-        model_simulation_data[7] = (float)iteration;
+        float model_simulation_data[MODEL_SIMULATION_DATA_SIZE];
+        model_simulation_data[MODEL_SIMULATION_STATE_X1] = get(x, 1, 1);
+        model_simulation_data[MODEL_SIMULATION_STATE_X1_DOT] = get(x, 2, 1);
+        model_simulation_data[MODEL_SIMULATION_STATE_Y1] = get(x, 3, 1);
+        model_simulation_data[MODEL_SIMULATION_STATE_Y1_DOT] = get(x, 4, 1);
+        model_simulation_data[MODEL_SIMULATION_STATE_Y2] = get(x, 5, 1);
+        model_simulation_data[MODEL_SIMULATION_STATE_ROAD] = road;
+        model_simulation_data[MODEL_SIMULATION_STATE_FORCE] = force;
+        model_simulation_data[MODEL_SIMULATION_STATE_ITERATION] = (float)iteration;
 
         pthread_mutex_unlock(GetForceMutex());
 
-        Gui_SendMessage(gui_message_model_simulation_data, model_simulation_data, GUI_MODEL_SIMULATION_DATA_SIZE);
-        Control_SendMessage(control_message_model_states, model_simulation_data, GUI_MODEL_SIMULATION_DATA_SIZE);
+        Gui_SendMessage(gui_message_model_simulation_data, model_simulation_data, MODEL_SIMULATION_DATA_SIZE);
+        Control_SendMessage(control_message_model_states, model_simulation_data, MODEL_SIMULATION_DATA_SIZE);
     }
     else
     {

@@ -4,11 +4,11 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#define INIT_GUI
+/*** INCLUDE GUI SYSTEM PROCESS ***/
+// #define INIT_GUI
 
+/*** INCLUDE PYTHON GUI ***/
 // #define INCLUDE_PYTHON_GUI
-
-#define GUI_MODEL_SIMULATION_DATA_SIZE      (8)
 
 typedef enum
 {
