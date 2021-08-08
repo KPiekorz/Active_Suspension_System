@@ -25,7 +25,7 @@ typedef enum
 
 /*** INCLUDE CONTROLER ***/
 
-#define INCLUDE_CONTROLER
+// #define INCLUDE_CONTROLER
 
 /*** MODEL_SIMULATION_INTERVAL_STEP ***/
 
@@ -48,7 +48,7 @@ pthread_mutex_t mutex_force = PTHREAD_MUTEX_INITIALIZER;
 const float simulation_time = SIM_TIME; // how many iteration will be performed
 const float sampling_period = 0.5;
 
-#define STEP_VALUE  0.1
+#define STEP_VALUE  1000000
 #define ST_TIME     10
 const float step_time = ST_TIME;
 
