@@ -228,7 +228,7 @@ void Gui_Init(void)
 
 void Gui_Destroy(void)
 {
-    DEBUG_LOG_DEBUG("[GUI] Destroy process...");
+
 }
 
 void Gui_SendMessage(gui_message_type_t message_type, float * data, int data_len)

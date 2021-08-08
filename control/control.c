@@ -63,8 +63,11 @@ static void control_CalculateAndSendControlForce(float * float_data, int float_d
     /* set model states */
     control_GetModelStates(float_data, float_data_len, GetX());
 
-
+    /* calculate new control signale U (force) */
     Mat * U = multiply(GetK(), GetX());
+
+    /* send control signal to model simulation process */
+
 }
 
 static void *control_ReceiveMessageThread(void *cookie)
@@ -136,7 +139,6 @@ void Control_Init(void)
 
 void Control_Destroy(void)
 {
-    DEBUG_LOG_DEBUG("[CONTROL] Control_Destroy, Destroy CONTROL process...");
 
 }
 

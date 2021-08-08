@@ -41,8 +41,6 @@ process_attributes_t_t system_process_attributes[] =
 
 static void systemProcess_KillAllSystemProcess(void)
 {
-    DEBUG_LOG_DEBUG("systemProcess_KillAllSystemProcess");
-
     for (int i = 0; i < GetProcessCount(); i++)
     {
         DEBUG_LOG_DEBUG("systemProcess_KillAllSystemProcess, process name: %s, pid: %d", system_process_attributes[i].process_name, system_process_attributes[i].process_pid);
