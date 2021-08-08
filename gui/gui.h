@@ -5,9 +5,10 @@
 #include <stdint.h>
 
 #define INIT_GUI
-#define INCLUDE_PYTHON_GUI
 
-#define GUI_MODEL_SIMULATION_DATA_SIZE      (7)
+// #define INCLUDE_PYTHON_GUI
+
+#define GUI_MODEL_SIMULATION_DATA_SIZE      (8)
 
 typedef enum
 {

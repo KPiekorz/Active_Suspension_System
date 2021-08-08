@@ -159,8 +159,8 @@ const float b2 = 15020;
 
 /*** STATE SPACE MODEL - A ***/
 
-#define A_ROW_SIZE 4
-#define A_COLUMN_SIZE 4
+#define A_ROW_SIZE 5
+#define A_COLUMN_SIZE 5
 
 static float A_matrix[A_ROW_SIZE][A_COLUMN_SIZE];
 
@@ -174,26 +174,36 @@ static void modelSimluation_InitMatrixA(void)
     A_matrix[0][1] = 1;
     A_matrix[0][2] = 0;
     A_matrix[0][3] = 0;
+    A_matrix[0][4] = 0;
 
     A_matrix[1][0] = -(b1 * b2) / (m1 * m2);
     A_matrix[1][1] = 0;
     A_matrix[1][2] = ((b1 / m1) * ((b1 / m1) + (b1 / m2) + (b2 / m2))) - (k1 / m1);
     A_matrix[1][3] = -(b1 / m1);
+    A_matrix[1][4] = 0;
 
     A_matrix[2][0] = b2 / m2;
     A_matrix[2][1] = 0;
     A_matrix[2][2] = -((b1 / m1) + (b1 / m2) + (b2 / m2));
     A_matrix[2][3] = 1;
+    A_matrix[2][4] = 0;
 
     A_matrix[3][0] = k2 / m2;
     A_matrix[3][1] = 0;
     A_matrix[3][2] = -((k1 / m1) + (k1 / m2) + (k2 / m2));
     A_matrix[3][3] = 0;
+    A_matrix[3][4] = 0;
+
+    A_matrix[4][0] = 0;
+    A_matrix[4][1] = 0;
+    A_matrix[4][2] = 1;
+    A_matrix[4][3] = 0;
+    A_matrix[4][4] = 0;
 }
 
 /*** STATE SPACE MODEL - B ***/
 
-#define B_ROW_SIZE 4
+#define B_ROW_SIZE 5
 #define B_COLUMN_SIZE 2
 
 static float B_matrix[B_ROW_SIZE][B_COLUMN_SIZE];
@@ -215,12 +225,15 @@ static void modelSimluation_InitMatrixB(void)
 
     B_matrix[3][0] = (1 / m1) + (1 / m2);
     B_matrix[3][1] = -(k2 / m2);
+
+    B_matrix[4][0] = 0;
+    B_matrix[4][1] = 0;
 }
 
 /*** STATE SPACE MODEL - C ***/
 
 #define C_ROW_SIZE 1
-#define C_COLUMN_SIZE 4
+#define C_COLUMN_SIZE 5
 
 static float C_matrix[C_ROW_SIZE][C_COLUMN_SIZE];
 
@@ -234,11 +247,12 @@ static void modelSimluation_InitMatrixC(void)
     C_matrix[0][1] = 0;
     C_matrix[0][2] = 1;
     C_matrix[0][3] = 0;
+    C_matrix[0][4] = 0;
 }
 
 /*** STATE SPACE MODEL - STATES ***/
 
-#define INITIAL_STATES_ROW_SIZE 4
+#define INITIAL_STATES_ROW_SIZE 5
 #define INITIAL_STATES_COLUMN_SIZE 1
 
 static float INITIAL_STATES_matrix[INITIAL_STATES_ROW_SIZE][INITIAL_STATES_COLUMN_SIZE];
@@ -250,9 +264,10 @@ static Mat INITIAL_STATES = {(float *)INITIAL_STATES_matrix, INITIAL_STATES_ROW_
 static void modelSimluation_InitMatrixINITIAL_STATES(void)
 {
     INITIAL_STATES_matrix[0][0] = 0;
-    INITIAL_STATES_matrix[0][1] = 0;
-    INITIAL_STATES_matrix[0][2] = 0;
-    INITIAL_STATES_matrix[0][3] = 0;
+    INITIAL_STATES_matrix[1][0] = 0;
+    INITIAL_STATES_matrix[2][0] = 0;
+    INITIAL_STATES_matrix[3][0] = 0;
+    INITIAL_STATES_matrix[4][0] = 0;
 }
 
 /*** INPUT MATRIX ***/
@@ -273,9 +288,10 @@ static void modelSimluation_SendModelStates(Mat *x, float road, int iteration)
         model_simulation_data[1] = get(x, 2, 1);
         model_simulation_data[2] = get(x, 3, 1);
         model_simulation_data[3] = get(x, 4, 1);
-        model_simulation_data[4] = road;
-        model_simulation_data[5] = force;
-        model_simulation_data[6] = (float)iteration;
+        model_simulation_data[4] = get(x, 5, 1);
+        model_simulation_data[5] = road;
+        model_simulation_data[6] = force;
+        model_simulation_data[7] = (float)iteration;
 
         pthread_mutex_unlock(GetForceMutex());
 
@@ -296,6 +312,15 @@ static void *modelSimluation_SimulationStepThread(void *cookie)
     modelSimluation_InitMatrixA();
     modelSimluation_InitMatrixB();
     modelSimluation_InitMatrixC();
+    modelSimluation_InitMatrixINITIAL_STATES();
+
+    showmat(GetA());
+    showmat(GetB());
+    showmat(GetC());
+    showmat(GetINITIAL_STATES());
+
+
+/*
 
     // calcualte Ad matrix - discrete matric of A
     Mat *s_a = scalermultiply(GetA(), sampling_period);
@@ -389,6 +414,8 @@ static void *modelSimluation_SimulationStepThread(void *cookie)
     freemat(Ad);
     freemat(Bd);
     freemat(xk_1);
+
+*/
 
     return 0;
 }
