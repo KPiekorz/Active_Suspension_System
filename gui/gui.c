@@ -217,7 +217,7 @@ void Gui_Init(void)
         /* event loop for gui process */
         while (1)
         {
-            DELAY_S(10);
+            DELAY_S(SYSTEM_EVENT_LOOP_DELAY_S);
         }
 
         exit(EXIT_SUCCESS);

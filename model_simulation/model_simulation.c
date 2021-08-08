@@ -448,7 +448,7 @@ void ModelSimulation_Init(void)
 
     while (1)
     {
-        DELAY_S(5);
+        DELAY_S(SYSTEM_EVENT_LOOP_DELAY_S);
     }
 
     exit(EXIT_SUCCESS);

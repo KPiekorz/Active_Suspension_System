@@ -10,6 +10,10 @@
 #include <string.h>
 #include <stdint.h>
 
+/*** SYSTEM EVENT LOOP DELAY ***/
+
+#define SYSTEM_EVENT_LOOP_DELAY_S                   (10)
+
 /*** RECEIVE FIFO MESSAGE SYSTEM DELAY */
 
 #define RECEIVE_FIFO_MESSAGE_SYSTEM_DELAY_MS        (1)
