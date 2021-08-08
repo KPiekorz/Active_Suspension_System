@@ -18,8 +18,6 @@
 #include "system_utility.h"
 #include "model_simulation.h"
 
-#define INCLUDE_PYTHON_GUI
-
 #define GUI_MAX_FLOAT_DATA_LENGHT                       (40)
 
 pthread_mutex_t mutex_udp_byte_data = PTHREAD_MUTEX_INITIALIZER;
@@ -126,7 +124,7 @@ static void * gui_ReceiveMessageThread(void *cookie)
     while (true)
     {
         /* delay for waiting for another message */
-        DELAY_MS(1);
+        DELAY_MS(RECEIVE_FIFO_MESSAGE_SYSTEM_DELAY_MS);
 
         /* try receive message */
         float_data_len = GUI_MAX_FLOAT_DATA_LENGHT;
@@ -202,7 +200,6 @@ static void * gui_UdpClientThread(void *cookie)
 void Gui_Init(void)
 {
     #ifdef  INIT_GUI
-        DEBUG_LOG_INFO("[GUI] Gui_Init, Init process...");
 
         /* Init pipe connection to gui process */
         if (!SystemUtility_CreateThread(gui_ReceiveMessageThread))
@@ -216,13 +213,15 @@ void Gui_Init(void)
             DEBUG_LOG_ERROR("[GUI] Gui_Init, Can't create udp client thread!");
         }
 
-        /* Start gui python app */
-        gui_RunGui();
+        #ifdef INCLUDE_PYTHON_GUI
+            /* Start gui python app */
+            gui_RunGui();
+        #endif /* INCLUDE_PYTHON_GUI */
 
+        /* event loop for gui process */
         while (1)
         {
-            DEBUG_LOG_VERBOSE("[GUI] Gui_Init, process running... (should never enter here).");
-            DELAY_S(5);
+            DELAY_S(10);
         }
 
         exit(EXIT_SUCCESS);

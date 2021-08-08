@@ -10,6 +10,10 @@
 #include <string.h>
 #include <stdint.h>
 
+/*** RECEIVE FIFO MESSAGE SYSTEM DELAY */
+
+#define RECEIVE_FIFO_MESSAGE_SYSTEM_DELAY_MS        (1)
+
 /*** SYSTEM_FIFO_SIZE ***/
 
 #define DEFAULT_FIFO_SIZE                           (256)

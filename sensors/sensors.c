@@ -7,7 +7,6 @@
 
 void Sensor_Init(void)
 {
-    DEBUG_LOG_INFO("Init CONTROL process...");
 
     while (1)
     {

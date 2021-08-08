@@ -23,7 +23,9 @@ typedef enum
 
 } road_type_t;
 
-#define MAX_SIMULATION_FLOAT_DATA_LEN   5
+#define MODEL_SIMULATION_STEP_INTERVAL_MS       (50)
+
+#define MAX_SIMULATION_FLOAT_DATA_LEN           (5)
 
 const char *simulation_fifo_name = "simulation_fifo";
 
@@ -34,7 +36,7 @@ pthread_mutex_t mutex_force = PTHREAD_MUTEX_INITIALIZER;
 
 /*** SIMULATION PARAMETERS ***/
 
-#define SIM_TIME (100)
+#define SIM_TIME (1)
 const float simulation_time = SIM_TIME; // how many iteration will be performed
 const float sampling_period = 0.5;
 
@@ -249,6 +251,8 @@ static void modelSimluation_InitMatrixINITIAL_STATES(void)
 
 static void modelSimluation_SendModelStates(Mat *x, float road, int iteration)
 {
+    DEBUG_LOG_DEBUG("SEND STATES!!!");
+
     if (x->row == 4 && x->col == 1)
     {
         float model_simulation_data[GUI_MODEL_SIMULATION_DATA_SIZE];
@@ -261,6 +265,7 @@ static void modelSimluation_SendModelStates(Mat *x, float road, int iteration)
         model_simulation_data[6] = (float)iteration;
 
         Gui_SendMessage(gui_message_model_simulation_data, model_simulation_data, GUI_MODEL_SIMULATION_DATA_SIZE);
+        Control_SendMessage(control_message_model_states, model_simulation_data, GUI_MODEL_SIMULATION_DATA_SIZE);
     }
     else
     {
@@ -299,8 +304,6 @@ static void *modelSimluation_SimulationStepThread(void *cookie)
     // actual simulation
     for (int i = 0; i < simulation_time; i++)
     {
-        DELAY_MS(50);
-
         if (i == 0)
         {
             pthread_mutex_lock(GetForceMutex());
@@ -359,6 +362,8 @@ static void *modelSimluation_SimulationStepThread(void *cookie)
             freemat(b_i);
             freemat(xk);
         }
+
+        DELAY_MS(MODEL_SIMULATION_STEP_INTERVAL_MS);
     }
 
     // send states to control and gui process (Xd and Yd)
@@ -377,7 +382,7 @@ static void *modelSimluation_ReceiveMessageThread(void *cookie)
     SystemUtility_InitThread(pthread_self());
 
     /* create message fifo queue */
-    if (!SystemUtility_CreateMessageFifo(simulation_fifo_name) == false)
+    if (!SystemUtility_CreateMessageFifo(simulation_fifo_name))
     {
         DEBUG_LOG_ERROR("[SIM] modelSimluation_ReceiveMessageThread, Can't create FIFO!");
         return 0;
@@ -390,7 +395,7 @@ static void *modelSimluation_ReceiveMessageThread(void *cookie)
     while (true)
     {
         /* delay for waiting for another message */
-        DELAY_MS(1);
+        DELAY_MS(RECEIVE_FIFO_MESSAGE_SYSTEM_DELAY_MS);
 
         /* try receive  */
         float_data_len = MAX_SIMULATION_FLOAT_DATA_LEN;
@@ -427,7 +432,6 @@ static void *modelSimluation_ReceiveMessageThread(void *cookie)
 void ModelSimulation_Init(void)
 {
 #ifdef INIT_MODEL_SIMULATION
-    DEBUG_LOG_DEBUG("[SIM] ModelSimulation_Init, Init model simulation process...");
 
     /* Init road input */
     modelSimluation_GenerateRoad(road_type_impuls);

@@ -3,15 +3,60 @@
 #include "model_simulation.h"
 #include "matrix_lib.h"
 
-const char *control_fifo_name = "simulation_fifo";
+const char *control_fifo_name = "control_fifo";
 
 #define MAX_CONTROL_FLOAT_DATA_LEN      20
 
+/* MATRIX FOR CONTROLER K */
+
+#define K_ROW_SIZE 1
+#define K_COLUMN_SIZE 4
+
+static float K_matrix[K_ROW_SIZE][K_COLUMN_SIZE];
+
+static Mat K = {(float *)K_matrix, K_ROW_SIZE, K_ROW_SIZE};
+
+#define GetK() (&K)
+
+/* MATRIX FOR SYSTEM STATES */
+
+#define X_ROW_SIZE 4
+#define X_COLUMN_SIZE 1
+
+static float X_matrix[X_ROW_SIZE][X_COLUMN_SIZE];
+
+static Mat X = {(float *)X_matrix, X_ROW_SIZE, X_COLUMN_SIZE};
+
+#define GetX() (&X)
+
 /* STATIC HELPER FUNCTION */
+
+static void control_GetModelStates(float * float_data, int float_data_len, Mat * X)
+{
+    if (float_data_len >= 4)
+    {
+        set(X, 1, 1, float_data[0]);
+        set(X, 2, 1, float_data[1]);
+        set(X, 3, 1, float_data[2]);
+        set(X, 4, 1, float_data[3]);
+
+        DEBUG_LOG_DEBUG("[CONTROL] control_CalculateAndSendControlForce, Matrix X:");
+        showmat(X);
+    }
+}
 
 static void control_CalculateAndSendControlForce(float * float_data, int float_data_len)
 {
     /* here for now will be simple controller, in the future can be implemented more advanced controlers */
+
+    // u = K * X
+
+    control_GetModelStates(float_data, float_data_len, GetX());
+
+    Mat * U = multiply(GetK(), GetX());
+
+    DEBUG_LOG_DEBUG("[CONTROL] control_CalculateAndSendControlForce, Matrix U:");
+    showmat(U);
 
 }
 
@@ -21,7 +66,7 @@ static void *control_ReceiveMessageThread(void *cookie)
     SystemUtility_InitThread(pthread_self());
 
     /* create message fifo queue */
-    if (!SystemUtility_CreateMessageFifo(control_fifo_name) == false)
+    if (!SystemUtility_CreateMessageFifo(control_fifo_name))
     {
         DEBUG_LOG_ERROR("[CONTROL] control_ReceiveMessageThread, Can't create FIFO!");
         return 0;
@@ -34,7 +79,7 @@ static void *control_ReceiveMessageThread(void *cookie)
     while (true)
     {
         /* delay for waiting for another message */
-        DELAY_MS(1);
+        DELAY_MS(RECEIVE_FIFO_MESSAGE_SYSTEM_DELAY_MS);
 
         /* try receive  */
         float_data_len = MAX_CONTROL_FLOAT_DATA_LEN;
@@ -64,7 +109,6 @@ static void *control_ReceiveMessageThread(void *cookie)
 void Control_Init(void)
 {
     #ifdef INIT_CONTROL
-        DEBUG_LOG_DEBUG("[CONTROL] Control_Init, Init model simulation process...");
 
         /* Init simulation of suspension */
         if (!SystemUtility_CreateThread(control_ReceiveMessageThread))
