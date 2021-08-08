@@ -251,8 +251,6 @@ static void modelSimluation_InitMatrixINITIAL_STATES(void)
 
 static void modelSimluation_SendModelStates(Mat *x, float road, int iteration)
 {
-    DEBUG_LOG_DEBUG("SEND STATES!!!");
-
     if (x->row == 4 && x->col == 1)
     {
         float model_simulation_data[GUI_MODEL_SIMULATION_DATA_SIZE];

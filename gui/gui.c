@@ -35,13 +35,11 @@ const char *gui_fifo_name = "gui_fifo";
 
 static bool gui_UdpClientCreate(int * my_socket)
 {
-    DEBUG_LOG_DEBUG("[GUI] Init udp client.");
-
 	int s = socket(PF_INET, SOCK_DGRAM, 0);
 
 	if (s == -1)
     {
-        DEBUG_LOG_ERROR("[GUI] Cannot create socket.");
+        DEBUG_LOG_ERROR("[GUI] gui_UdpClientCreate, Cannot create socket.");
 		return false;
 	}
 
@@ -52,8 +50,6 @@ static bool gui_UdpClientCreate(int * my_socket)
 
 static void gui_UdpClientDestroy(int my_socket)
 {
-    DEBUG_LOG_DEBUG("[GUI] Init udp client.");
-
 	/* Clean up */
     close(my_socket);
 }

@@ -14,9 +14,18 @@ const char *control_fifo_name = "control_fifo";
 
 static float K_matrix[K_ROW_SIZE][K_COLUMN_SIZE];
 
-static Mat K = {(float *)K_matrix, K_ROW_SIZE, K_ROW_SIZE};
+static Mat K = {(float *)K_matrix, K_ROW_SIZE, K_COLUMN_SIZE};
 
 #define GetK() (&K)
+
+static void control_InitMatrixK(void)
+{
+    K_matrix[0][0] = 0;
+    K_matrix[0][1] = 2300000;
+    K_matrix[0][2] = 500000000;
+    K_matrix[0][3] = 6000000;
+}
+
 
 /* MATRIX FOR SYSTEM STATES */
 
@@ -39,9 +48,6 @@ static void control_GetModelStates(float * float_data, int float_data_len, Mat *
         set(X, 2, 1, float_data[1]);
         set(X, 3, 1, float_data[2]);
         set(X, 4, 1, float_data[3]);
-
-        DEBUG_LOG_DEBUG("[CONTROL] control_CalculateAndSendControlForce, Matrix X:");
-        showmat(X);
     }
 }
 
@@ -51,13 +57,14 @@ static void control_CalculateAndSendControlForce(float * float_data, int float_d
 
     // u = K * X
 
+    /* init control K matrix */
+    control_InitMatrixK();
+
+    /* set model states */
     control_GetModelStates(float_data, float_data_len, GetX());
 
+
     Mat * U = multiply(GetK(), GetX());
-
-    DEBUG_LOG_DEBUG("[CONTROL] control_CalculateAndSendControlForce, Matrix U:");
-    showmat(U);
-
 }
 
 static void *control_ReceiveMessageThread(void *cookie)
@@ -113,7 +120,7 @@ void Control_Init(void)
         /* Init simulation of suspension */
         if (!SystemUtility_CreateThread(control_ReceiveMessageThread))
         {
-            DEBUG_LOG_ERROR("[CONTROL] Control_Init, Can't create simulaton step thread!");
+            DEBUG_LOG_ERROR("[CONTROL] Control_Init, Can't create control receive thread thread!");
         }
 
         while (1)
@@ -137,6 +144,6 @@ void Control_SendMessage(control_message_type_t message_type, float *data, int d
 {
     if (!SystemUtility_SendMessage(control_fifo_name, (int)message_type, data, data_len))
     {
-        DEBUG_LOG_ERROR("[CONTROL] ModelSimulation_SendMessage, Can't send message to gui process!");
+        DEBUG_LOG_ERROR("[CONTROL] Control_SendMessage, Can't send message to gui process!");
     }
 }
