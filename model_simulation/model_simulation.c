@@ -23,7 +23,15 @@ typedef enum
 
 } road_type_t;
 
-#define MODEL_SIMULATION_STEP_INTERVAL_MS       (50)
+/*** INCLUDE CONTROLER ***/
+
+#define INCLUDE_CONTROLER
+
+/*** MODEL_SIMULATION_INTERVAL_STEP ***/
+
+#define MODEL_SIMULATION_STEP_INTERVAL_MS       (100)
+
+/*** MODEL SIMULATION MESSAGE FIFO ***/
 
 #define MAX_SIMULATION_FLOAT_DATA_LEN           (5)
 
@@ -36,12 +44,12 @@ pthread_mutex_t mutex_force = PTHREAD_MUTEX_INITIALIZER;
 
 /*** SIMULATION PARAMETERS ***/
 
-#define SIM_TIME (1)
+#define SIM_TIME (50)
 const float simulation_time = SIM_TIME; // how many iteration will be performed
 const float sampling_period = 0.5;
 
-#define STEP_VALUE  10
-#define ST_TIME     2
+#define STEP_VALUE  0.1
+#define ST_TIME     10
 const float step_time = ST_TIME;
 
 #define IMPULSE_VALUE   1000
@@ -52,7 +60,12 @@ const float impulse_time = IM_TIME;
  * @note Road and force will be set in input matrix in every interation
  */
 
-static float force = -5; // this varialbe will be update from control process (access to force variable have to be done through mutex semaphore)
+/*** INPUT CONTROL SIGNAL - FORCE ***/
+
+#define INITIAL_FORCE_VALUE     (-5)
+static float force = INITIAL_FORCE_VALUE; // this varialbe will be update from control process (access to force variable have to be done through mutex semaphore)
+
+/*** INPUT ROAD SIGNAL ***/
 
 static float road[SIM_TIME]; // for now it will be only step signal, in 10 step in will be 10 [cm] (0.1 [m])
 
@@ -253,6 +266,8 @@ static void modelSimluation_SendModelStates(Mat *x, float road, int iteration)
 {
     if (x->row == 4 && x->col == 1)
     {
+        pthread_mutex_lock(GetForceMutex());
+
         float model_simulation_data[GUI_MODEL_SIMULATION_DATA_SIZE];
         model_simulation_data[0] = get(x, 1, 1);
         model_simulation_data[1] = get(x, 2, 1);
@@ -261,6 +276,8 @@ static void modelSimluation_SendModelStates(Mat *x, float road, int iteration)
         model_simulation_data[4] = road;
         model_simulation_data[5] = force;
         model_simulation_data[6] = (float)iteration;
+
+        pthread_mutex_unlock(GetForceMutex());
 
         Gui_SendMessage(gui_message_model_simulation_data, model_simulation_data, GUI_MODEL_SIMULATION_DATA_SIZE);
         Control_SendMessage(control_message_model_states, model_simulation_data, GUI_MODEL_SIMULATION_DATA_SIZE);
@@ -340,6 +357,8 @@ static void *modelSimluation_SimulationStepThread(void *cookie)
             set(INPUT, 1, 1, road[i]);
             set(INPUT, 2, 1, force); // this will be update by mesage from control process
 
+            showmat(INPUT);
+
             pthread_mutex_unlock(GetForceMutex());
 
             // send states to control and gui process (Xd and Yd)
@@ -406,7 +425,11 @@ static void *modelSimluation_ReceiveMessageThread(void *cookie)
 
                     if (float_data_len = 1)
                     {
-                        force =+ float_data[0]; // last control force value add to last force value
+                        #ifdef INCLUDE_CONTROLER
+                            force += float_data[0]; // last control force value add to last force value
+                        #else
+                            force += 0; // last control force value add to last force value
+                        #endif /* INCLUDE_CONTROLER */
                     }
 
                     pthread_mutex_unlock(GetForceMutex());
@@ -415,10 +438,10 @@ static void *modelSimluation_ReceiveMessageThread(void *cookie)
                 break;
             }
 
-            for (int i = 0; i < float_data_len; i++)
-            {
-                DEBUG_LOG_VERBOSE("[SIM] modelSimluation_ReceiveMessageThread, float[%d]: %f", i, float_data[i]);
-            }
+            // for (int i = 0; i < float_data_len; i++)
+            // {
+            //     DEBUG_LOG_VERBOSE("[SIM] modelSimluation_ReceiveMessageThread, float[%d]: %f", i, float_data[i]);
+            // }
         }
     }
 
@@ -432,7 +455,7 @@ void ModelSimulation_Init(void)
 #ifdef INIT_MODEL_SIMULATION
 
     /* Init road input */
-    modelSimluation_GenerateRoad(road_type_impuls);
+    modelSimluation_GenerateRoad(road_type_step);
 
     /* Init simulation of suspension */
     if (!SystemUtility_CreateThread(modelSimluation_SimulationStepThread))
@@ -462,7 +485,7 @@ void ModelSimulation_Destroy(void)
 
 }
 
-void ModelSimulation_SendMessage(model_simulation_message_type_t message_type, float *data, int data_len)
+void ModelSimulation_SendMessage(model_simulation_message_type_t message_type, float * data, int data_len)
 {
         if (!SystemUtility_SendMessage(simulation_fifo_name, (int)message_type, data, data_len))
     {

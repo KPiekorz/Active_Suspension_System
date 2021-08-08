@@ -51,6 +51,18 @@ static void control_GetModelStates(float * float_data, int float_data_len, Mat *
     }
 }
 
+static int control_SetControlForce(float force, float * float_data, int float_data_len)
+{
+    if (float_data_len >= 1)
+    {
+        float_data[0] = force;
+
+        return 1;
+    }
+
+    return 0;
+}
+
 static void control_CalculateAndSendControlForce(float * float_data, int float_data_len)
 {
     /* here for now will be simple controller, in the future can be implemented more advanced controlers */
@@ -66,8 +78,11 @@ static void control_CalculateAndSendControlForce(float * float_data, int float_d
     /* calculate new control signale U (force) */
     Mat * U = multiply(GetK(), GetX());
 
-    /* send control signal to model simulation process */
+    float force_data[MAX_CONTROL_FLOAT_DATA_LEN];
+    int force_data_len = control_SetControlForce(get(U, 1, 1), force_data, MAX_CONTROL_FLOAT_DATA_LEN);
 
+    /* send control signal to model simulation process */
+    ModelSimulation_SendMessage(simulation_message_control_force, force_data, force_data_len);
 }
 
 static void *control_ReceiveMessageThread(void *cookie)
