@@ -12,6 +12,6 @@
 
 
 ## Active suspension system architecture (process and threads)
-
+![architectura](https://user-images.githubusercontent.com/52105679/128628677-73a0f736-bf6f-4d22-a686-0694084a95f2.png)
 
 ## Key Performance Indicators
