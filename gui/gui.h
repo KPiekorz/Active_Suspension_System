@@ -5,10 +5,10 @@
 #include <stdint.h>
 
 /*** INCLUDE GUI SYSTEM PROCESS ***/
-// #define INIT_GUI
+#define INIT_GUI
 
 /*** INCLUDE PYTHON GUI ***/
-// #define INCLUDE_PYTHON_GUI
+#define INCLUDE_PYTHON_GUI
 
 typedef enum
 {

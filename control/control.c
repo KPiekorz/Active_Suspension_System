@@ -21,9 +21,10 @@ static Mat K = {(float *)K_matrix, K_ROW_SIZE, K_COLUMN_SIZE};
 static void control_InitMatrixK(void)
 {
     K_matrix[0][0] = 0;
-    K_matrix[0][1] = 2300000;
-    K_matrix[0][2] = 500000000;
-    K_matrix[0][3] = 6000000;
+    K_matrix[0][1] = 230;
+    K_matrix[0][2] = 5000;
+    K_matrix[0][3] = 0;
+    K_matrix[0][4] = 800;
 }
 
 
@@ -76,7 +77,7 @@ static void control_CalculateAndSendControlForce(float * float_data, int float_d
     /* set model states */
     control_GetModelStates(float_data, float_data_len, GetX());
 
-    /* calculate new control signale U (force) */
+    /* calculate new control signal U (force) */
     Mat * U = multiply(GetK(), GetX());
 
     float force_data[MAX_CONTROL_FLOAT_DATA_LEN];

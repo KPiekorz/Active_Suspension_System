@@ -16,20 +16,22 @@
 
 typedef enum
 {
+    road_type_zero,
     road_type_step,
     road_type_random,
     road_type_impuls,
     road_type_ramp,
+    road_speed_bump,
 
 } road_type_t;
 
 /*** INCLUDE CONTROLER ***/
 
-// #define INCLUDE_CONTROLER
+#define INCLUDE_CONTROLER
 
 /*** MODEL_SIMULATION_INTERVAL_STEP ***/
 
-#define MODEL_SIMULATION_STEP_INTERVAL_MS       (100)
+#define MODEL_SIMULATION_STEP_INTERVAL_MS       (50)
 
 /*** MODEL SIMULATION MESSAGE FIFO ***/
 
@@ -44,16 +46,16 @@ pthread_mutex_t mutex_force = PTHREAD_MUTEX_INITIALIZER;
 
 /*** SIMULATION PARAMETERS ***/
 
-#define SIM_TIME (50)
+#define SIM_TIME (60)
 const float simulation_time = SIM_TIME; // how many iteration will be performed
 const float sampling_period = 0.5;
 
-#define STEP_VALUE  1000000
-#define ST_TIME     10
+#define STEP_VALUE  0.1
+#define ST_TIME     40
 const float step_time = ST_TIME;
 
-#define IMPULSE_VALUE   1000
-#define IM_TIME         40
+#define IMPULSE_VALUE   0.1
+#define IM_TIME         20
 const float impulse_time = IM_TIME;
 
 /**
@@ -62,12 +64,20 @@ const float impulse_time = IM_TIME;
 
 /*** INPUT CONTROL SIGNAL - FORCE ***/
 
-#define INITIAL_FORCE_VALUE     (-5)
+#define INITIAL_FORCE_VALUE     (5)
 static float force = INITIAL_FORCE_VALUE; // this varialbe will be update from control process (access to force variable have to be done through mutex semaphore)
 
 /*** INPUT ROAD SIGNAL ***/
 
 static float road[SIM_TIME]; // for now it will be only step signal, in 10 step in will be 10 [cm] (0.1 [m])
+
+static void modelSimluation_GenerateZero(void)
+{
+    for (int i = 0; i < simulation_time; i++)
+    {
+        road[i] = 0;
+    }
+}
 
 static void modelSimluation_GenerateStep(void)
 {
@@ -126,23 +136,45 @@ static void  modelSimluation_GenerateRamp(void)
 
 }
 
+static void  modelSimluation_GenerateSpeedBump(void)
+{
+    if (simulation_time < 10000)
+    {
+        DEBUG_LOG_ERROR("[SIM] modelSimluation_GenerateSpeedBump, invalid simulation  time!");
+        return;
+    }
+
+    for (int i = 0; i < 100; i++)
+    {
+        road[i] = 0;
+    }
+
+    // for 
+}
+
 static void modelSimluation_GenerateRoad(road_type_t type)
 {
     switch (type)
     {
-    case road_type_step:
-        modelSimluation_GenerateStep();
-    break;
-    case road_type_random:
-        modelSimluation_GenerateRandom();
-    break;
-    case road_type_impuls:
-        modelSimluation_GenerateImpuls();
-    break;
-    case road_type_ramp:
-        modelSimluation_GenerateRamp();
-    break;
-    default:
+        case road_type_zero:
+            modelSimluation_GenerateZero();
+        break;
+        case road_type_step:
+            modelSimluation_GenerateStep();
+        break;
+        case road_type_random:
+            modelSimluation_GenerateRandom();
+        break;
+        case road_type_impuls:
+            modelSimluation_GenerateImpuls();
+        break;
+        case road_type_ramp:
+            modelSimluation_GenerateRamp();
+        break;
+        case road_speed_bump:
+            modelSimluation_GenerateSpeedBump();
+        break;
+        default:
         DEBUG_LOG_WARN("[SIM] modelSimluation_GenerateRoad, unknown road!");
         break;
     }
@@ -279,7 +311,7 @@ static void modelSimluation_InitMatrixINITIAL_STATES(void)
 
 static void modelSimluation_SendModelStates(Mat *x, float road, int iteration)
 {
-    if (x->row == 4 && x->col == 1)
+    if (x->row == INITIAL_STATES_ROW_SIZE && x->col == INITIAL_STATES_COLUMN_SIZE)
     {
         pthread_mutex_lock(GetForceMutex());
 
@@ -314,14 +346,6 @@ static void *modelSimluation_SimulationStepThread(void *cookie)
     modelSimluation_InitMatrixC();
     modelSimluation_InitMatrixINITIAL_STATES();
 
-    showmat(GetA());
-    showmat(GetB());
-    showmat(GetC());
-    showmat(GetINITIAL_STATES());
-
-
-/*
-
     // calcualte Ad matrix - discrete matric of A
     Mat *s_a = scalermultiply(GetA(), sampling_period);
     Mat *I = eye(A_ROW_SIZE);
@@ -350,8 +374,8 @@ static void *modelSimluation_SimulationStepThread(void *cookie)
 
             // set input matrix
             Mat *INPUT = newmat(INPUT_ROW_SIZE, INPUT_COLUMN_SIZE, DEFAULT_VALUE);
-            set(INPUT, 1, 1, road[i]);
-            set(INPUT, 2, 1, force); // this will be update by mesage from control process
+            set(INPUT, 1, 1, force);
+            set(INPUT, 2, 1, road[i]); // this will be update by mesage from control process
 
             pthread_mutex_unlock(GetForceMutex());
 
@@ -367,6 +391,7 @@ static void *modelSimluation_SimulationStepThread(void *cookie)
             set(xk_1, 2, 1, get(xk, 2, 1));
             set(xk_1, 3, 1, get(xk, 3, 1));
             set(xk_1, 4, 1, get(xk, 4, 1));
+            set(xk_1, 5, 1, get(xk, 5, 1));
 
             freemat(INPUT);
             freemat(a_x);
@@ -379,10 +404,8 @@ static void *modelSimluation_SimulationStepThread(void *cookie)
 
             // set input matrix
             Mat *INPUT = newmat(INPUT_ROW_SIZE, INPUT_COLUMN_SIZE, DEFAULT_VALUE);
-            set(INPUT, 1, 1, road[i]);
-            set(INPUT, 2, 1, force); // this will be update by mesage from control process
-
-            showmat(INPUT);
+            set(INPUT, 1, 1, force);
+            set(INPUT, 2, 1, road[i]); // this will be update by mesage from control process
 
             pthread_mutex_unlock(GetForceMutex());
 
@@ -398,6 +421,7 @@ static void *modelSimluation_SimulationStepThread(void *cookie)
             set(xk_1, 2, 1, get(xk, 2, 1));
             set(xk_1, 3, 1, get(xk, 3, 1));
             set(xk_1, 4, 1, get(xk, 4, 1));
+            set(xk_1, 5, 1, get(xk, 5, 1));
 
             freemat(INPUT);
             freemat(a_x);
@@ -414,8 +438,6 @@ static void *modelSimluation_SimulationStepThread(void *cookie)
     freemat(Ad);
     freemat(Bd);
     freemat(xk_1);
-
-*/
 
     return 0;
 }
@@ -453,7 +475,10 @@ static void *modelSimluation_ReceiveMessageThread(void *cookie)
                     if (float_data_len = 1)
                     {
                         #ifdef INCLUDE_CONTROLER
-                            force += float_data[0]; // last control force value add to last force value
+                            force -= float_data[0]; // last control force value add to last force value
+
+                            DEBUG_LOG_DEBUG("force: %f", force);
+
                         #else
                             force += 0; // last control force value add to last force value
                         #endif /* INCLUDE_CONTROLER */
@@ -482,7 +507,7 @@ void ModelSimulation_Init(void)
 #ifdef INIT_MODEL_SIMULATION
 
     /* Init road input */
-    modelSimluation_GenerateRoad(road_type_step);
+    modelSimluation_GenerateRoad(road_type_impuls);
 
     /* Init simulation of suspension */
     if (!SystemUtility_CreateThread(modelSimluation_SimulationStepThread))
