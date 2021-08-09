@@ -15,6 +15,12 @@
 #define MODEL_SIMULATION_STATE_ITERATION    (7)
 #define MODEL_SIMULATION_DATA_SIZE          (8)
 
+
+/*** SIMULATION PARAMETERS ***/
+
+#define SIM_TIME       (60)
+#define SAMPLE_TIME    (0.01f)
+
 typedef enum
 {
     simulation_message_unknown = 0,

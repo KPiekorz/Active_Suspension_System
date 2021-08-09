@@ -46,9 +46,8 @@ pthread_mutex_t mutex_force = PTHREAD_MUTEX_INITIALIZER;
 
 /*** SIMULATION PARAMETERS ***/
 
-#define SIM_TIME (60)
 const float simulation_time = SIM_TIME; // how many iteration will be performed
-const float sampling_period = 0.5;
+const float sampling_period = SAMPLE_TIME;
 
 #define STEP_VALUE  0.1
 #define ST_TIME     40
@@ -475,7 +474,14 @@ static void *modelSimluation_ReceiveMessageThread(void *cookie)
                     if (float_data_len = 1)
                     {
                         #ifdef INCLUDE_CONTROLER
-                            force -= float_data[0]; // last control force value add to last force value
+
+                            #ifdef FEEDFORWARD_CONTRLER
+                                force -= float_data[0]; // last control force value add to last force value
+                            #endif
+
+                            #ifdef PID_CONTROLLER
+                                force = float_data[0];
+                            #endif
 
                             DEBUG_LOG_DEBUG("force: %f", force);
 
