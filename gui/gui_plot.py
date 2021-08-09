@@ -32,7 +32,6 @@ class UDPServer(QtCore.QObject):
 
     @QtCore.pyqtSlot()
     def init_server(self):
-        print("[PYTHON GUI] Udp server starting...")
         self.server_start = True
         ip = ''
         port = 1100
@@ -41,7 +40,6 @@ class UDPServer(QtCore.QObject):
         self.receive_server_data()
 
     def receive_server_data(self):
-        print("[PYTHON GUI] Upd server has started...")
         while self.server_start:
             data, addr = self.sock.recvfrom(1024)
             # set float data from byte data in little endian

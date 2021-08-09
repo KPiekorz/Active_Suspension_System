@@ -21,7 +21,7 @@ typedef enum
     road_type_random,
     road_type_impuls,
     road_type_ramp,
-    road_speed_hills,
+    road_type_hills,
 
 } road_type_t;
 
@@ -63,7 +63,7 @@ const float impulse_time = IM_TIME;
 
 /*** INPUT CONTROL SIGNAL - FORCE ***/
 
-#define INITIAL_FORCE_VALUE     (0)
+#define INITIAL_FORCE_VALUE     (-50)
 static float force = INITIAL_FORCE_VALUE; // this varialbe will be update from control process (access to force variable have to be done through mutex semaphore)
 
 /*** INPUT ROAD SIGNAL ***/
@@ -135,8 +135,8 @@ static void  modelSimluation_GenerateRamp(void)
 
 }
 
-#define NUMBER_OF_HILLS         (3)
-#define HILL_STEP               (0.1)
+#define NUMBER_OF_HILLS         (2)
+#define HILL_STEP               (1)
 
 static void  modelSimluation_GenerateHills(void)
 {
@@ -179,7 +179,7 @@ static void modelSimluation_GenerateRoad(road_type_t type)
         case road_type_ramp:
             modelSimluation_GenerateRamp();
         break;
-        case road_speed_hills:
+        case road_type_hills:
             modelSimluation_GenerateHills();
         break;
         default:
@@ -190,12 +190,12 @@ static void modelSimluation_GenerateRoad(road_type_t type)
 
 /*** VARIABLES ***/
 
-const float m1 = 2500;
-const float m2 = 320;
-const float k1 = 80000;
-const float k2 = 500000;
-const float b1 = 350;
-const float b2 = 15020;
+const float m1 = 250;
+const float m2 = 32;
+const float k1 = 80;
+const float k2 = 500;
+const float b1 = 35;
+const float b2 = 150;
 
 /*** STATE SPACE MODEL - A ***/
 
@@ -415,6 +415,8 @@ static void *modelSimluation_SimulationStepThread(void *cookie)
             set(INPUT, 1, 1, force);
             set(INPUT, 2, 1, road[i]); // this will be update by mesage from control process
 
+            showmat(INPUT);
+
             pthread_mutex_unlock(GetForceMutex());
 
             // send states to control and gui process (Xd and Yd)
@@ -492,8 +494,6 @@ static void *modelSimluation_ReceiveMessageThread(void *cookie)
                                 force = float_data[0];
                             #endif /* PID_CONTROLLER */
 
-                            // DEBUG_LOG_DEBUG("force: %f", force);
-
                         #else
                             force += 0; // last control force value add to last force value
                         #endif /* INCLUDE_CONTROLER */
@@ -522,7 +522,7 @@ void ModelSimulation_Init(void)
 #ifdef INIT_MODEL_SIMULATION
 
     /* Init road input */
-    modelSimluation_GenerateRoad(road_speed_hills);
+    modelSimluation_GenerateRoad(road_type_hills);
 
     /* Init simulation of suspension */
     if (!SystemUtility_CreateThread(modelSimluation_SimulationStepThread))
