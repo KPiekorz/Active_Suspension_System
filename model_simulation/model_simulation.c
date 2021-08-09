@@ -31,7 +31,7 @@ typedef enum
 
 /*** MODEL_SIMULATION_INTERVAL_STEP ***/
 
-#define MODEL_SIMULATION_STEP_INTERVAL_MS       (50)
+#define MODEL_SIMULATION_STEP_INTERVAL_MS       (10)
 
 /*** MODEL SIMULATION MESSAGE FIFO ***/
 
@@ -63,7 +63,7 @@ const float impulse_time = IM_TIME;
 
 /*** INPUT CONTROL SIGNAL - FORCE ***/
 
-#define INITIAL_FORCE_VALUE     (5)
+#define INITIAL_FORCE_VALUE     (0)
 static float force = INITIAL_FORCE_VALUE; // this varialbe will be update from control process (access to force variable have to be done through mutex semaphore)
 
 /*** INPUT ROAD SIGNAL ***/
@@ -135,28 +135,28 @@ static void  modelSimluation_GenerateRamp(void)
 
 }
 
-#define NUMBER_OF_HILLS         (5)
+#define NUMBER_OF_HILLS         (3)
 #define HILL_STEP               (0.1)
 
 static void  modelSimluation_GenerateHills(void)
 {
-    if (simulation_time < 10000)
+    if (simulation_time < 1000)
     {
         DEBUG_LOG_ERROR("[SIM] modelSimluation_GenerateHills, invalid simulation  time!");
         return;
     }
 
     int change_inclination = simulation_time / (NUMBER_OF_HILLS * 2);
-    int sign = (-1);
+    int sign = (1);
 
-    for (int i = 0; i < simulation_time; i++)
+    for (int i = 1; i < simulation_time; i++)
     {
-        if (i % NUMBER_OF_HILLS == 0)
+        if ((i % change_inclination) == 0)
         {
             sign *= (-1);
         }
 
-        road[i] += HILL_STEP;
+        road[i] += road[i-1] + (sign * HILL_STEP);
     }
 }
 

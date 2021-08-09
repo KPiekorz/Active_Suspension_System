@@ -18,7 +18,7 @@
 
 /*** SIMULATION PARAMETERS ***/
 
-#define SIM_TIME       (60)
+#define SIM_TIME       (1000)
 #define SAMPLE_TIME    (0.01f)
 
 typedef enum
