@@ -9,6 +9,11 @@ typedef enum
     control_message_model_states,
 } control_message_type_t;
 
+/*** CONTROLLER TYPE ***/
+
+// #define FEEDFORWARD_CONTRLER
+#define PID_CONTROLLER
+
 /**
  * @brief  Init control process
  * @note

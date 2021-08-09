@@ -49,11 +49,11 @@ pthread_mutex_t mutex_force = PTHREAD_MUTEX_INITIALIZER;
 const float simulation_time = SIM_TIME; // how many iteration will be performed
 const float sampling_period = SAMPLE_TIME;
 
-#define STEP_VALUE  0.1
+#define STEP_VALUE  10
 #define ST_TIME     40
 const float step_time = ST_TIME;
 
-#define IMPULSE_VALUE   0.1
+#define IMPULSE_VALUE   10
 #define IM_TIME         20
 const float impulse_time = IM_TIME;
 
