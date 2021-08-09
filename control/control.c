@@ -120,7 +120,7 @@ static void control_PIDControler(float * float_data, int float_data_len)
 
     PIDController_Update(&pid, setpoint, measurement);
 
-    DEBUG_LOG_DEBUG("pid out: %f", pid.out);
+    // DEBUG_LOG_DEBUG("pid out: %f", pid.out);
 
     float force_data[MAX_CONTROL_FLOAT_DATA_LEN];
     int force_data_len = control_SetControlForce(pid.out, force_data, MAX_CONTROL_FLOAT_DATA_LEN);
