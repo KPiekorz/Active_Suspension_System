@@ -307,7 +307,7 @@ static void modelSimluation_InitMatrixINITIAL_STATES(void)
     INITIAL_STATES_matrix[1][0] = 0;
     INITIAL_STATES_matrix[2][0] = 0;
     INITIAL_STATES_matrix[3][0] = 0;
-    INITIAL_STATES_matrix[4][0] = 5;
+    INITIAL_STATES_matrix[4][0] = 0;
 }
 
 /*** INPUT MATRIX ***/
