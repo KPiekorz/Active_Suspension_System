@@ -27,11 +27,11 @@ typedef enum
 
 /*** INCLUDE CONTROLER ***/
 
-// #define INCLUDE_CONTROLER
+#define INCLUDE_CONTROLER
 
 /*** MODEL_SIMULATION_INTERVAL_STEP ***/
 
-#define MODEL_SIMULATION_STEP_INTERVAL_MS       (10)
+#define MODEL_SIMULATION_STEP_INTERVAL_MS       (5)
 
 /*** MODEL SIMULATION MESSAGE FIFO ***/
 
@@ -63,7 +63,7 @@ const float impulse_time = IM_TIME;
 
 /*** INPUT CONTROL SIGNAL - FORCE ***/
 
-#define INITIAL_FORCE_VALUE     (-50)
+#define INITIAL_FORCE_VALUE     (0)
 static float force = INITIAL_FORCE_VALUE; // this varialbe will be update from control process (access to force variable have to be done through mutex semaphore)
 
 /*** INPUT ROAD SIGNAL ***/
@@ -307,7 +307,7 @@ static void modelSimluation_InitMatrixINITIAL_STATES(void)
     INITIAL_STATES_matrix[1][0] = 0;
     INITIAL_STATES_matrix[2][0] = 0;
     INITIAL_STATES_matrix[3][0] = 0;
-    INITIAL_STATES_matrix[4][0] = 0;
+    INITIAL_STATES_matrix[4][0] = 5;
 }
 
 /*** INPUT MATRIX ***/
@@ -475,15 +475,15 @@ static void *modelSimluation_ReceiveMessageThread(void *cookie)
                         #ifdef INCLUDE_CONTROLER
 
                             #ifdef FEEDFORWARD_CONTRLER
-                                force -= float_data[0]; // last control force value add to last force value
+                                force += float_data[0]; // last control force value add to last force value
                             #endif /* FEEDFORWARD_CONTRLER */
 
                             #ifdef PID_CONTROLLER
-                                force = float_data[0];
+                                force += float_data[0];
                             #endif /* PID_CONTROLLER */
 
                         #else
-                            force += 0; // last control force value add to last force value
+                            // force = 0; // last control force value add to last force value
                         #endif /* INCLUDE_CONTROLER */
                     }
 
