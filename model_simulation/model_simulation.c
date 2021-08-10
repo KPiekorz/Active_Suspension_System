@@ -26,9 +26,6 @@ typedef enum
 
 } road_type_t;
 
-/*** INCLUDE CONTROLER ***/
-
-#define INCLUDE_CONTROLER
 
 /*** MODEL_SIMULATION_INTERVAL_STEP ***/
 
@@ -161,7 +158,7 @@ static void  modelSimluation_GenerateHills(void)
     }
 }
 
-#define POLAND_STEP         (1.1)
+#define POLAND_STEP         (1)
 
 static void  modelSimluation_GenerateNormalRoadInPoland(void)
 {
@@ -538,7 +535,7 @@ static void *modelSimluation_ReceiveMessageThread(void *cookie)
                             #endif /* FEEDFORWARD_CONTRLER */
 
                             #ifdef PID_CONTROLLER
-                                force += -float_data[0];
+                                force = float_data[0];
                             #endif /* PID_CONTROLLER */
 
                         #else
@@ -569,7 +566,7 @@ void ModelSimulation_Init(void)
 #ifdef INIT_MODEL_SIMULATION
 
     /* Init road input */
-    modelSimluation_GenerateRoad(road_type_poland);
+    modelSimluation_GenerateRoad(road_type_step);
 
     /* Init simulation of suspension */
     if (!SystemUtility_CreateThread(modelSimluation_SimulationStepThread))

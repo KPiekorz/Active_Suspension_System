@@ -13,8 +13,8 @@ const char *control_fifo_name = "control_fifo";
 /* PID CONTROLLER PARAMETERS */
 
 #define PID_KP  2000
-#define PID_KI  10000
-#define PID_KD  3000
+#define PID_KI  10
+#define PID_KD  0
 
 #define PID_TAU 0.02f
 
@@ -116,7 +116,7 @@ static void control_PIDControler(float * float_data, int float_data_len)
 
     /* Compute new control signal */
     float setpoint = 0;
-    float measurement = get(GetX(), 5, 1);
+    float measurement = get(GetX(), 3, 1);
 
     PIDController_Update(&pid, setpoint, measurement);
 
