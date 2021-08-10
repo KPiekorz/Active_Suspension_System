@@ -22,6 +22,7 @@ typedef enum
     road_type_impuls,
     road_type_ramp,
     road_type_hills,
+    road_type_poland,
 
 } road_type_t;
 
@@ -160,6 +161,61 @@ static void  modelSimluation_GenerateHills(void)
     }
 }
 
+#define POLAND_STEP         (1.1)
+
+static void  modelSimluation_GenerateNormalRoadInPoland(void)
+{
+    if (simulation_time < 1000)
+    {
+        DEBUG_LOG_ERROR("[SIM] modelSimluation_GenerateNormalRoadInPoland, invalid simulation  time!");
+        return;
+    }
+
+    /* 1 disturb */
+    for (int i = 100; i < 130; i++)
+    {
+        road[i] = road[i-1] + POLAND_STEP;
+    }
+
+    for (int i = 130; i < 160; i++)
+    {
+        road[i] = road[i-1] - POLAND_STEP;
+    }
+
+    /* 2 disturb */
+    for (int i = 230; i < 270; i++)
+    {
+        road[i] = road[i-1] - POLAND_STEP;
+    }
+
+    for (int i = 270; i < 310; i++)
+    {
+        road[i] = road[i-1] + POLAND_STEP;
+    }
+
+    /* 3 disturb */
+    for (int i = 500; i < 550; i++)
+    {
+        road[i] = road[i-1] + POLAND_STEP;
+    }
+
+    for (int i = 550; i < 600; i++)
+    {
+        road[i] = road[i-1] - POLAND_STEP;
+    }
+
+    /* 4 disturb */
+    for (int i = 800; i < 830; i++)
+    {
+        road[i] = road[i-1] + POLAND_STEP;
+    }
+
+    for (int i = 830; i < 860; i++)
+    {
+        road[i] = road[i-1] - POLAND_STEP;
+    }
+}
+
 static void modelSimluation_GenerateRoad(road_type_t type)
 {
     switch (type)
@@ -181,6 +237,9 @@ static void modelSimluation_GenerateRoad(road_type_t type)
         break;
         case road_type_hills:
             modelSimluation_GenerateHills();
+        break;
+        case road_type_poland:
+            modelSimluation_GenerateNormalRoadInPoland();
         break;
         default:
         DEBUG_LOG_WARN("[SIM] modelSimluation_GenerateRoad, unknown road!");
@@ -479,7 +538,7 @@ static void *modelSimluation_ReceiveMessageThread(void *cookie)
                             #endif /* FEEDFORWARD_CONTRLER */
 
                             #ifdef PID_CONTROLLER
-                                force += float_data[0];
+                                force += -float_data[0];
                             #endif /* PID_CONTROLLER */
 
                         #else
@@ -510,7 +569,7 @@ void ModelSimulation_Init(void)
 #ifdef INIT_MODEL_SIMULATION
 
     /* Init road input */
-    modelSimluation_GenerateRoad(road_type_hills);
+    modelSimluation_GenerateRoad(road_type_poland);
 
     /* Init simulation of suspension */
     if (!SystemUtility_CreateThread(modelSimluation_SimulationStepThread))
