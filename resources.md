@@ -79,6 +79,8 @@ while ((wpid = wait(&status)) > 0); // this way, the father waits for all the ch
   - matrix operation: https://www.codeproject.com/Articles/5283245/Matrix-Library-in-C
   - matlab discretization: https://www.mathworks.com/help/control/ref/ss.html
   - discretizion in a loop: https://www.mathworks.com/matlabcentral/answers/315209-discrete-state-space-find-and-plot
+  - c2d (ZOH): https://www.mathworks.com/help/ident/ref/lti.c2d.html
+
 
 ## Control
 
