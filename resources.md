@@ -77,6 +77,7 @@ while ((wpid = wait(&status)) > 0); // this way, the father waits for all the ch
   - model simulation in python: https://aleksandarhaber.com/control-systems-lecture-intro-to-state-space-models-and-python-simulation-of-a-mass-spring-system/
   - suspension state model: https://ctms.engin.umich.edu/CTMS/index.php?example=Suspension&section=ControlStateSpace
   - matrix operation: https://www.codeproject.com/Articles/5283245/Matrix-Library-in-C
+  - matlab discretization: https://www.mathworks.com/help/control/ref/ss.html
 
 ## Control
 
