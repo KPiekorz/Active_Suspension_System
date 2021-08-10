@@ -210,35 +210,35 @@ static Mat A = {(float *)A_matrix, A_ROW_SIZE, A_ROW_SIZE};
 
 static void modelSimluation_InitMatrixA(void)
 {
-    A_matrix[0][0] = 0;
-    A_matrix[0][1] = 1;
-    A_matrix[0][2] = 0;
-    A_matrix[0][3] = 0;
+    A_matrix[0][0] = 0.8628;
+    A_matrix[0][1] = 0.0958;
+    A_matrix[0][2] = -0.0044;
+    A_matrix[0][3] = -0.0013;
     A_matrix[0][4] = 0;
 
-    A_matrix[1][0] = -(b1 * b2) / (m1 * m2);
-    A_matrix[1][1] = 0;
-    A_matrix[1][2] = ((b1 / m1) * ((b1 / m1) + (b1 / m2) + (b2 / m2))) - (k1 / m1);
-    A_matrix[1][3] = -(b1 / m1);
+    A_matrix[1][0] = -2.8741;
+    A_matrix[1][1] = 0.8628;
+    A_matrix[1][2] = 0.1998;
+    A_matrix[1][3] = -0.0178;
     A_matrix[1][4] = 0;
 
-    A_matrix[2][0] = b2 / m2;
-    A_matrix[2][1] = 0;
-    A_matrix[2][2] = -((b1 / m1) + (b1 / m2) + (b2 / m2));
-    A_matrix[2][3] = 1;
+    A_matrix[2][0] = 0.7829;
+    A_matrix[2][1] = 0.0864;
+    A_matrix[2][2] = -0.0648;
+    A_matrix[2][3] = -0.0021;
     A_matrix[2][4] = 0;
 
-    A_matrix[3][0] = k2 / m2;
-    A_matrix[3][1] = 0;
-    A_matrix[3][2] = -((k1 / m1) + (k1 / m2) + (k2 / m2));
-    A_matrix[3][3] = 0;
+    A_matrix[3][0] = -9.7229;
+    A_matrix[3][1] = 0.4498;
+    A_matrix[3][2] = 1.9570;
+    A_matrix[3][3] = -0.1183;
     A_matrix[3][4] = 0;
 
-    A_matrix[4][0] = 0;
-    A_matrix[4][1] = 0;
-    A_matrix[4][2] = 1;
-    A_matrix[4][3] = 0;
-    A_matrix[4][4] = 0;
+    A_matrix[4][0] = 0.0864;
+    A_matrix[4][1] = 0.0039;
+    A_matrix[4][2] = -0.0016;
+    A_matrix[4][3] = 0.0006;
+    A_matrix[4][4] = 1.0000;
 }
 
 /*** STATE SPACE MODEL - B ***/
@@ -255,19 +255,19 @@ static Mat B = {(float *)B_matrix, B_ROW_SIZE, B_COLUMN_SIZE};
 static void modelSimluation_InitMatrixB(void)
 {
     B_matrix[0][0] = 0;
-    B_matrix[0][1] = 0;
+    B_matrix[0][1] = 0.1372;
 
-    B_matrix[1][0] = 1 / m1;
-    B_matrix[1][1] = (b1 * b2) / (m1 * m2);
+    B_matrix[1][0] = 0;
+    B_matrix[1][1] = 2.8741;
 
     B_matrix[2][0] = 0;
-    B_matrix[2][1] = -(b2 / m2);
+    B_matrix[2][1] = -0.7829;
 
-    B_matrix[3][0] = (1 / m1) + (1 / m2);
-    B_matrix[3][1] = -(k2 / m2);
+    B_matrix[3][0] = 0.0001;
+    B_matrix[3][1] = 9.7229;
 
     B_matrix[4][0] = 0;
-    B_matrix[4][1] = 0;
+    B_matrix[4][1] = -0.0864;
 }
 
 /*** STATE SPACE MODEL - C ***/
@@ -354,19 +354,9 @@ static void *modelSimluation_SimulationStepThread(void *cookie)
     modelSimluation_InitMatrixC();
     modelSimluation_InitMatrixINITIAL_STATES();
 
-    // calcualte Ad matrix - discrete matric of A
-    Mat *s_a = scalermultiply(GetA(), sampling_period);
-    Mat *I = eye(A_ROW_SIZE);
-    Mat *before_inv = minus(I, s_a);
-    freemat(s_a);
-    freemat(I);
-    Mat *Ad = inverse(before_inv);
-    freemat(before_inv);
-
-    // calcualte Bd matrix - discrete matric of B
-    Mat *ad_s = scalermultiply(Ad, sampling_period);
-    Mat *Bd = multiply(ad_s, GetB());
-    freemat(ad_s);
+    // showmat(GetA());
+    // showmat(GetB());
+    // showmat(GetC());
 
     // x(k-1)
     Mat *xk_1 = newmat(INITIAL_STATES_ROW_SIZE, INITIAL_STATES_COLUMN_SIZE, DEFAULT_VALUE);
@@ -391,8 +381,8 @@ static void *modelSimluation_SimulationStepThread(void *cookie)
             modelSimluation_SendModelStates(GetINITIAL_STATES(), road[i], i);
 
             // calculate x
-            Mat *a_x = multiply(Ad, GetINITIAL_STATES());
-            Mat *b_i = multiply(Bd, INPUT);
+            Mat *a_x = multiply(GetA(), GetINITIAL_STATES());
+            Mat *b_i = multiply(GetB(), INPUT);
 
             Mat *xk = sum(a_x, b_i);
             set(xk_1, 1, 1, get(xk, 1, 1));
@@ -423,8 +413,8 @@ static void *modelSimluation_SimulationStepThread(void *cookie)
             modelSimluation_SendModelStates(xk_1, road[i], i);
 
             // calculate x
-            Mat *a_x = multiply(Ad, xk_1);
-            Mat *b_i = multiply(Bd, INPUT);
+            Mat *a_x = multiply(GetA(), xk_1);
+            Mat *b_i = multiply(GetB(), INPUT);
 
             Mat *xk = sum(a_x, b_i);
             set(xk_1, 1, 1, get(xk, 1, 1));
@@ -445,8 +435,6 @@ static void *modelSimluation_SimulationStepThread(void *cookie)
     // send states to control and gui process (Xd and Yd)
     modelSimluation_SendModelStates(xk_1, road[SIM_TIME-1], (int)SIM_TIME-1);
 
-    freemat(Ad);
-    freemat(Bd);
     freemat(xk_1);
 
     return 0;
