@@ -27,7 +27,7 @@ typedef enum
 
 /*** INCLUDE CONTROLER ***/
 
-#define INCLUDE_CONTROLER
+// #define INCLUDE_CONTROLER
 
 /*** MODEL_SIMULATION_INTERVAL_STEP ***/
 
@@ -144,7 +144,7 @@ static void  modelSimluation_GenerateRamp(void)
 }
 
 #define NUMBER_OF_HILLS         (2)
-#define HILL_STEP               (1)
+#define HILL_STEP               (0.1)
 
 static void  modelSimluation_GenerateHills(void)
 {
