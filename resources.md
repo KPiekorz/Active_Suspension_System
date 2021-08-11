@@ -81,7 +81,6 @@ while ((wpid = wait(&status)) > 0); // this way, the father waits for all the ch
   - discretizion in a loop: https://www.mathworks.com/matlabcentral/answers/315209-discrete-state-space-find-and-plot
   - c2d (ZOH): https://www.mathworks.com/help/ident/ref/lti.c2d.html
 
-
 ## Control
 
 - Discretize PID controller: https://github.com/pms67/PID
