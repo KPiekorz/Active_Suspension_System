@@ -484,6 +484,8 @@ static void *modelSimluation_ReceiveMessageThread(void *cookie)
                                 force += float_data[0];
                             #endif /* PID_CONTROLLER */
 
+                            // DEBUG_LOG_DEBUG("[SIM] FORCE: %f", force);
+
                         #else
                             // force = 0; // last control force value add to last force value
                         #endif /* INCLUDE_CONTROLER */
