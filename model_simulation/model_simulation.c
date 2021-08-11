@@ -44,6 +44,14 @@ pthread_mutex_t mutex_force = PTHREAD_MUTEX_INITIALIZER;
 
 #define DEFAULT_VALUE (0)
 
+/*** INIT STATES ***/
+
+#define INIT_STATE_X1           0
+#define INIT_STATE_X1_DOT       0
+#define INIT_STATE_Y1           0
+#define INIT_STATE_Y1_DOT       0
+#define INIT_STATE_Y2           0
+
 /*** SIMULATION PARAMETERS ***/
 
 const float simulation_time = SIM_TIME; // how many iteration will be performed
@@ -303,11 +311,11 @@ static Mat INITIAL_STATES = {(float *)INITIAL_STATES_matrix, INITIAL_STATES_ROW_
 
 static void modelSimluation_InitMatrixINITIAL_STATES(void)
 {
-    INITIAL_STATES_matrix[0][0] = 0;
-    INITIAL_STATES_matrix[1][0] = 0;
-    INITIAL_STATES_matrix[2][0] = 0;
-    INITIAL_STATES_matrix[3][0] = 0;
-    INITIAL_STATES_matrix[4][0] = 5;
+    INITIAL_STATES_matrix[0][0] = INIT_STATE_X1;
+    INITIAL_STATES_matrix[1][0] = INIT_STATE_X1_DOT;
+    INITIAL_STATES_matrix[2][0] = INIT_STATE_Y1 ;
+    INITIAL_STATES_matrix[3][0] = INIT_STATE_Y1_DOT;
+    INITIAL_STATES_matrix[4][0] = INIT_STATE_Y2;
 }
 
 /*** INPUT MATRIX ***/
@@ -404,8 +412,6 @@ static void *modelSimluation_SimulationStepThread(void *cookie)
             Mat *INPUT = newmat(INPUT_ROW_SIZE, INPUT_COLUMN_SIZE, DEFAULT_VALUE);
             set(INPUT, 1, 1, force);
             set(INPUT, 2, 1, road[i]); // this will be update by mesage from control process
-
-            showmat(INPUT);
 
             pthread_mutex_unlock(GetForceMutex());
 
