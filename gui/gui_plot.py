@@ -166,6 +166,7 @@ class GUI(QtWidgets.QMainWindow):
         self.plot_model_state.draw()
 
     def calculate_kpi(self):
+        # KPI - will be average value change from one step to another (the smaller value of KPI is the better suspension works)
         new_kpi = "New kpi value model state Y: "  + str(randrange(10))
         self.kpi_label.setText(new_kpi)
         QApplication.processEvents()

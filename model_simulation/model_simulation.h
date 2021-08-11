@@ -21,6 +21,10 @@
 #define SIM_TIME       (1000)
 #define SAMPLE_TIME    (0.1f)
 
+/*** INCLUDE CONTROLER ***/
+
+#define INCLUDE_CONTROLER
+
 typedef enum
 {
     simulation_message_unknown = 0,

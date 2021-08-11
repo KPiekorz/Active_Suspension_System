@@ -25,10 +25,6 @@ typedef enum
 
 } road_type_t;
 
-/*** INCLUDE CONTROLER ***/
-
-#define INCLUDE_CONTROLER
-
 /*** MODEL_SIMULATION_INTERVAL_STEP ***/
 
 #define MODEL_SIMULATION_STEP_INTERVAL_MS       (5)
