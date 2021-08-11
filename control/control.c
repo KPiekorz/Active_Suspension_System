@@ -12,17 +12,17 @@ const char *control_fifo_name = "control_fifo";
 
 /* PID CONTROLLER PARAMETERS */
 
-#define PID_KP              2000               // default 2000
-#define PID_KI              5            // defualt 10
-#define PID_KD              300000
+#define PID_KP              200           // default 2000
+#define PID_KI              50            // defualt 10
+#define PID_KD              30000
 
 #define PID_TAU             0.02f
 
 #define PID_LIM_MIN         -100.0f
 #define PID_LIM_MAX         100.0f
 
-#define PID_LIM_MIN_INT     -1000.0f
-#define PID_LIM_MAX_INT     1000.0f
+#define PID_LIM_MIN_INT     -100.0f
+#define PID_LIM_MAX_INT     100.0f
 
 PIDController pid = { PID_KP, PID_KI, PID_KD, PID_TAU, PID_LIM_MIN, PID_LIM_MAX, PID_LIM_MIN_INT, PID_LIM_MAX_INT, SAMPLE_TIME };
 
@@ -120,7 +120,7 @@ static void control_PIDControler(float * float_data, int float_data_len)
     float setpoint = PID_SETPOINT;
     float measurement = get(GetX(), 5, 1);
 
-    DEBUG_LOG_DEBUG("[CONTROL] MEASUREMENT: %f", measurement);
+    // DEBUG_LOG_DEBUG("[CONTROL] MEASUREMENT: %f", measurement);
 
     PIDController_Update(&pid, setpoint, measurement);
 
