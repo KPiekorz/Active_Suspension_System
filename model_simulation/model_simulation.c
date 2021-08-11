@@ -362,10 +362,6 @@ static void *modelSimluation_SimulationStepThread(void *cookie)
     modelSimluation_InitMatrixC();
     modelSimluation_InitMatrixINITIAL_STATES();
 
-    // showmat(GetA());
-    // showmat(GetB());
-    // showmat(GetC());
-
     // x(k-1)
     Mat *xk_1 = newmat(INITIAL_STATES_ROW_SIZE, INITIAL_STATES_COLUMN_SIZE, DEFAULT_VALUE);
 
