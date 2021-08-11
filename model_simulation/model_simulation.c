@@ -50,7 +50,7 @@ pthread_mutex_t mutex_force = PTHREAD_MUTEX_INITIALIZER;
 #define INIT_STATE_X1_DOT       0
 #define INIT_STATE_Y1           0
 #define INIT_STATE_Y1_DOT       0
-#define INIT_STATE_Y2           0.5
+#define INIT_STATE_Y2           0
 
 /*** SIMULATION PARAMETERS ***/
 
@@ -144,7 +144,7 @@ static void  modelSimluation_GenerateRamp(void)
 }
 
 #define NUMBER_OF_HILLS         (2)
-#define HILL_STEP               (0.001)
+#define HILL_STEP               (1)
 
 static void  modelSimluation_GenerateHills(void)
 {
