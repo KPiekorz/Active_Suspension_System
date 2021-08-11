@@ -87,4 +87,3 @@ while ((wpid = wait(&status)) > 0); // this way, the father waits for all the ch
 - Discretize PID controller: https://github.com/pms67/PID
 - Control active suspension system by PID regulator: https://www.researchgate.net/publication/299579915_PID_CONTROLLER_OF_ACTIVE_SUSPENSION_SYSTEM_FOR_A_QUARTER_CAR_MODEL
 - https://www.scilab.org/discrete-time-pid-controller-implementation
-- 
