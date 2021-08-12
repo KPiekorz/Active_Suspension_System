@@ -86,3 +86,9 @@ while ((wpid = wait(&status)) > 0); // this way, the father waits for all the ch
 - Discretize PID controller: https://github.com/pms67/PID
 - Control active suspension system by PID regulator: https://www.researchgate.net/publication/299579915_PID_CONTROLLER_OF_ACTIVE_SUSPENSION_SYSTEM_FOR_A_QUARTER_CAR_MODEL
 - https://www.scilab.org/discrete-time-pid-controller-implementation
+
+## RTOS POSIX
+
+- https://epics-controls.org/resources-and-support/documents/howto-documents/posix-thread-priority/
+- linux manual - priority: https://man7.org/linux/man-pages/man7/sched.7.html
+- linux manuual - set param: https://man7.org/linux/man-pages/man3/pthread_setschedparam.3.html

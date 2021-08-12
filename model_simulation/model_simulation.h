@@ -15,15 +15,14 @@
 #define MODEL_SIMULATION_STATE_ITERATION    (7)
 #define MODEL_SIMULATION_DATA_SIZE          (8)
 
+/*** INCLUDE CONTROLER ***/
+
+#define INCLUDE_CONTROLER
 
 /*** SIMULATION PARAMETERS ***/
 
 #define SIM_TIME       (1000)
 #define SAMPLE_TIME    (0.1f)
-
-/*** INCLUDE CONTROLER ***/
-
-#define INCLUDE_CONTROLER
 
 typedef enum
 {
