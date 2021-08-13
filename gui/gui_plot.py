@@ -63,7 +63,7 @@ class UDPServer(QtCore.QObject):
             global model_Y_state
             road.append(f_road[0])
             control_force.append(f_force[0])
-            model_Y_state.append(f_x5[0])
+            model_Y_state.append(f_x3[0])
 
 
 class GUI(QtWidgets.QMainWindow):
