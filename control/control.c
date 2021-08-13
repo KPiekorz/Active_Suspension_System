@@ -12,17 +12,17 @@ const char *control_fifo_name = "control_fifo";
 
 /* PID CONTROLLER PARAMETERS */
 
-#define PID_KP              20000          // default 2000
+#define PID_KP              200          // default 2000
 #define PID_KI              100          // defualt 10
-#define PID_KD              5000
+#define PID_KD              2500
 
 #define PID_TAU             0.02f
 
 #define PID_LIM_MIN         -1000000.0f
 #define PID_LIM_MAX         1000000.0f
 
-#define PID_LIM_MIN_INT     -1000.0f
-#define PID_LIM_MAX_INT     1000.0f
+#define PID_LIM_MIN_INT     -10000.0f
+#define PID_LIM_MAX_INT     10000.0f
 
 PIDController pid = { PID_KP, PID_KI, PID_KD, PID_TAU, PID_LIM_MIN, PID_LIM_MAX, PID_LIM_MIN_INT, PID_LIM_MAX_INT, SAMPLE_TIME };
 
