@@ -86,7 +86,7 @@ class GUI(QtWidgets.QMainWindow):
         self.plot_control_force = MplCanvas(self, width=5, height=4, dpi=100)
         self.plot_control_force.fig.suptitle("Control signal force", fontsize=10)
         self.plot_model_state = MplCanvas(self, width=5, height=4, dpi=100)
-        self.plot_model_state.fig.suptitle("Model state - Y", fontsize=10)
+        self.plot_model_state.fig.suptitle("Model state", fontsize=10)
         self.update_plot()
 
         # Create toolbar, passing canvas as first parament, parent (self, the MainWindow) as second.
