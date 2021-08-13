@@ -8,14 +8,16 @@ import sys
 import matplotlib
 import socket
 import sys
-from random import randrange
 import struct
+import statistics
 
 matplotlib.use('Qt5Agg')
 
 road = []
 control_force = []
-model_Y_state = []
+model_y_state = []
+
+avergae_kpi = [0]
 
 class MplCanvas(FigureCanvasQTAgg):
 
@@ -60,10 +62,10 @@ class UDPServer(QtCore.QObject):
             # add values to array for plot
             global road
             global control_force
-            global model_Y_state
+            global model_y_state
             road.append(f_road[0])
             control_force.append(f_force[0])
-            model_Y_state.append(f_x3[0])
+            model_y_state.append(f_x3[0])
 
 
 class GUI(QtWidgets.QMainWindow):
@@ -156,20 +158,25 @@ class GUI(QtWidgets.QMainWindow):
         self.plot_control_force.draw()
 
         # plot model states
-        global model_Y_state
+        global model_y_state
         # clear plot
         self.plot_model_state.axes.cla()
         # set new plot axes values
-        model_states_x = list(range(0, len(model_Y_state)))
-        self.plot_model_state.axes.plot(model_states_x, model_Y_state)
+        model_states_x = list(range(0, len(model_y_state)))
+        self.plot_model_state.axes.plot(model_states_x, model_y_state)
         # Trigger the canvas to update and redraw.
         self.plot_model_state.draw()
 
     def calculate_kpi(self):
         # KPI - will be average value change from one step to another (the smaller value of KPI is the better suspension works)
-        new_kpi = "New kpi value model state Y: "  + str(randrange(10))
-        self.kpi_label.setText(new_kpi)
-        QApplication.processEvents()
+        # plot model states
+        global model_y_state
+        if len(model_y_state) > 1:
+            global avergae_kpi
+            avergae_kpi.append(abs(model_y_state[len(model_y_state)-1] - model_y_state[len(model_y_state)-2]))
+            new_kpi = "New kpi value model state Y: "  + str(statistics.mean(avergae_kpi))
+            self.kpi_label.setText(new_kpi)
+            QApplication.processEvents()
 
     def start_udp_server(self):
         # start udp server
