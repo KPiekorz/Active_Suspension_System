@@ -173,7 +173,7 @@ class GUI(QtWidgets.QMainWindow):
             avergae_kpi = [0]
             for i in range(1, len(model_y_state)):
                 avergae_kpi.append(abs(model_y_state[i] - model_y_state[i-1]))
-            new_kpi = "New kpi value model state Y: "  + str(statistics.mean(avergae_kpi))
+            new_kpi = "New kpi value model state: "  + str(statistics.mean(avergae_kpi))
             self.kpi_label.setText(new_kpi)
             QApplication.processEvents()
 

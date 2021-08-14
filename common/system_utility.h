@@ -21,6 +21,18 @@ typedef enum
     thread_priority_max
 } system_thread_piority_t;
 
+/*** TIMER TYPEDEF ***/
+
+typedef struct
+{
+    /* Structure with time values */
+    struct itimerspec timerSpecStruct;
+
+    /* Timer variable */
+    timer_t	timerVar;
+
+} system_timer_t;
+
 /*** SYSTEM EVENT LOOP DELAY ***/
 
 #define SYSTEM_EVENT_LOOP_DELAY_S                   (10)
@@ -168,9 +180,18 @@ bool SystemUtility_CreateThread(void *(*__start_routine) (void *));
  * @brief  Create cyclic threa
  * @note
  * @param  __start_routine: thread function
+ * @param  timer: timer
  * @retval true if successfuly cyclic thread is created, otherwise false
  */
-bool SystemUtility_CreateCyclicThread(void *(*__start_routine) (void *), int interval_ms);
+bool SystemUtility_CreateCyclicThread(void *(*__start_routine) (void *), system_timer_t * timer, int interval_ms);
+
+/**
+ * @brief  Destory timer
+ * @note
+ * @param  timer: timer
+ * @retval None
+ */
+void SystemUtility_DestroyCyclicThread(system_timer_t * timer);
 
 /**
  * @brief  Init thread

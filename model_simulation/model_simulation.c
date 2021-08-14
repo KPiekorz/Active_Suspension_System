@@ -30,13 +30,18 @@ typedef enum
 
 sig_atomic_t simulation_iteration;
 
+/*** MODEL SIMULATION TIMER ***/
+
+system_timer_t simulation_timer;
+#define GetSimulationTimer()    (&simulation_timer)
+
 /*** MODEL_SIMULATION_INTERVAL_STEP ***/
 
 #define MODEL_SIMULATION_STEP_INTERVAL_MS       (5)
 
 /*** MODEL SIMULATION MESSAGE FIFO ***/
 
-#define MAX_SIMULATION_FLOAT_DATA_LEN           (5)
+#define MAX_SIMULATION_FLOAT_DATA_LEN           (10)
 
 const char *simulation_fifo_name = "simulation_fifo";
 
@@ -300,7 +305,7 @@ static void modelSimluation_InitMatrixC(void)
     C_matrix[0][4] = 0;
 }
 
-/*** STATE SPACE MODEL - STATES ***/
+/*** STATE SPACE MODEL - INITIAL STATES ***/
 
 #define INITIAL_STATES_ROW_SIZE 5
 #define INITIAL_STATES_COLUMN_SIZE 1
@@ -318,6 +323,26 @@ static void modelSimluation_InitMatrixINITIAL_STATES(void)
     INITIAL_STATES_matrix[2][0] = INIT_STATE_Y1 ;
     INITIAL_STATES_matrix[3][0] = INIT_STATE_Y1_DOT;
     INITIAL_STATES_matrix[4][0] = INIT_STATE_Y2;
+}
+
+/*** STATE SPACE MODEL - PREVIOUS STATES ***/
+
+#define XK_1_STATES_ROW_SIZE INITIAL_STATES_ROW_SIZE
+#define XK_1_STATES_COLUMN_SIZE INITIAL_STATES_COLUMN_SIZE
+
+static float XK_1_matrix[XK_1_STATES_ROW_SIZE][XK_1_STATES_COLUMN_SIZE];
+
+static Mat XK_1 = {(float *)XK_1_matrix, XK_1_STATES_ROW_SIZE, XK_1_STATES_COLUMN_SIZE};
+
+#define GetXK_1_STATES() (&XK_1)
+
+static void modelSimluation_InitMatrixXK_1(void)
+{
+    XK_1_matrix[0][0] = 0;
+    XK_1_matrix[1][0] = 0;
+    XK_1_matrix[2][0] = 0 ;
+    XK_1_matrix[3][0] = 0;
+    XK_1_matrix[4][0] = 0;
 }
 
 /*** INPUT MATRIX ***/
@@ -354,48 +379,70 @@ static void modelSimluation_SendModelStates(Mat *x, float road, int iteration)
     }
 }
 
-static void *modelSimluation_SimulationStepThread(void *cookie)
+static void modelSimluation_SimulionStart(void)
 {
-    /* init thread with good priority */
-    SystemUtility_InitThread(pthread_self(), thread_priority_max);
+    /* set simulation iteration variable to 0 */
+    simulation_iteration = 0;
 
+    /* Init road input */
+    modelSimluation_GenerateRoad(road_type_hills);
+
+    /* init simulation matrixes */
     modelSimluation_InitMatrixA();
     modelSimluation_InitMatrixB();
     modelSimluation_InitMatrixC();
     modelSimluation_InitMatrixINITIAL_STATES();
 
-    // x(k-1)
-    Mat *xk_1 = newmat(INITIAL_STATES_ROW_SIZE, INITIAL_STATES_COLUMN_SIZE, DEFAULT_VALUE);
+    /* init x(k-1) states matrix */
+    modelSimluation_InitMatrixXK_1();
+}
 
-    DELAY_S(1);
+static void modelSimluation_SimulationEnd(void)
+{
+    /* send states to control and gui process (Xd and Yd) */
+    modelSimluation_SendModelStates(GetXK_1_STATES(), road[SIM_TIME-1], (int)SIM_TIME-1);
 
-    // actual simulation
-    for (int i = 0; i < simulation_time; i++)
+    /* set simulation iteration variable to 0 */
+    simulation_iteration = 0;
+}
+
+static void *modelSimluation_SimulationStepThread(void *cookie)
+{
+    /* init thread with good priority */
+    SystemUtility_InitThread(pthread_self(), thread_priority_max);
+
+    if (simulation_iteration < 0 || simulation_iteration >= simulation_time)
     {
-        if (i == 0)
+        SystemUtility_DestroyCyclicThread(GetSimulationTimer());
+        return 0;
+    }
+
+    if (simulation_iteration < simulation_time)
+    {
+        if (simulation_iteration == 0)
         {
             pthread_mutex_lock(GetForceMutex());
 
             // set input matrix
             Mat *INPUT = newmat(INPUT_ROW_SIZE, INPUT_COLUMN_SIZE, DEFAULT_VALUE);
             set(INPUT, 1, 1, force);
-            set(INPUT, 2, 1, road[i]); // this will be update by mesage from control process
+            set(INPUT, 2, 1, road[simulation_iteration]); // this will be update by mesage from control process
 
             pthread_mutex_unlock(GetForceMutex());
 
             // send states to control and gui process (Xd and Yd)
-            modelSimluation_SendModelStates(GetINITIAL_STATES(), road[i], i);
+            modelSimluation_SendModelStates(GetINITIAL_STATES(), road[simulation_iteration], simulation_iteration);
 
             // calculate x
             Mat *a_x = multiply(GetA(), GetINITIAL_STATES());
             Mat *b_i = multiply(GetB(), INPUT);
 
             Mat *xk = sum(a_x, b_i);
-            set(xk_1, 1, 1, get(xk, 1, 1));
-            set(xk_1, 2, 1, get(xk, 2, 1));
-            set(xk_1, 3, 1, get(xk, 3, 1));
-            set(xk_1, 4, 1, get(xk, 4, 1));
-            set(xk_1, 5, 1, get(xk, 5, 1));
+            set(GetXK_1_STATES(), 1, 1, get(xk, 1, 1));
+            set(GetXK_1_STATES(), 2, 1, get(xk, 2, 1));
+            set(GetXK_1_STATES(), 3, 1, get(xk, 3, 1));
+            set(GetXK_1_STATES(), 4, 1, get(xk, 4, 1));
+            set(GetXK_1_STATES(), 5, 1, get(xk, 5, 1));
 
             freemat(INPUT);
             freemat(a_x);
@@ -409,23 +456,23 @@ static void *modelSimluation_SimulationStepThread(void *cookie)
             // set input matrix
             Mat *INPUT = newmat(INPUT_ROW_SIZE, INPUT_COLUMN_SIZE, DEFAULT_VALUE);
             set(INPUT, 1, 1, force);
-            set(INPUT, 2, 1, road[i]); // this will be update by mesage from control process
+            set(INPUT, 2, 1, road[simulation_iteration]); // this will be update by mesage from control process
 
             pthread_mutex_unlock(GetForceMutex());
 
             // send states to control and gui process (Xd and Yd)
-            modelSimluation_SendModelStates(xk_1, road[i], i);
+            modelSimluation_SendModelStates(GetXK_1_STATES(), road[simulation_iteration], simulation_iteration);
 
             // calculate x
-            Mat *a_x = multiply(GetA(), xk_1);
+            Mat *a_x = multiply(GetA(), GetXK_1_STATES());
             Mat *b_i = multiply(GetB(), INPUT);
 
             Mat *xk = sum(a_x, b_i);
-            set(xk_1, 1, 1, get(xk, 1, 1));
-            set(xk_1, 2, 1, get(xk, 2, 1));
-            set(xk_1, 3, 1, get(xk, 3, 1));
-            set(xk_1, 4, 1, get(xk, 4, 1));
-            set(xk_1, 5, 1, get(xk, 5, 1));
+            set(GetXK_1_STATES(), 1, 1, get(xk, 1, 1));
+            set(GetXK_1_STATES(), 2, 1, get(xk, 2, 1));
+            set(GetXK_1_STATES(), 3, 1, get(xk, 3, 1));
+            set(GetXK_1_STATES(), 4, 1, get(xk, 4, 1));
+            set(GetXK_1_STATES(), 5, 1, get(xk, 5, 1));
 
             freemat(INPUT);
             freemat(a_x);
@@ -433,36 +480,11 @@ static void *modelSimluation_SimulationStepThread(void *cookie)
             freemat(xk);
         }
 
-        DELAY_MS(MODEL_SIMULATION_STEP_INTERVAL_MS);
+        simulation_iteration++;
     }
 
-    // send states to control and gui process (Xd and Yd)
-    modelSimluation_SendModelStates(xk_1, road[SIM_TIME-1], (int)SIM_TIME-1);
-
-    freemat(xk_1);
-
     return 0;
 }
-
-
-
-
-
-
-
-static void *modelSimluation_TestThread(void *cookie)
-{
-    SystemUtility_InitThread(pthread_self(), thread_priority_max);
-
-    DEBUG_LOG_DEBUG("CYCLIC THREAD")
-
-    return 0;
-}
-
-
-
-
-
 
 static void *modelSimluation_ReceiveMessageThread(void *cookie)
 {
@@ -533,26 +555,23 @@ void ModelSimulation_Init(void)
 {
 #ifdef INIT_MODEL_SIMULATION
 
-    /* Init road input */
-    modelSimluation_GenerateRoad(road_type_hills);
+    DELAY_S(1);
 
-    // /* Init simulation of suspension */
-    // if (!SystemUtility_CreateThread(modelSimluation_SimulationStepThread))
-    // {
-    //     DEBUG_LOG_ERROR("[SIM] ModelSimulation_Init, Can't create simulaton step thread!");
-    // }
-
-    // /* Init receive message */
-    // if (!SystemUtility_CreateThread(modelSimluation_ReceiveMessageThread))
-    // {
-    //     DEBUG_LOG_ERROR("[SIM] ModelSimulation_Init, Can't create receive thread!");
-    // }
-
-    /* Init simulation of suspension */
-    if (!SystemUtility_CreateCyclicThread(modelSimluation_SimulationStepThread, 1000))
+    /* Init receive message */
+    if (!SystemUtility_CreateThread(modelSimluation_ReceiveMessageThread))
     {
-        DEBUG_LOG_ERROR("[SIM] ModelSimulation_Init, Can't create simulaton step thread!");
+        DEBUG_LOG_ERROR("[SIM] ModelSimulation_Init, Can't create receive thread!");
     }
+
+    modelSimluation_SimulionStart();
+
+    /* Perform simulation steps */
+    if (!SystemUtility_CreateCyclicThread(modelSimluation_SimulationStepThread, GetSimulationTimer(), MODEL_SIMULATION_STEP_INTERVAL_MS))
+    {
+        DEBUG_LOG_ERROR("[SIM] ModelSimulation_Init, Can't create simulaton cyclic step thread!");
+    }
+
+    modelSimluation_SimulationEnd();
 
     while (1)
     {

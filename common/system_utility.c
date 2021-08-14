@@ -282,7 +282,7 @@ bool SystemUtility_CreateThread(void *(*__start_routine) (void *))
     return true;
 }
 
-bool SystemUtility_CreateCyclicThread(void *(*__start_routine) (void *), int interval_ms)
+bool SystemUtility_CreateCyclicThread(void *(*__start_routine) (void *), system_timer_t * timer, int interval_ms)
 {
     int	status;
 
@@ -291,12 +291,6 @@ bool SystemUtility_CreateCyclicThread(void *(*__start_routine) (void *), int int
 
     /* Threads attributes variables */
     pthread_attr_t ThreadAttr;
-
-    /* Structure with time values */
-    struct itimerspec timerSpecStruct;
-
-    /* Timer variable */
-    timer_t	timerVar;
 
     /* Signal variable */
     struct	sigevent timerEvent;
@@ -311,7 +305,7 @@ bool SystemUtility_CreateCyclicThread(void *(*__start_routine) (void *), int int
 	timerEvent.sigev_notify_attributes = &ThreadAttr;
 
 	/* Create timer */
-  	if ((status = timer_create(CLOCK_REALTIME, &timerEvent, &timerVar)))
+  	if ((status = timer_create(CLOCK_REALTIME, &timerEvent, &(timer->timerVar))))
     {
   		DEBUG_LOG_ERROR("SystemUtility_CreateCyclicThread, Error creating timer : %d", status);
   		return false;
@@ -321,18 +315,28 @@ bool SystemUtility_CreateCyclicThread(void *(*__start_routine) (void *), int int
     interval_ms -= (sec * 1000);
     long int nano_sec = ((long int)1000000 * (long int)interval_ms);
 
-    DEBUG_LOG_DEBUG("TIMER SEC: %d, TIMER NSEC: %d", sec, (int)nano_sec);
-
   	/* Set up timer structure with time parameters */
-	timerSpecStruct.it_value.tv_sec = sec;
-	timerSpecStruct.it_value.tv_nsec = nano_sec;
-	timerSpecStruct.it_interval.tv_sec = sec;
-	timerSpecStruct.it_interval.tv_nsec = nano_sec;
+	timer->timerSpecStruct.it_value.tv_sec = sec;
+	timer->timerSpecStruct.it_value.tv_nsec = nano_sec;
+	timer->timerSpecStruct.it_interval.tv_sec = sec;
+	timer->timerSpecStruct.it_interval.tv_nsec = nano_sec;
 
 	/* Change timer parameters and run */
-  	timer_settime( timerVar, 0, &timerSpecStruct, NULL);
+  	timer_settime( timer->timerVar, 0, &(timer->timerSpecStruct), NULL);
 
     return true;
+}
+
+void SystemUtility_DestroyCyclicThread(system_timer_t * timer)
+{
+    /* Set up timer structure with time parameters */
+	timer->timerSpecStruct.it_value.tv_sec = 0;
+	timer->timerSpecStruct.it_value.tv_nsec = 0;
+	timer->timerSpecStruct.it_interval.tv_sec = 0;
+	timer->timerSpecStruct.it_interval.tv_nsec = 0;
+
+	/* Change timer parameters and stop */
+  	timer_settime( timer->timerVar, 0, &(timer->timerSpecStruct), NULL);
 }
 
 void SystemUtility_InitThread(pthread_t thread_id, system_thread_piority_t thread_priority)
