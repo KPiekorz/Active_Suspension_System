@@ -380,6 +380,12 @@ bool SystemUtility_SendMQueueMessage(system_mqueue_t * mqueue, void * message)
 
 bool SystemUtility_ReceiveMQueueMessage(system_mqueue_t * mqueue, void * message)
 {
+    if (sizeof(message) != mqueue->myMQueueAttr.mq_msgsize)
+    {
+        DEBUG_LOG_DEBUG("[SYSTEM] SystemUtility_SendMQueueMessage, Ivalid message size!");
+        return false;
+    }
+
     mq_receive(mqueue->myMQueue, (char *)message, sizeof(message), NULL);
 
     return true;

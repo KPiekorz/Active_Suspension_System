@@ -563,6 +563,7 @@ void ModelSimulation_Init(void)
         DEBUG_LOG_ERROR("[SIM] ModelSimulation_Init, Can't create receive thread!");
     }
 
+    /* START SIMULATION */
     modelSimluation_SimulionStart();
 
     /* Perform simulation steps */
@@ -571,6 +572,7 @@ void ModelSimulation_Init(void)
         DEBUG_LOG_ERROR("[SIM] ModelSimulation_Init, Can't create simulaton cyclic step thread!");
     }
 
+    /* STOP SIMULATION */
     modelSimluation_SimulationEnd();
 
     while (1)
@@ -591,7 +593,7 @@ void ModelSimulation_Destroy(void)
 
 void ModelSimulation_SendMessage(model_simulation_message_type_t message_type, float * data, int data_len)
 {
-        if (!SystemUtility_SendMessage(simulation_fifo_name, (int)message_type, data, data_len))
+    if (!SystemUtility_SendMessage(simulation_fifo_name, (int)message_type, data, data_len))
     {
         DEBUG_LOG_ERROR("[SIM] ModelSimulation_SendMessage, Can't send message to gui process!");
     }

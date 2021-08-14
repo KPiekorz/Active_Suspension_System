@@ -1,7 +1,14 @@
 #ifndef SENSORS_H
 #define SENSORS_H
 
-// #define INIT_SENSOR
+#define INIT_SENSORS
+
+/*** sensor mqueue message ***/
+
+typedef struct
+{
+	float state_X1;
+} sensor_mqueue_message_t;
 
 /**
  * @brief  Init sensor process
@@ -16,5 +23,13 @@ void Sensor_Init(void);
  * @retval None
  */
 void Sensor_Destroy(void);
+
+/**
+ * @brief  Send mqueue to sensor process
+ * @note
+ * @param  message: message
+ * @retval None
+ */
+void Sensor_SendMQueueMessage(sensor_mqueue_message_t * message);
 
 #endif /* SENSORS_H */
