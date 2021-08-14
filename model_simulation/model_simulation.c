@@ -181,7 +181,8 @@ static void modelSimluation_GenerateRoad(road_type_t type)
             modelSimluation_GenerateImpuls();
         break;
         case road_type_ramp:
-            modelSimluation_GenerateRamp();
+            // modelSimluation_GenerateRamp();
+            DEBUG_LOG_ERROR("SIM] modelSimluation_GenerateRoad, road not implemented!");
         break;
         case road_type_hills:
             modelSimluation_GenerateHills();
