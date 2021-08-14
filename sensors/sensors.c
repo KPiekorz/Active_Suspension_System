@@ -6,24 +6,25 @@
 
 /*** message queue for receive message ***/
 
-system_mqueue_t sensor_mqueue;
-#define GetSensorMQueue()	(&sensor_mqueue)
-
-const char * sensor_queue_name = "/sensor_queue";
-
 #define MAX_SENSOR_MQUEUE_LEN	10
+
+const struct mq_attr myMQueueAttr = {.mq_maxmsg = MAX_SENSOR_MQUEUE_LEN, .mq_msgsize = sizeof(sensor_mqueue_message_t)};
+const system_mqueue_t sensor_mqueue = {.myMQueueAttr = &myMQueueAttr, .queue_name = "/sensor_queue"};
+#define GetSensorMQueue()	(&sensor_mqueue)
 
 /*** STATIC FUNCTION ***/
 
 static void *sensors_ReceiveMessageThread(void *cookie)
 {
+	/* init sensor receive thread */
 	SystemUtility_InitThread(pthread_self(), thread_priority_high);
 
+	/* mqueu mesage to sensor process */
 	sensor_mqueue_message_t message;
 
 	while(1)
 	{
-		if (SystemUtility_ReceiveMQueueMessage(GetSensorMQueue(), &message))
+		if (SystemUtility_ReceiveMQueueMessage(GetSensorMQueue(), &message, sizeof(message)))
 		{
 			DEBUG_LOG_DEBUG("SENSOR MSG: %f", message.state_X1);
 		}
@@ -41,12 +42,6 @@ static void *sensors_ReceiveMessageThread(void *cookie)
 void Sensor_Init(void)
 {
 #ifdef INIT_SENSORS
-
-	/* create mqueue for receiving messages */
-	if (!SystemUtility_CreateMQueue(GetSensorMQueue(), sensor_queue_name, MAX_SENSOR_MQUEUE_LEN, sizeof(sensor_mqueue_message_t)))
-	{
-        DEBUG_LOG_ERROR("[SENSOR] Sensor_Init, Can't create mqueue!");
-	}
 
     /* Init receive message */
 	if (!SystemUtility_CreateThread(sensors_ReceiveMessageThread))
@@ -67,9 +62,9 @@ void Sensor_Destroy(void)
 
 }
 
-void Sensor_SendMQueueMessage(sensor_mqueue_message_t * message)
+void Sensor_SendMQueueMessage(sensor_mqueue_message_t * message,  size_t message_size)
 {
-    if (!SystemUtility_SendMQueueMessage(GetSensorMQueue(), message))
+    if (!SystemUtility_SendMQueueMessage(GetSensorMQueue(), message, message_size))
     {
         DEBUG_LOG_ERROR("[SENSOR] Sensor_SendMQueueMessage, Can't send mqueue message sensor process!");
     }

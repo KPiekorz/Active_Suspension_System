@@ -370,8 +370,14 @@ static void modelSimluation_SendModelStates(Mat *x, float road, int iteration)
 
         pthread_mutex_unlock(GetForceMutex());
 
+        /* send fifo messages */
         Gui_SendMessage(gui_message_model_simulation_data, model_simulation_data, MODEL_SIMULATION_DATA_SIZE);
         Control_SendMessage(control_message_model_states, model_simulation_data, MODEL_SIMULATION_DATA_SIZE);
+
+        /* send mqueue messages */
+        sensor_mqueue_message_t sensor_message;
+        sensor_message.state_X1 = get(x, 1, 1);
+        Sensor_SendMQueueMessage(&sensor_message, sizeof(sensor_message));
     }
     else
     {

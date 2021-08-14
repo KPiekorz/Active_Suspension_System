@@ -1,6 +1,8 @@
 #ifndef SENSORS_H
 #define SENSORS_H
 
+#include <stdlib.h>
+
 #define INIT_SENSORS
 
 /*** sensor mqueue message ***/
@@ -30,6 +32,6 @@ void Sensor_Destroy(void);
  * @param  message: message
  * @retval None
  */
-void Sensor_SendMQueueMessage(sensor_mqueue_message_t * message);
+void Sensor_SendMQueueMessage(sensor_mqueue_message_t * message, size_t message_size);
 
 #endif /* SENSORS_H */

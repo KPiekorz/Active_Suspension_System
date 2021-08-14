@@ -34,8 +34,7 @@ typedef struct
 
 typedef struct
 {
-    mqd_t myMQueue;
-    struct	mq_attr myMQueueAttr;
+    const struct mq_attr * myMQueueAttr;
     const char * queue_name;
 } system_mqueue_t;
 
@@ -208,39 +207,23 @@ void SystemUtility_DestroyCyclicThread(system_timer_t * timer);
 void SystemUtility_InitThread(pthread_t thread_id, system_thread_piority_t thread_priority);
 
 /**
- * @brief  Create message queueu to send message to threads or other process
- * @note
- * @param  queue_name: queue name
- * @param  max_messge_num: max number of message in queue
- * @param  message_size: size of one message in queue
- * @retval true if queue is successful created, otherwise false
- */
-bool SystemUtility_CreateMQueue(system_mqueue_t * mqueue, const char * queue_name, int max_messge_num, size_t message_size);
-
-/**
- * @brief  Destroy queue
- * @note
- * @param  mqueue: mqueue
- * @retval None
- */
-void SystemUtility_DestroyMQueue(system_mqueue_t * mqueue);
-
-/**
  * @brief  Send message with queue
  * @note   Type of message send in specified queue is defined by queue name
  * @param  queue_name: queue name
  * @param  message: mesage to send
+ * @param  message_size: message size
  * @retval true if message successfuly send, otherwise false
  */
-bool SystemUtility_SendMQueueMessage(system_mqueue_t * mqueue, void * message);
+bool SystemUtility_SendMQueueMessage(const system_mqueue_t * mqueue, void * message, size_t message_size);
 
 /**
  * @brief  Receive message from queue
  * @note   Type of message send in specified queue is defined by queue name
  * @param  queue_name: queue name
  * @param  message: message received with queue
+ * @param  message_size: message size
  * @retval true if successful received message, otherwise false
  */
-bool SystemUtility_ReceiveMQueueMessage(system_mqueue_t * mqueue, void * message);
+bool SystemUtility_ReceiveMQueueMessage(const system_mqueue_t * mqueue, void * message, size_t message_size);
 
 #endif  /* SYSTEM_UTILITY_H */

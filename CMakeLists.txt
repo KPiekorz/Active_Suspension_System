@@ -32,4 +32,4 @@ add_executable(automatic_suspension_system main.c)
 
 find_library(LIBRT rt)
 
-target_link_libraries(automatic_suspension_system system_process sensors model_simulation control gui matrix_lib PID ${LIBRT} ${PYTHON_LIBRARIES})
+target_link_libraries(automatic_suspension_system system_process model_simulation control gui sensors matrix_lib PID ${LIBRT} ${PYTHON_LIBRARIES})

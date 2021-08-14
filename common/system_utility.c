@@ -343,50 +343,48 @@ void SystemUtility_InitThread(pthread_t thread_id, system_thread_piority_t threa
     systemUtility_SetThreadPriority(thread_id, thread_priority);
 }
 
-bool SystemUtility_CreateMQueue(system_mqueue_t * mqueue, const char * queue_name, int max_messge_num, size_t message_size)
+bool SystemUtility_SendMQueueMessage(const system_mqueue_t * mqueue, void * message, size_t message_size)
 {
-    mqueue->queue_name = queue_name;
-    mqueue->myMQueueAttr.mq_maxmsg = max_messge_num;
-    mqueue->myMQueueAttr.mq_msgsize = message_size;
-
-    /* Create Message Queue */
-	if ((mqueue->myMQueue = mq_open(queue_name, O_CREAT | O_RDWR, 0644, &(mqueue->myMQueueAttr))) == -1)
+    if (message_size != mqueue->myMQueueAttr->mq_msgsize)
     {
-		DEBUG_LOG_ERROR("[SYSTEM] SystemUtility_CreateMQueue, Creation of the mqueues failed!");
+        DEBUG_LOG_DEBUG("[SYSTEM] SystemUtility_SendMQueueMessage, Ivalid message size!");
+        return false;
+    }
+
+    mqd_t myMQueue;
+     /* Create Message Queue */
+	if ((myMQueue = mq_open(mqueue->queue_name, O_CREAT | O_RDWR, 0644, &(mqueue->myMQueueAttr))) == -1)
+    {
+		DEBUG_LOG_ERROR("[SYSTEM] SystemUtility_SendMQueueMessage, Creation of the mqueues failed!");
 		return false;
 	}
 
-    return true;
-}
+	mq_send(myMQueue, (const char *)message, message_size, 0);
 
-void SystemUtility_DestroyMQueue(system_mqueue_t * mqueue)
-{
-    /* Close Message Queue */
-	mq_close(mqueue->myMQueue);
-}
-
-bool SystemUtility_SendMQueueMessage(system_mqueue_t * mqueue, void * message)
-{
-    if (sizeof(message) != mqueue->myMQueueAttr.mq_msgsize)
-    {
-        DEBUG_LOG_DEBUG("[SYSTEM] SystemUtility_SendMQueueMessage, Ivalid message size!");
-        return false;
-    }
-
-	mq_send(mqueue->myMQueue, (const char *)message, sizeof(message), 0);
+    mq_close(myMQueue);
 
     return true;
 }
 
-bool SystemUtility_ReceiveMQueueMessage(system_mqueue_t * mqueue, void * message)
+bool SystemUtility_ReceiveMQueueMessage(const system_mqueue_t * mqueue, void * message, size_t message_size)
 {
-    if (sizeof(message) != mqueue->myMQueueAttr.mq_msgsize)
+    if (message_size != mqueue->myMQueueAttr->mq_msgsize)
     {
-        DEBUG_LOG_DEBUG("[SYSTEM] SystemUtility_SendMQueueMessage, Ivalid message size!");
+        DEBUG_LOG_DEBUG("[SYSTEM] SystemUtility_ReceiveMQueueMessage, Ivalid message size!");
         return false;
     }
 
-    mq_receive(mqueue->myMQueue, (char *)message, sizeof(message), NULL);
+    mqd_t myMQueue;
+     /* Create Message Queue */
+	if ((myMQueue = mq_open(mqueue->queue_name, O_CREAT | O_RDWR, 0644, &(mqueue->myMQueueAttr))) == -1)
+    {
+		DEBUG_LOG_ERROR("[SYSTEM] SystemUtility_ReceiveMQueueMessage, Creation of the mqueues failed!");
+		return false;
+	}
+
+    mq_receive(myMQueue, (char *)message, message_size, NULL);
+
+    mq_close(myMQueue);
 
     return true;
 }
