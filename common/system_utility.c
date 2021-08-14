@@ -125,7 +125,7 @@ bool SystemUtility_ReceiveMessage(const char *fifo_name, int *message_type, floa
     /* Open FIFO file */
     if ((fd = open(fifo_name, O_RDONLY)) == -1)
     {
-        DEBUG_LOG_ERROR("[SYSTEM] Cannot open FIFO.");
+        DEBUG_LOG_ERROR("[SYSTEM] SystemUtility_ReceiveMessage, Cannot open FIFO.");
         return false;
     }
 
@@ -135,7 +135,7 @@ bool SystemUtility_ReceiveMessage(const char *fifo_name, int *message_type, floa
     /* Read data from FIFO */
     if ((bytes_read = read(fd, buff, sizeof(buff))) == -1)
     {
-        DEBUG_LOG_ERROR("[SYSTEM] Something is wrong with FIFO.");
+        DEBUG_LOG_ERROR("[SYSTEM] SystemUtility_ReceiveMessage, Something is wrong with FIFO.");
         return false;
     }
 
@@ -148,11 +148,6 @@ bool SystemUtility_ReceiveMessage(const char *fifo_name, int *message_type, floa
     /* If there is message print it */
     if (bytes_read > 2)
     {
-        // DEBUG_LOG_DEBUG("[SYSTEM] SystemUtility_ReceiveMessage, type: %d, len: %d, float data len: %d",
-        //                 buff[SYSTEM_MESSAGE_TYPE_OFFSET],
-        //                 buff[SYSTEM_MESSAGE_PAYLOAD_SIZE_OFFSET],
-        //                 *float_data_len);
-
         if (GET_FLOAT_DATA_LEN(buff[SYSTEM_MESSAGE_PAYLOAD_SIZE_OFFSET]) > *float_data_len)
         {
             return false;
