@@ -7,6 +7,9 @@
 #include <error.h>
 #include <fcntl.h>
 #include <string.h>
+#include <signal.h>
+#include <time.h>
+#include <mqueue.h>
 
 #define FLOAT_SIZE (4)
 
@@ -65,11 +68,6 @@ bool SystemUtility_CreateMessageFifo(const char *fifo_name)
     }
 
     return true;
-}
-
-void SystemUtility_DeleteMessageFifo(const char * fifo_name)
-{
-    // delete fifo
 }
 
 bool SystemUtility_SendMessage(const char *fifo_name, int message_type, float *float_data, const int float_data_len)
@@ -286,6 +284,54 @@ bool SystemUtility_CreateThread(void *(*__start_routine) (void *))
 
 bool SystemUtility_CreateCyclicThread(void *(*__start_routine) (void *), int interval_ms)
 {
+    int	status;
+
+    /* Threads variables */
+    pthread_t Thread;
+
+    /* Threads attributes variables */
+    pthread_attr_t ThreadAttr;
+
+    /* Structure with time values */
+    struct itimerspec timerSpecStruct;
+
+    /* Timer variable */
+    timer_t	timerVar;
+
+    /* Signal variable */
+    struct	sigevent timerEvent;
+
+    /* Initialize threads attributes structures for FIFO scheduling */
+	pthread_attr_init(&ThreadAttr);
+	pthread_attr_setschedpolicy(&ThreadAttr, SCHED_FIFO);
+
+	/* Initialize event to send signal SIGRTMAX */
+	timerEvent.sigev_notify = SIGEV_THREAD;
+    timerEvent.sigev_notify_function = (void *)__start_routine;
+	timerEvent.sigev_notify_attributes = &ThreadAttr;
+
+	/* Create timer */
+  	if ((status = timer_create(CLOCK_REALTIME, &timerEvent, &timerVar)))
+    {
+  		DEBUG_LOG_ERROR("SystemUtility_CreateCyclicThread, Error creating timer : %d", status);
+  		return false;
+  	}
+
+    int sec = (int)((float)interval_ms / (float)1000);
+    interval_ms -= (sec * 1000);
+    long int nano_sec = ((long int)1000000 * (long int)interval_ms);
+
+    DEBUG_LOG_DEBUG("TIMER SEC: %d, TIMER NSEC: %d", sec, (int)nano_sec);
+
+  	/* Set up timer structure with time parameters */
+	timerSpecStruct.it_value.tv_sec = sec;
+	timerSpecStruct.it_value.tv_nsec = nano_sec;
+	timerSpecStruct.it_interval.tv_sec = sec;
+	timerSpecStruct.it_interval.tv_nsec = nano_sec;
+
+	/* Change timer parameters and run */
+  	timer_settime( timerVar, 0, &timerSpecStruct, NULL);
+
     return true;
 }
 

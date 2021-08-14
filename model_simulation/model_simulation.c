@@ -444,6 +444,26 @@ static void *modelSimluation_SimulationStepThread(void *cookie)
     return 0;
 }
 
+
+
+
+
+
+
+static void *modelSimluation_TestThread(void *cookie)
+{
+    SystemUtility_InitThread(pthread_self(), thread_priority_max);
+
+    DEBUG_LOG_DEBUG("CYCLIC THREAD")
+
+    return 0;
+}
+
+
+
+
+
+
 static void *modelSimluation_ReceiveMessageThread(void *cookie)
 {
     /* init thread with good priority */
@@ -516,16 +536,22 @@ void ModelSimulation_Init(void)
     /* Init road input */
     modelSimluation_GenerateRoad(road_type_hills);
 
+    // /* Init simulation of suspension */
+    // if (!SystemUtility_CreateThread(modelSimluation_SimulationStepThread))
+    // {
+    //     DEBUG_LOG_ERROR("[SIM] ModelSimulation_Init, Can't create simulaton step thread!");
+    // }
+
+    // /* Init receive message */
+    // if (!SystemUtility_CreateThread(modelSimluation_ReceiveMessageThread))
+    // {
+    //     DEBUG_LOG_ERROR("[SIM] ModelSimulation_Init, Can't create receive thread!");
+    // }
+
     /* Init simulation of suspension */
-    if (!SystemUtility_CreateThread(modelSimluation_SimulationStepThread))
+    if (!SystemUtility_CreateCyclicThread(modelSimluation_SimulationStepThread, 1000))
     {
         DEBUG_LOG_ERROR("[SIM] ModelSimulation_Init, Can't create simulaton step thread!");
-    }
-
-    /* Init receive message */
-    if (!SystemUtility_CreateThread(modelSimluation_ReceiveMessageThread))
-    {
-        DEBUG_LOG_ERROR("[SIM] ModelSimulation_Init, Can't create receive thread!");
     }
 
     while (1)

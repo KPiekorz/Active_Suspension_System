@@ -104,14 +104,6 @@ typedef uint8_t byte; //unsigned int //char // uint8_t
 bool SystemUtility_CreateMessageFifo(const char * fifo_name);
 
 /**
- * @brief  Delete message fifo
- * @note
- * @param  fifo_name: fifo name
- * @retval None
- */
-void SystemUtility_DeleteMessageFifo(const char * fifo_name);
-
-/**
  * @brief  Send messages to other process created in system.
  * @note
  * @param  fifo_name: fifo queue name
