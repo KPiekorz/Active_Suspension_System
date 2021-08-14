@@ -104,6 +104,14 @@ typedef uint8_t byte; //unsigned int //char // uint8_t
 bool SystemUtility_CreateMessageFifo(const char * fifo_name);
 
 /**
+ * @brief  Delete message fifo
+ * @note
+ * @param  fifo_name: fifo name
+ * @retval None
+ */
+void SystemUtility_DeleteMessageFifo(const char * fifo_name);
+
+/**
  * @brief  Send messages to other process created in system.
  * @note
  * @param  fifo_name: fifo queue name
@@ -165,11 +173,47 @@ int SystemUtility_GetFloatArrayFromByteArray(byte * src, const int src_len, floa
 bool SystemUtility_CreateThread(void *(*__start_routine) (void *));
 
 /**
+ * @brief  Create cyclic threa
+ * @note
+ * @param  __start_routine: thread function
+ * @retval true if successfuly cyclic thread is created, otherwise false
+ */
+bool SystemUtility_CreateCyclicThread(void *(*__start_routine) (void *), int interval_ms);
+
+/**
  * @brief  Init thread
  * @note
  * @param  thread_id: thread id
  * @retval None
  */
 void SystemUtility_InitThread(pthread_t thread_id, system_thread_piority_t thread_priority);
+
+/**
+ * @brief  Create message queueu to send message to threads or other process
+ * @note
+ * @param  queue_name: queue name
+ * @param  max_messge_num: max number of message in queue
+ * @param  message_size: size of one message in queue
+ * @retval true if queue is successful created, otherwise false
+ */
+bool SystemUtility_CreateMQueue(const char * queue_name, int max_messge_num, size_t message_size);
+
+/**
+ * @brief  Send message with queue
+ * @note   Type of message send in specified queue is defined by queue name
+ * @param  queue_name: queue name
+ * @param  message: mesage to send
+ * @retval true if message successfuly send, otherwise false
+ */
+bool SystemUtility_SendMQueueMessage(const char * queue_name, void * message);
+
+/**
+ * @brief  Receive message from queue
+ * @note   Type of message send in specified queue is defined by queue name
+ * @param  queue_name: queue name
+ * @param  message: message received with queue
+ * @retval true if successful received message, otherwise false
+ */
+bool SystemUtility_ReceiveMQueueMessage(const char * queue_name, void * message);
 
 #endif  /* SYSTEM_UTILITY_H */

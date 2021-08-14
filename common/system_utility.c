@@ -67,6 +67,11 @@ bool SystemUtility_CreateMessageFifo(const char *fifo_name)
     return true;
 }
 
+void SystemUtility_DeleteMessageFifo(const char * fifo_name)
+{
+    // delete fifo
+}
+
 bool SystemUtility_SendMessage(const char *fifo_name, int message_type, float *float_data, const int float_data_len)
 {
     // copy float to byte array and send byte array
@@ -279,7 +284,27 @@ bool SystemUtility_CreateThread(void *(*__start_routine) (void *))
     return true;
 }
 
+bool SystemUtility_CreateCyclicThread(void *(*__start_routine) (void *), int interval_ms)
+{
+    return true;
+}
+
 void SystemUtility_InitThread(pthread_t thread_id, system_thread_piority_t thread_priority)
 {
     systemUtility_SetThreadPriority(thread_id, thread_priority);
+}
+
+bool SystemUtility_CreateMQueue(const char * queue_name, int max_messge_num, size_t message_size)
+{
+    return true;
+}
+
+bool SystemUtility_SendMQueueMessage(const char * queue_name, void * message)
+{
+    return true;
+}
+
+bool SystemUtility_ReceiveMQueueMessage(const char * queue_name, void * message)
+{
+    return true;
 }

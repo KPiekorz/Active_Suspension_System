@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <stdint.h>
 #include <string.h>
+#include <signal.h>
 
 #include "system_utility.h"
 #include "model_simulation.h"
@@ -24,6 +25,10 @@ typedef enum
     road_type_hills,
 
 } road_type_t;
+
+/*** MODEL SIMULATION INTERATION ***/
+
+sig_atomic_t simulation_iteration;
 
 /*** MODEL_SIMULATION_INTERVAL_STEP ***/
 
