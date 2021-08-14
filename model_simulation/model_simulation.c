@@ -351,7 +351,7 @@ static void modelSimluation_SendModelStates(Mat *x, float road, int iteration)
 static void *modelSimluation_SimulationStepThread(void *cookie)
 {
     /* init thread with good priority */
-    SystemUtility_InitThread(pthread_self());
+    SystemUtility_InitThread(pthread_self(), thread_priority_max);
 
     modelSimluation_InitMatrixA();
     modelSimluation_InitMatrixB();
@@ -441,7 +441,7 @@ static void *modelSimluation_SimulationStepThread(void *cookie)
 static void *modelSimluation_ReceiveMessageThread(void *cookie)
 {
     /* init thread with good priority */
-    SystemUtility_InitThread(pthread_self());
+    SystemUtility_InitThread(pthread_self(), thread_priority_high);
 
     /* create message fifo queue */
     if (!SystemUtility_CreateMessageFifo(simulation_fifo_name))

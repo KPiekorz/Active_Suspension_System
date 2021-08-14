@@ -136,7 +136,7 @@ static void control_PIDControler(float * float_data, int float_data_len)
 static void *control_ReceiveMessageThread(void *cookie)
 {
     /* init thread with good priority */
-    SystemUtility_InitThread(pthread_self());
+    SystemUtility_InitThread(pthread_self(), thread_priority_high);
 
     /* create message fifo queue */
     if (!SystemUtility_CreateMessageFifo(control_fifo_name))

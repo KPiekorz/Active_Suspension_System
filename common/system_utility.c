@@ -12,6 +12,47 @@
 
 /*** STATIC FUNCTION ***/
 
+static void systemUtility_SetThreadPriority(pthread_t thread_id, system_thread_piority_t thread_priority)
+{
+    /* Scheduling policy: FIFO or RR (thsi is the only rtos scheduling) */
+    int policy;
+
+    /* Structure of other thread parameters */
+    struct sched_param param;
+
+    /* Read modify and set new thread priority */
+    pthread_getschedparam(thread_id, &policy, &param);
+
+    int max_priority = sched_get_priority_max(policy);
+    int min_priority = sched_get_priority_min(policy);
+
+    switch (thread_priority)
+    {
+        case thread_priority_min:
+            param.sched_priority = sched_get_priority_min(policy);
+        break;
+        case thread_priority_low:
+            param.sched_priority = (int)((float)((float)max_priority-(float)min_priority)*(float)0.25);
+        break;
+        case thread_priority_medium:
+            param.sched_priority = (int)((float)((float)max_priority-(float)min_priority)*(float)(0.5));
+        break;
+        case thread_priority_high:
+            param.sched_priority = (int)((float)((float)max_priority-(float)min_priority)*(float)0.75);
+        break;
+        case thread_priority_max:
+            param.sched_priority = sched_get_priority_max(policy);
+        break;
+        default:
+            DEBUG_LOG_ERROR("[SYSTEM] Invalid thread piority!")
+        break;
+    }
+
+    // DEBUG_LOG_DEBUG("NUM PIOR: %d, PIOR VALUE: %d", thread_priority, param.sched_priority);
+
+    pthread_setschedparam(thread_id, policy, &param);
+}
+
 /*** GLOBAL FUNCTION ***/
 
 bool SystemUtility_CreateMessageFifo(const char *fifo_name)
@@ -243,15 +284,7 @@ bool SystemUtility_CreateThread(void *(*__start_routine) (void *))
     return true;
 }
 
-void SystemUtility_InitThread(pthread_t thread_id)
+void SystemUtility_InitThread(pthread_t thread_id, system_thread_piority_t thread_priority)
 {
-    /* Scheduling policy: FIFO or RR */
-    int policy;
-    /* Structure of other thread parameters */
-    struct sched_param param;
-
-    /* Read modify and set new thread priority */
-    pthread_getschedparam(thread_id, &policy, &param);
-    param.sched_priority = sched_get_priority_max(policy);
-    pthread_setschedparam(thread_id, policy, &param);
+    systemUtility_SetThreadPriority(thread_id, thread_priority);
 }

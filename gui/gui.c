@@ -104,7 +104,7 @@ static void gui_RunGui(void)
 static void * gui_ReceiveMessageThread(void *cookie)
 {
     /* init thread with good priority */
-    SystemUtility_InitThread(pthread_self());
+    SystemUtility_InitThread(pthread_self(), thread_priority_high);
 
     /* create message fifo queue */
     if (SystemUtility_CreateMessageFifo(gui_fifo_name) == false)
@@ -154,7 +154,7 @@ static void * gui_ReceiveMessageThread(void *cookie)
 static void * gui_UdpClientThread(void *cookie)
 {
     /* init thread with good priority */
-    SystemUtility_InitThread(pthread_self());
+    SystemUtility_InitThread(pthread_self(), thread_priority_medium);
 
     int my_socket = INVALID_SOCKET;
     if (false == gui_UdpClientCreate(&my_socket))

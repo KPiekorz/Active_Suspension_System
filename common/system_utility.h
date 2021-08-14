@@ -10,6 +10,17 @@
 #include <string.h>
 #include <stdint.h>
 
+/*** SYSYTEM THREAD PRIORITY ***/
+
+typedef enum
+{
+    thread_priority_min,
+    thread_priority_low,
+    thread_priority_medium,
+    thread_priority_high,
+    thread_priority_max
+} system_thread_piority_t;
+
 /*** SYSTEM EVENT LOOP DELAY ***/
 
 #define SYSTEM_EVENT_LOOP_DELAY_S                   (10)
@@ -159,6 +170,6 @@ bool SystemUtility_CreateThread(void *(*__start_routine) (void *));
  * @param  thread_id: thread id
  * @retval None
  */
-void SystemUtility_InitThread(pthread_t thread_id);
+void SystemUtility_InitThread(pthread_t thread_id, system_thread_piority_t thread_priority);
 
 #endif  /* SYSTEM_UTILITY_H */
