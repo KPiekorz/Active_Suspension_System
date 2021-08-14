@@ -17,8 +17,6 @@ road = []
 control_force = []
 model_y_state = []
 
-avergae_kpi = [0]
-
 class MplCanvas(FigureCanvasQTAgg):
 
     def __init__(self, parent=None, width=5, height=4, dpi=100):
@@ -172,8 +170,9 @@ class GUI(QtWidgets.QMainWindow):
         # plot model states
         global model_y_state
         if len(model_y_state) > 1:
-            global avergae_kpi
-            avergae_kpi.append(abs(model_y_state[len(model_y_state)-1] - model_y_state[len(model_y_state)-2]))
+            avergae_kpi = [0]
+            for i in range(1, len(model_y_state)):
+                avergae_kpi.append(abs(model_y_state[i] - model_y_state[i-1]))
             new_kpi = "New kpi value model state Y: "  + str(statistics.mean(avergae_kpi))
             self.kpi_label.setText(new_kpi)
             QApplication.processEvents()
