@@ -33,7 +33,7 @@ PIDController pid = { PID_KP, PID_KI, PID_KD, PID_TAU, PID_LIM_MIN, PID_LIM_MAX,
 /* MATRIX FOR CONTROLER K */
 
 #define K_ROW_SIZE 1
-#define K_COLUMN_SIZE 4
+#define K_COLUMN_SIZE 5
 
 static float K_matrix[K_ROW_SIZE][K_COLUMN_SIZE];
 

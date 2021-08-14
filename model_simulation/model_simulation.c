@@ -451,7 +451,7 @@ static void *modelSimluation_ReceiveMessageThread(void *cookie)
         return 0;
     }
 
-    gui_message_type_t message_type = simulation_message_unknown;
+    gui_message_type_t message_type = gui_message_unknown;
     int float_data_len = MAX_SIMULATION_FLOAT_DATA_LEN;
     float float_data[MAX_SIMULATION_FLOAT_DATA_LEN];
 
@@ -469,7 +469,7 @@ static void *modelSimluation_ReceiveMessageThread(void *cookie)
                 case simulation_message_control_force:
                     pthread_mutex_lock(GetForceMutex());
 
-                    if (float_data_len = 1)
+                    if (float_data_len == 1)
                     {
                         #ifdef INCLUDE_CONTROLER
 
@@ -483,8 +483,6 @@ static void *modelSimluation_ReceiveMessageThread(void *cookie)
 
                             // DEBUG_LOG_DEBUG("[SIM] FORCE: %f", force);
 
-                        #else
-                            // force = 0; // last control force value add to last force value
                         #endif /* INCLUDE_CONTROLER */
                     }
 
