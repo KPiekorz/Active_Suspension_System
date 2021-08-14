@@ -1,3 +1,7 @@
+/*
+* Senssor process is for operate sensors, which are mounted on car. Now for simulation, model states will be used as sensor output for control algoritm.
+*/
+
 #include "sensors.h"
 #include <stdio.h>
 

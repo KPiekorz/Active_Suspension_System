@@ -12,7 +12,7 @@ const char *control_fifo_name = "control_fifo";
 
 /* PID CONTROLLER PARAMETERS */
 
-#define PID_KP              200          // default 2000
+#define PID_KP              2000          // default 2000
 #define PID_KI              100          // defualt 10
 #define PID_KD              2500
 
