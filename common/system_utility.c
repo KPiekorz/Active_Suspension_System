@@ -9,7 +9,6 @@
 #include <string.h>
 #include <signal.h>
 #include <time.h>
-#include <mqueue.h>
 
 #define FLOAT_SIZE (4)
 
@@ -344,17 +343,44 @@ void SystemUtility_InitThread(pthread_t thread_id, system_thread_piority_t threa
     systemUtility_SetThreadPriority(thread_id, thread_priority);
 }
 
-bool SystemUtility_CreateMQueue(const char * queue_name, int max_messge_num, size_t message_size)
+bool SystemUtility_CreateMQueue(system_mqueue_t * mqueue, const char * queue_name, int max_messge_num, size_t message_size)
 {
+    mqueue->queue_name = queue_name;
+    mqueue->myMQueueAttr.mq_maxmsg = max_messge_num;
+    mqueue->myMQueueAttr.mq_msgsize = message_size;
+
+    /* Create Message Queue */
+	if ((mqueue->myMQueue = mq_open(queue_name, O_CREAT | O_RDWR, 0644, &(mqueue->myMQueueAttr))) == -1)
+    {
+		DEBUG_LOG_ERROR("[SYSTEM] SystemUtility_CreateMQueue, Creation of the mqueues failed!");
+		return false;
+	}
+
     return true;
 }
 
-bool SystemUtility_SendMQueueMessage(const char * queue_name, void * message)
+void SystemUtility_DestroyMQueue(system_mqueue_t * mqueue)
 {
+    /* Close Message Queue */
+	mq_close(mqueue->myMQueue);
+}
+
+bool SystemUtility_SendMQueueMessage(system_mqueue_t * mqueue, void * message)
+{
+    if (sizeof(message) != mqueue->myMQueueAttr.mq_msgsize)
+    {
+        DEBUG_LOG_DEBUG("[SYSTEM] SystemUtility_SendMQueueMessage, Ivalid message size!");
+        return false;
+    }
+
+	mq_send(mqueue->myMQueue, (const char *)message, sizeof(message), 0);
+
     return true;
 }
 
-bool SystemUtility_ReceiveMQueueMessage(const char * queue_name, void * message)
+bool SystemUtility_ReceiveMQueueMessage(system_mqueue_t * mqueue, void * message)
 {
+    mq_receive(mqueue->myMQueue, (char *)message, sizeof(message), NULL);
+
     return true;
 }

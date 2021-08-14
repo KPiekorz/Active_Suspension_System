@@ -9,6 +9,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <stdint.h>
+#include <mqueue.h>
 
 /*** SYSYTEM THREAD PRIORITY ***/
 
@@ -25,13 +26,18 @@ typedef enum
 
 typedef struct
 {
-    /* Structure with time values */
     struct itimerspec timerSpecStruct;
-
-    /* Timer variable */
     timer_t	timerVar;
-
 } system_timer_t;
+
+/*** MQUEUE TYPEDEF ***/
+
+typedef struct
+{
+    mqd_t myMQueue;
+    struct	mq_attr myMQueueAttr;
+    const char * queue_name;
+} system_mqueue_t;
 
 /*** SYSTEM EVENT LOOP DELAY ***/
 
@@ -209,7 +215,15 @@ void SystemUtility_InitThread(pthread_t thread_id, system_thread_piority_t threa
  * @param  message_size: size of one message in queue
  * @retval true if queue is successful created, otherwise false
  */
-bool SystemUtility_CreateMQueue(const char * queue_name, int max_messge_num, size_t message_size);
+bool SystemUtility_CreateMQueue(system_mqueue_t * mqueue, const char * queue_name, int max_messge_num, size_t message_size);
+
+/**
+ * @brief  Destroy queue
+ * @note
+ * @param  mqueue: mqueue
+ * @retval None
+ */
+void SystemUtility_DestroyMQueue(system_mqueue_t * mqueue);
 
 /**
  * @brief  Send message with queue
@@ -218,7 +232,7 @@ bool SystemUtility_CreateMQueue(const char * queue_name, int max_messge_num, siz
  * @param  message: mesage to send
  * @retval true if message successfuly send, otherwise false
  */
-bool SystemUtility_SendMQueueMessage(const char * queue_name, void * message);
+bool SystemUtility_SendMQueueMessage(system_mqueue_t * mqueue, void * message);
 
 /**
  * @brief  Receive message from queue
@@ -227,6 +241,6 @@ bool SystemUtility_SendMQueueMessage(const char * queue_name, void * message);
  * @param  message: message received with queue
  * @retval true if successful received message, otherwise false
  */
-bool SystemUtility_ReceiveMQueueMessage(const char * queue_name, void * message);
+bool SystemUtility_ReceiveMQueueMessage(system_mqueue_t * mqueue, void * message);
 
 #endif  /* SYSTEM_UTILITY_H */
