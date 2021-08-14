@@ -140,11 +140,6 @@ static void * gui_ReceiveMessageThread(void *cookie)
                     DEBUG_LOG_WARN("[GUI] gui_ReceiveMessageThread, unknown message type!");
                 break;
             }
-
-            // for (int i = 0; i < float_data_len; i++)
-            // {
-            //     DEBUG_LOG_VERBOSE("[GUI] gui_ReceiveMessageThread, float[%d]: %f", i, float_data[i]);
-            // }
         }
     }
 

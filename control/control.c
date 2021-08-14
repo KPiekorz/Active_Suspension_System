@@ -174,11 +174,6 @@ static void *control_ReceiveMessageThread(void *cookie)
                 default:
                 break;
             }
-
-            // for (int i = 0; i < float_data_len; i++)
-            // {
-            //     DEBUG_LOG_VERBOSE("[CONTROL] control_ReceiveMessageThread, float[%d]: %f", i, float_data[i]);
-            // }
         }
     }
 

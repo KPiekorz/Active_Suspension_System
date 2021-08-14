@@ -353,7 +353,7 @@ bool SystemUtility_SendMQueueMessage(const system_mqueue_t * mqueue, void * mess
 
     mqd_t myMQueue;
      /* Create Message Queue */
-	if ((myMQueue = mq_open(mqueue->queue_name, O_CREAT | O_RDWR, 0644, &(mqueue->myMQueueAttr))) == -1)
+	if ((myMQueue = mq_open(mqueue->queue_name, O_CREAT | O_RDWR, 0644, mqueue->myMQueueAttr)) == -1)
     {
 		DEBUG_LOG_ERROR("[SYSTEM] SystemUtility_SendMQueueMessage, Creation of the mqueues failed!");
 		return false;
@@ -376,7 +376,7 @@ bool SystemUtility_ReceiveMQueueMessage(const system_mqueue_t * mqueue, void * m
 
     mqd_t myMQueue;
      /* Create Message Queue */
-	if ((myMQueue = mq_open(mqueue->queue_name, O_CREAT | O_RDWR, 0644, &(mqueue->myMQueueAttr))) == -1)
+	if ((myMQueue = mq_open(mqueue->queue_name, O_CREAT | O_RDWR, 0644, mqueue->myMQueueAttr)) == -1)
     {
 		DEBUG_LOG_ERROR("[SYSTEM] SystemUtility_ReceiveMQueueMessage, Creation of the mqueues failed!");
 		return false;
@@ -387,4 +387,9 @@ bool SystemUtility_ReceiveMQueueMessage(const system_mqueue_t * mqueue, void * m
     mq_close(myMQueue);
 
     return true;
+}
+
+void SystemUtility_RemoveMQueue(const system_mqueue_t * mqueue)
+{
+    mq_unlink(mqueue->queue_name);
 }

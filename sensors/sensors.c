@@ -26,7 +26,7 @@ static void *sensors_ReceiveMessageThread(void *cookie)
 	{
 		if (SystemUtility_ReceiveMQueueMessage(GetSensorMQueue(), &message, sizeof(message)))
 		{
-			DEBUG_LOG_DEBUG("SENSOR MSG: %f", message.state_X1);
+			DEBUG_LOG_DEBUG("SENSOR MSG: %f, %f, %f, %f", message.state_X1, message.state_X1_dot, message.state_Y1, message.state_Y1_dot);
 		}
 		else
 		{
@@ -42,6 +42,9 @@ static void *sensors_ReceiveMessageThread(void *cookie)
 void Sensor_Init(void)
 {
 #ifdef INIT_SENSORS
+
+	/* remove sensor message queeu */
+	SystemUtility_RemoveMQueue(GetSensorMQueue());
 
     /* Init receive message */
 	if (!SystemUtility_CreateThread(sensors_ReceiveMessageThread))

@@ -226,4 +226,12 @@ bool SystemUtility_SendMQueueMessage(const system_mqueue_t * mqueue, void * mess
  */
 bool SystemUtility_ReceiveMQueueMessage(const system_mqueue_t * mqueue, void * message, size_t message_size);
 
+/**
+ * @brief  Remove mqueue
+ * @note
+ * @param  mqueue: mqueue
+ * @retval None
+ */
+void SystemUtility_RemoveMQueue(const system_mqueue_t * mqueue);
+
 #endif  /* SYSTEM_UTILITY_H */

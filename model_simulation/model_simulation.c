@@ -377,6 +377,9 @@ static void modelSimluation_SendModelStates(Mat *x, float road, int iteration)
         /* send mqueue messages */
         sensor_mqueue_message_t sensor_message;
         sensor_message.state_X1 = get(x, 1, 1);
+        sensor_message.state_X1_dot = get(x, 2, 1);
+        sensor_message.state_Y1 = get(x, 3, 1);
+        sensor_message.state_Y1_dot = get(x, 4, 1);
         Sensor_SendMQueueMessage(&sensor_message, sizeof(sensor_message));
     }
     else
@@ -544,11 +547,6 @@ static void *modelSimluation_ReceiveMessageThread(void *cookie)
                 default:
                 break;
             }
-
-            // for (int i = 0; i < float_data_len; i++)
-            // {
-            //     DEBUG_LOG_VERBOSE("[SIM] modelSimluation_ReceiveMessageThread, float[%d]: %f", i, float_data[i]);
-            // }
         }
     }
 

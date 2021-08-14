@@ -10,6 +10,10 @@
 typedef struct
 {
 	float state_X1;
+	float state_X1_dot;
+	float state_Y1;
+	float state_Y1_dot;
+
 } sensor_mqueue_message_t;
 
 /**
