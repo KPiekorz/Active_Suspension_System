@@ -37,7 +37,7 @@ system_timer_t simulation_timer;
 
 /*** MODEL_SIMULATION_INTERVAL_STEP ***/
 
-#define MODEL_SIMULATION_STEP_INTERVAL_MS       (5)
+#define MODEL_SIMULATION_STEP_INTERVAL_MS       (10)
 
 /*** MODEL SIMULATION MESSAGE FIFO ***/
 
@@ -536,8 +536,6 @@ static void *modelSimluation_ReceiveMessageThread(void *cookie)
                             #ifdef PID_CONTROLLER
                                 force = float_data[0];
                             #endif /* PID_CONTROLLER */
-
-                            // DEBUG_LOG_DEBUG("[SIM] FORCE: %f", force);
 
                         #endif /* INCLUDE_CONTROLER */
                     }
