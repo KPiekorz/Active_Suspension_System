@@ -45,7 +45,7 @@ static void systemProcess_KillAllSystemProcess(void)
 {
     for (int i = 0; i < GetProcessCount(); i++)
     {
-        DEBUG_LOG_DEBUG("systemProcess_KillAllSystemProcess, process name: %s, pid: %d", system_process_attributes[i].process_name, system_process_attributes[i].process_pid);
+        DEBUG_LOG_INFO("systemProcess_KillAllSystemProcess, process name: %s, pid: %d", system_process_attributes[i].process_name, system_process_attributes[i].process_pid);
         kill(system_process_attributes[i].process_pid, SIGKILL);
         system_process_attributes[i].process_pid = UNKNOWN_PID;
     }
@@ -55,7 +55,7 @@ static void systemProcess_PrintAllProcessPid(void)
 {
     for (int i = 0; i < GetProcessCount(); i++)
     {
-        DEBUG_LOG_DEBUG("Process %s, pid: %d", system_process_attributes[i].process_name,
+        DEBUG_LOG_INFO("Process %s, pid: %d", system_process_attributes[i].process_name,
                                                system_process_attributes[i].process_pid);
     }
 }
@@ -64,7 +64,7 @@ static void systemProcess_PrintAllProcessPid(void)
 
 void SystemProcess_Initialize(void)
 {
-    DEBUG_LOG_DEBUG("SystemProcess_Initialize");
+    DEBUG_LOG_INFO("SystemProcess_Initialize");
 
     for (int i = 0; i < GetProcessCount(); i++)
     {
@@ -90,7 +90,7 @@ void SystemProcess_Initialize(void)
 
 void SystemProcess_Destroy(void)
 {
-    DEBUG_LOG_DEBUG("SystemProcess_Destroy");
+    DEBUG_LOG_INFO("SystemProcess_Destroy");
 
     for (int i = 0; i < GetProcessCount(); i++)
     {
