@@ -67,6 +67,9 @@ void Sensor_Init(void)
 void Sensor_Destroy(void)
 {
 
+	DEBUG_LOG_INFO("SENSOR CLOSED!");
+
+	SystemUtility_RemoveMQueue(GetSensorMQueue());
 }
 
 void Sensor_SendMQueueMessage(sensor_mqueue_message_t * message,  size_t message_size)

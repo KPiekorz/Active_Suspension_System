@@ -592,7 +592,7 @@ void ModelSimulation_Init(void)
 
 void ModelSimulation_Destroy(void)
 {
-
+    remove(simulation_fifo_name);
 }
 
 void ModelSimulation_SendMessage(model_simulation_message_type_t message_type, float * data, int data_len)

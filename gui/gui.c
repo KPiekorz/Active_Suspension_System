@@ -31,6 +31,10 @@ int udp_byte_data_size;
 
 const char *gui_fifo_name = "gui_fifo";
 
+/*** socket for udp gui communication */
+
+static int my_socket_global = INVALID_SOCKET;
+
 /*** STATIC FUNTION ***/
 
 static bool gui_UdpClientCreate(int * my_socket)
@@ -151,8 +155,7 @@ static void * gui_UdpClientThread(void *cookie)
     /* init thread with good priority */
     SystemUtility_InitThread(pthread_self(), thread_priority_medium);
 
-    int my_socket = INVALID_SOCKET;
-    if (false == gui_UdpClientCreate(&my_socket))
+    if (false == gui_UdpClientCreate(&my_socket_global))
     {
         return 0;
     }
@@ -166,9 +169,9 @@ static void * gui_UdpClientThread(void *cookie)
 
         if (udp_byte_data_size > 0)
         {
-            if (false == gui_UdpClientSendData(my_socket, upd_byte_data, udp_byte_data_size))
+            if (false == gui_UdpClientSendData(my_socket_global, upd_byte_data, udp_byte_data_size))
             {
-                DEBUG_LOG_ERROR("[GUI] gui_UdpClientThread, can't send udp data, data len: %d, socket id: %d", data_len, my_socket);
+                DEBUG_LOG_ERROR("[GUI] gui_UdpClientThread, can't send udp data, data len: %d, socket id: %d", data_len, my_socket_global);
             }
         }
 
@@ -181,7 +184,7 @@ static void * gui_UdpClientThread(void *cookie)
         DELAY_MS(10);
     }
 
-    gui_UdpClientDestroy(my_socket);
+    gui_UdpClientDestroy(my_socket_global);
 
     return 0;
 }
@@ -223,7 +226,8 @@ void Gui_Init(void)
 
 void Gui_Destroy(void)
 {
-
+    remove(gui_fifo_name);
+    gui_UdpClientDestroy(my_socket_global);
 }
 
 void Gui_SendMessage(gui_message_type_t message_type, float * data, int data_len)

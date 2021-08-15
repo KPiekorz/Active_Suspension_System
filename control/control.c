@@ -205,7 +205,7 @@ void Control_Init(void)
 
 void Control_Destroy(void)
 {
-
+    remove(control_fifo_name);
 }
 
 void Control_SendMessage(control_message_type_t message_type, float *data, int data_len)
