@@ -52,8 +52,12 @@ int main(int argc, char *argv[])
     sigset_t mask;
 	SignalsHandler_InitSignalMask(&mask);
 
-	/* register sigint signal */
 	if (!SignalsHandler_RegisterSignalHandler(SIGINT, main_ExitHandler))
+	{
+		DEBUG_LOG_ERROR("[MAIN] main, Can't register SIGINT signal!");
+	}
+
+	if (!SignalsHandler_RegisterSignalHandler(SIGTSTP, main_ExitHandler))
 	{
 		DEBUG_LOG_ERROR("[MAIN] main, Can't register SIGINT signal!");
 	}
