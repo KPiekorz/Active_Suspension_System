@@ -95,7 +95,7 @@ class GUI(QtWidgets.QMainWindow):
         toolbar_model = NavigationToolbar(self.plot_model_state, self)
 
         # create kpi push button
-        kpi_button = QtWidgets.QPushButton("Calculate KPI from Y state");
+        kpi_button = QtWidgets.QPushButton("Calculate KPI from model state");
         kpi_button.clicked.connect(self.calculate_kpi)
 
         # kpi label - value
