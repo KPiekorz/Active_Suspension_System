@@ -2,8 +2,9 @@
 #define SIGNALS_HANDLER_H
 
 #include <signal.h>
+#include <stdbool.h>
 
-void SignalsHandler_RegisterSignalHandler(int signal, __sighandler_t handler);
+bool SignalsHandler_RegisterSignalHandler(int signal, __sighandler_t handler);
 
 void SignalsHandler_InitSignalMask(sigset_t * mask);
 
