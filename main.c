@@ -12,6 +12,7 @@
 #include "model_simulation.h"
 #include "system_utility.h"
 #include "system_process.h"
+#include "signals_handler.h"
 
 #include "gui.h"
 

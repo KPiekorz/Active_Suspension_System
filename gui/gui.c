@@ -83,8 +83,8 @@ static void gui_RunGui(void)
     Py_Initialize();
 
     errno = 0;
-    system("chmod +x ./gui/gui_plot.py");
-    FILE *PScriptFile = fopen("./gui/gui_plot.py", "r");
+    system("chmod +x ./../gui/gui_plot.py");
+    FILE *PScriptFile = fopen("./../gui/gui_plot.py", "r");
 
     if (PScriptFile == NULL)
     {

@@ -30,7 +30,7 @@ static void *sensors_ReceiveMessageThread(void *cookie)
 	{
 		if (SystemUtility_ReceiveMQueueMessage(GetSensorMQueue(), &message, sizeof(message)))
 		{
-			DEBUG_LOG_DEBUG("SENSOR MSG: %f, %f, %f, %f", message.state_X1, message.state_X1_dot, message.state_Y1, message.state_Y1_dot);
+			// DEBUG_LOG_DEBUG("SENSOR MSG: %f, %f, %f, %f", message.state_X1, message.state_X1_dot, message.state_Y1, message.state_Y1_dot);
 		}
 		else
 		{
