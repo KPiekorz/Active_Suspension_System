@@ -1,7 +1,3 @@
-#ifndef _POSIX_C_SOURCE
-#define _POSIX_C_SOURCE 200112L /* Or higher */
-#endif
-
 #include <stdio.h>
 #include <pthread.h>
 #include <stdlib.h>

@@ -1,6 +1,18 @@
 #ifndef SYSTEM_UTILITY_H
 #define SYSTEM_UTILITY_H
 
+#ifndef _POSIX_C_SOURCE
+#define _POSIX_C_SOURCE 200112L /* Or higher */
+#endif
+
+#ifndef _XOPEN_SOURCE
+#define _XOPEN_SOURCE 500
+#endif
+
+#ifndef __USE_XOPEN2K
+#define __USE_XOPEN2K
+#endif
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>

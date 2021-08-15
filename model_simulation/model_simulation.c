@@ -1,3 +1,10 @@
+#include "system_utility.h"
+#include "model_simulation.h"
+#include "gui.h"
+#include "control.h"
+#include "sensors.h"
+#include "matrix_lib.h"
+
 #include <pthread.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -7,13 +14,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <signal.h>
-
-#include "system_utility.h"
-#include "model_simulation.h"
-#include "gui.h"
-#include "control.h"
-#include "sensors.h"
-#include "matrix_lib.h"
+#include <pthread.h>
 
 typedef enum
 {
@@ -345,6 +346,9 @@ static void modelSimluation_InitMatrixXK_1(void)
     XK_1_matrix[4][0] = 0;
 }
 
+pthread_rwlock_t xk_1_matrix_lock; // rw_lock for secure z(k_1) matrix read and write
+#define GetXK_1rwlock() (&xk_1_matrix_lock)
+
 /*** INPUT MATRIX ***/
 
 #define INPUT_ROW_SIZE 2
@@ -408,8 +412,10 @@ static void modelSimluation_SimulionStart(void)
 
 static void modelSimluation_SimulationEnd(void)
 {
+    pthread_rwlock_rdlock(GetXK_1rwlock());
     /* send states to control and gui process (Xd and Yd) */
     modelSimluation_SendModelStates(GetXK_1_STATES(), road[SIM_TIME-1], (int)SIM_TIME-1);
+    pthread_rwlock_unlock(GetXK_1rwlock());
 
     /* set simulation iteration variable to 0 */
     simulation_iteration = 0;
@@ -447,11 +453,14 @@ static void *modelSimluation_SimulationStepThread(void *cookie)
             Mat *b_i = multiply(GetB(), INPUT);
 
             Mat *xk = sum(a_x, b_i);
+
+            pthread_rwlock_wrlock(GetXK_1rwlock());
             set(GetXK_1_STATES(), 1, 1, get(xk, 1, 1));
             set(GetXK_1_STATES(), 2, 1, get(xk, 2, 1));
             set(GetXK_1_STATES(), 3, 1, get(xk, 3, 1));
             set(GetXK_1_STATES(), 4, 1, get(xk, 4, 1));
             set(GetXK_1_STATES(), 5, 1, get(xk, 5, 1));
+            pthread_rwlock_unlock(GetXK_1rwlock());
 
             freemat(INPUT);
             freemat(a_x);
@@ -469,19 +478,25 @@ static void *modelSimluation_SimulationStepThread(void *cookie)
 
             pthread_mutex_unlock(GetForceMutex());
 
+            pthread_rwlock_rdlock(GetXK_1rwlock());
             // send states to control and gui process (Xd and Yd)
             modelSimluation_SendModelStates(GetXK_1_STATES(), road[simulation_iteration], simulation_iteration);
 
             // calculate x
             Mat *a_x = multiply(GetA(), GetXK_1_STATES());
             Mat *b_i = multiply(GetB(), INPUT);
+            pthread_rwlock_unlock(GetXK_1rwlock());
+
 
             Mat *xk = sum(a_x, b_i);
+
+            pthread_rwlock_wrlock(GetXK_1rwlock());
             set(GetXK_1_STATES(), 1, 1, get(xk, 1, 1));
             set(GetXK_1_STATES(), 2, 1, get(xk, 2, 1));
             set(GetXK_1_STATES(), 3, 1, get(xk, 3, 1));
             set(GetXK_1_STATES(), 4, 1, get(xk, 4, 1));
             set(GetXK_1_STATES(), 5, 1, get(xk, 5, 1));
+            pthread_rwlock_unlock(GetXK_1rwlock());
 
             freemat(INPUT);
             freemat(a_x);
