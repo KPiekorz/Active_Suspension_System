@@ -1,3 +1,8 @@
+
+#[[
+    All that cmake have to be refactored.
+]]
+
 cmake_minimum_required(VERSION 3.0.0)
 project(automatic_suspension_system VERSION 0.0.0)
 project(automatic_suspension_system C)
